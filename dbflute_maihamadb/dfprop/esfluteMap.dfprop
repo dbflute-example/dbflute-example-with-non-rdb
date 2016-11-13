@@ -1,0 +1,39 @@
+# /---------------------------------------------------------------------------
+# esfluteMap: (NotRequired - Default map:{})
+#
+# Specification:
+# map:{
+#     ; basePackage = [your base package]
+#     ; basePath = [base path, URL or relative path]
+#     ; indexMap = map:{
+#         ; [index name] = map:{
+#             ; package = [package name for index]
+#             ; esclientDiFile = [e.g. Di xml for elasticsearch client]
+#             ; esfluteDiFile = [e.g. Di xml for esflute classes]
+#         }
+#     }
+#     ; elasticsearchVersion = [e.g. 2.0]
+# }
+#
+# *The line that starts with '#' means comment-out.
+#
+map:{
+    # base package of generated classes
+    ; basePackage = org.docksidestage.esflute
+
+    # base path to JSON resource, URL or relative path
+    ; basePath = ./playes/index
+
+    # settings for indexes
+    ; indexMap = map:{
+        ; maihama = map:{
+            ; package = maihama
+            #; esclientDiFile = elasticsearch_client.xml
+            #; esfluteDiFile = esflute_maihama.xml
+        }
+    }
+
+    # version for elasticsearch's jar file (no version means latest)
+    ; elasticsearchVersion = 2.3.0
+}
+# ----------------/

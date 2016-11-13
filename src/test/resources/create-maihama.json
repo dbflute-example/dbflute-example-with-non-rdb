@@ -1,0 +1,95 @@
+{
+    "mappings" : {
+      "product" : {
+        "_all" : {
+          "enabled" : false
+        },
+        "properties" : {
+          "latest_purchase_date" : {
+            "type" : "date",
+            "format" : "date_optional_time"
+          },
+          "product_category" : {
+            "type" : "string",
+            "index" : "not_analyzed"
+          },
+          "product_category_code" : {
+            "type" : "string",
+            "index" : "not_analyzed"
+          },
+          "product_description" : {
+            "type" : "string",
+            "analyzer" : "standard"
+          },
+          "product_handle_code" : {
+            "type" : "string",
+            "index" : "not_analyzed"
+          },
+          "product_name" : {
+            "type" : "string",
+            "analyzer" : "standard",
+            "fields" : {
+              "raw" : {
+                "type" : "string",
+                "index" : "not_analyzed"
+              }
+            }
+          },
+          "product_status" : {
+            "type" : "string",
+            "index" : "not_analyzed"
+          },
+          "product_status_code" : {
+            "type" : "string",
+            "index" : "not_analyzed"
+          },
+          "register_datetime" : {
+            "type" : "date",
+            "format" : "date_optional_time"
+          },
+          "register_user" : {
+            "type" : "string",
+            "index" : "not_analyzed"
+          },
+          "regular_price" : {
+            "type" : "integer"
+          },
+          "update_datetime" : {
+            "type" : "date",
+            "format" : "date_optional_time"
+          },
+          "update_user" : {
+            "type" : "string",
+            "index" : "not_analyzed"
+          }
+        }
+      },
+      "menber" : {
+        "_all" : {
+          "enabled" : false
+        },
+        "properties" : {
+          "account" : {
+            "type" : "string",
+            "index" : "not_analyzed"
+          },
+          "name" : {
+            "type" : "string",
+            "analyzer" : "standard",
+            "fields" : {
+              "raw" : {
+                "type" : "string",
+                "index" : "not_analyzed"
+              }
+            }
+          }
+        }
+      }
+    },
+    "settings" : {
+      "index" : {
+        "number_of_shards" : "5",
+        "number_of_replicas" : "0"
+      }
+    }
+}
