@@ -6,8 +6,16 @@ LastaFlute:
 https://github.com/dbflute-example/dbflute-example-with-non-rdb
 
 # Generators for Non RDBs
-*ESFlute for Elasticsearch
-
+## ESFlute for Elasticsearch
+```java
+PagingResultBean<Product> productPage = productBhv.selectPage(cb -> {
+    cb.query().setProductName_MatchPhrase(form.productName);
+    cb.query().setProductStatusCode_Equal(form.productStatus);
+    cb.query().addOrderBy_ProductName_Asc();
+    cb.query().addOrderBy_Id_Asc();
+    cb.paging(4, pageNumber);
+});
+```
 contributed by CodeLibs Project: https://github.com/codelibs
 
 # Quick Trial
