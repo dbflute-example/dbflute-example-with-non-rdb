@@ -1,0 +1,261 @@
+##
+## Copyright 2014-2016 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+$manager.info("requestList: ${requestList.size()}")
+#set ($genKvsCore = false)
+
+#foreach ($request in $requestList)
+#set ($tableMap = $request.tableMap)
+$request.enableOutputDirectory()
+$manager.makeDirectory($request.generateDirPath)
+
+#if ($request.isResourceTypeSolr() && ($manager.isTargetContainerSeasar() || $manager.isTargetContainerLastaDi() || $tableMap.targetContainer))
+  #if (!$genKvsCore)
+    #set ($genKvsCore = true)
+
+    #set ($path = "org/dbflute/solr/bhv/AbstractSolrBehavior.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/bhv/AbstractSolrBehavior.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/cbean/AbstractSolrConditionBean.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/cbean/AbstractSolrConditionBean.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/cbean/AbstractSolrFilterQueryBean.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/cbean/AbstractSolrFilterQueryBean.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/cbean/AbstractSolrQueryBean.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/cbean/AbstractSolrQueryBean.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/cbean/AbstractSolrSpecification.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/cbean/AbstractSolrSpecification.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/cbean/SolrCBCall.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/cbean/SolrCBCall.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/cbean/SolrConditionBean.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/cbean/SolrConditionBean.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/cbean/SolrFilterQueryBean.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/cbean/SolrFilterQueryBean.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/cbean/SolrFQBCall.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/cbean/SolrFQBCall.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/cbean/SolrQBCall.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/cbean/SolrQBCall.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/cbean/SolrQFCall.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/cbean/SolrQFCall.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/cbean/SolrQueryBean.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/cbean/SolrQueryBean.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/cbean/SolrQueryBuilder.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/cbean/SolrQueryBuilder.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/cbean/SolrQueryLogicalOperator.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/cbean/SolrQueryLogicalOperator.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/cbean/SolrSetRangeSearchBean.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/cbean/SolrSetRangeSearchBean.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/cbean/SolrSpecification.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/cbean/SolrSpecification.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/entity/AbstractSolrEntity.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/entity/AbstractSolrEntity.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/entity/AbstractSolrIndexEntity.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/entity/AbstractSolrIndexEntity.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/entity/dbmeta/SolrDBMeta.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/entity/dbmeta/SolrDBMeta.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/entity/SolrEntity.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/entity/SolrEntity.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/exception/SolrException.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/exception/SolrException.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/result/SolrFacetResultBean.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/result/SolrFacetResultBean.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/result/SolrPagingResultBean.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/result/SolrPagingResultBean.vm", $path, "", "")
+
+    #set ($path = "org/dbflute/solr/result/SolrResultBean.java")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/solr/result/SolrResultBean.vm", $path, "", "")
+  #end
+
+  ## Meta
+  #set ($path = "${request.generateDirPath}/bsentity/meta/Solr${tableMap.schema}Dbm.java")
+  $manager.makeDirectory($path)
+  $request.info("parse('${path}')")
+  $generator.parse("./solr/SolrDBMeta.vm", $path, "", "")
+
+  ## Condition Bean
+  #set ($path = "${request.generateDirPath}/cbean/bs/SolrBs${tableMap.schema}CB.java")
+  $manager.makeDirectory($path)
+  $request.info("parse('${path}')")
+  $generator.parse("./solr/SolrBsConditionBean.vm", $path, "", "")
+
+  #set ($path = "${request.generateDirPath}/cbean/Solr${tableMap.schema}CB.java")
+  $manager.makeDirectory($path)
+  $request.info("parse('${path}')")
+  #if (!$files.file(${generator.outputPath},$path).exists())
+    $generator.parse("./solr/SolrExConditionBean.vm", $path, "", "")
+  #end
+
+  ## Entity
+  #set ($path = "${request.generateDirPath}/bsentity/SolrBs${tableMap.schema}.java")
+  $manager.makeDirectory($path)
+  $request.info("parse('${path}')")
+  $generator.parse("./solr/SolrBsEntity.vm", $path, "", "")
+
+  #set ($path = "${request.generateDirPath}/exentity/Solr${tableMap.schema}.java")
+  $manager.makeDirectory($path)
+  $request.info("parse('${path}')")
+  #if (!$files.file(${generator.outputPath},$path).exists())
+    $generator.parse("./solr/SolrExEntity.vm", $path, "", "")
+  #end
+
+  ## Query Bean
+  #set ($path = "${request.generateDirPath}/cbean/cq/bs/SolrBs${tableMap.schema}CQ.java")
+  $manager.makeDirectory($path)
+  $request.info("parse('${path}')")
+  $generator.parse("./solr/SolrBsQueryBean.vm", $path, "", "")
+
+  #set ($path = "${request.generateDirPath}/cbean/cq/Solr${tableMap.schema}CQ.java")
+  $manager.makeDirectory($path)
+  $request.info("parse('${path}')")
+  #if (!$files.file(${generator.outputPath},$path).exists())
+    $generator.parse("./solr/SolrExQueryBean.vm", $path, "", "")
+  #end
+
+  ## Filter Query Bean
+  #set ($path = "${request.generateDirPath}/cbean/cfq/bs/SolrBs${tableMap.schema}CFQ.java")
+  $manager.makeDirectory($path)
+  $request.info("parse('${path}')")
+  $generator.parse("./solr/SolrBsFilterQueryBean.vm", $path, "", "")
+
+  #set ($path = "${request.generateDirPath}/cbean/cfq/Solr${tableMap.schema}CFQ.java")
+  $manager.makeDirectory($path)
+  $request.info("parse('${path}')")
+  #if (!$files.file(${generator.outputPath},$path).exists())
+    $generator.parse("./solr/SolrExFilterQueryBean.vm", $path, "", "")
+  #end
+
+  ## Behavior
+  #set ($path = "${request.generateDirPath}/bsbhv/SolrBs${tableMap.schema}Bhv.java")
+  $manager.makeDirectory($path)
+  $request.info("parse('${path}')")
+  $generator.parse("./solr/SolrBsBehavior.vm", $path, "", "")
+
+  #set ($path = "${request.generateDirPath}/exbhv/Solr${tableMap.schema}Bhv.java")
+  $manager.makeDirectory($path)
+  $request.info("parse('${path}')")
+  #if (!$files.file(${generator.outputPath},$path).exists())
+    $generator.parse("./solr/SolrExBehavior.vm", $path, "", "")
+  #end
+
+  ## Index Entity
+  #set ($path = "${request.generateDirPath}/bsentity/index/SolrBs${tableMap.schema}Index.java")
+  $manager.makeDirectory($path)
+  $request.info("parse('${path}')")
+  $generator.parse("./solr/SolrBsIndexEntity.vm", $path, "", "")
+
+  #set ($path = "${request.generateDirPath}/exentity/index/Solr${tableMap.schema}Index.java")
+  $manager.makeDirectory($path)
+  $request.info("parse('${path}')")
+  #if (!$files.file(${generator.outputPath},$path).exists())
+    $generator.parse("./solr/SolrExIndexEntity.vm", $path, "", "")
+  #end
+
+  #if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+    #set ($path = "../resources/solr/di/solr-${manager.initUncap($tableMap.schema)}.dicon")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/container/seasar/SolrDicon.vm", $path, "", "")
+  #end
+  #if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+    #set ($path = "../resources/solr/di/solr-${manager.initUncap($tableMap.schema)}.xml")
+    $manager.makeDirectory($path)
+    $request.info("parse('${path}')")
+    $generator.parse("./solr/allcommon/container/lastadi/SolrDiXml.vm", $path, "", "")
+  #end
+#end
+#end
+
+#if ($genKvsCore)
+    #if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+      #set ($path = "../resources/solr/di/solr-all.dicon")
+      $manager.makeDirectory($path)
+      $request.info("parse('${path}')")
+      $generator.parse("./solr/allcommon/container/seasar/SolrAllDicon.vm", $path, "", "")
+    #end
+    #if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+      #set ($path = "../resources/solr/di/solr-all.xml")
+      $manager.makeDirectory($path)
+      $request.info("parse('${path}')")
+      $generator.parse("./solr/allcommon/container/lastadi/SolrAllDiXml.vm", $path, "", "")
+    #end
+#end

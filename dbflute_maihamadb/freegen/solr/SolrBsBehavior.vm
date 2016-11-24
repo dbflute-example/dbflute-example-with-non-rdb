@@ -1,0 +1,92 @@
+##
+## Copyright 2014-2016 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${manager.allClassCopyright}package ${request.package}.bsbhv;
+
+#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+import javax.annotation.PostConstruct;
+#end
+#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+import org.dbflute.saflute.core.util.ContainerUtil;
+#end
+import org.dbflute.solr.bhv.AbstractSolrBehavior;
+#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+import org.lastaflute.core.util.ContainerUtil;
+#end
+#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+import org.seasar.framework.container.annotation.tiger.InitMethod;
+#end
+
+import ${request.package}.cbean.Solr${tableMap.schema}CB;
+import ${request.package}.exentity.Solr${tableMap.schema};
+import ${request.package}.exentity.index.Solr${tableMap.schema}Index;
+
+/**
+ * Base Behavior class of Solr schema "${tableMap.schema}."
+ * @author FreeGen
+ */
+public abstract class SolrBs${tableMap.schema}Bhv extends AbstractSolrBehavior<Solr${tableMap.schema}, Solr${tableMap.schema}Index, Solr${tableMap.schema}CB> {
+
+#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+    @PostConstruct
+#end
+#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+    @InitMethod
+#end
+    public void init() {
+        ${tableMap.configClass} config = getConfig();
+        masterSolrClient = createHttpSolrClient(config.getSolr${manager.initCap($tableMap.schema)}Url());
+        slaveSolrClient = createHttpSolrClient(config.getSolr${manager.initCap($tableMap.schema)}Url());
+    }
+
+    @Override
+    public Solr${tableMap.schema}CB newConditionBean() {
+        return new Solr${tableMap.schema}CB();
+    }
+
+    @Override
+    public Class<Solr${tableMap.schema}> getEntityClass() {
+        return Solr${tableMap.schema}.class;
+    }
+
+    @Override
+    public int getConnectionTimeout() {
+        return getConfig().getSolrConnectionTimeoutAsInteger();
+    }
+
+    @Override
+    public int getSocketTimeout() {
+        return getConfig().getSolrSocketTimeoutAsInteger();
+    }
+
+    @Override
+    public int getDefaultMaxConnectionsPerHost() {
+        return getConfig().getSolrDefaultMaxConnectionsPerHostAsInteger();
+    }
+
+    @Override
+    public int getMaxTotalConnections() {
+        return getConfig().getSolrMaxTotalConnectionsAsInteger();
+    }
+
+    @Override
+    public int getAliveCheckInterval() {
+        return getConfig().getSolrAliveCheckIntervalAsInteger();
+    }
+
+    protected ${tableMap.configClass} getConfig() {
+        return ContainerUtil.getComponent(${tableMap.configClass}.class);
+    }
+}

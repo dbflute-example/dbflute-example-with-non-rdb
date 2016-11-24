@@ -1,0 +1,369 @@
+##
+## Copyright 2014-2016 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${manager.allClassCopyright}package ${request.package}.cbean.cfq.bs;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Collection;
+
+import org.dbflute.util.DfStringUtil;
+
+import org.dbflute.solr.cbean.AbstractSolrFilterQueryBean;
+import org.dbflute.solr.cbean.SolrFQBCall;
+import org.dbflute.solr.cbean.SolrQueryBuilder;
+import org.dbflute.solr.cbean.SolrQueryLogicalOperator;
+import org.dbflute.solr.cbean.SolrSetRangeSearchBean;
+
+import ${request.package}.cbean.cfq.Solr${tableMap.schema}CFQ;
+
+/**
+ * Base FilterQuery class of Solr schema "${tableMap.schema}."
+ * @author FreeGen
+ */
+public class SolrBs${tableMap.schema}CFQ extends AbstractSolrFilterQueryBean {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+#foreach ($column in $request.columnList)
+#if($column.indexed == true)
+    /** Query Attribute for ${column.name} (${column.nativeType}) */
+    protected String ${column.uncapCamelName}Query;
+
+#end
+#end
+    // ===================================================================================
+    //                                                                          Conditions
+    //                                                                          ==========
+#foreach ($column in $request.columnList)
+#if($column.indexed == true)
+    // ===========================================================
+    // Query Setter for ${column.name} (${column.nativeType})
+    //                                                  ==========
+    /**
+     * ExistsQuery( q=${column.name}:* )
+     */
+    public void set${column.capCamelName}_Exists() {
+        this.${column.uncapCamelName}Query = SolrQueryBuilder.queryBuilderForExists("${column.name}");
+    }
+
+    /**
+     * ExistsQuery( q=NOT ${column.name}:* )
+     */
+    public void set${column.capCamelName}_NotExists() {
+        this.${column.uncapCamelName}Query = SolrQueryBuilder.wrapNotGroupQuery(SolrQueryBuilder.queryBuilderForExists("${column.name}"), false);
+    }
+
+    /**
+     * ExistsQuery( q=(query OR (NOT ${column.name}:*)) )
+     */
+    public void add${column.capCamelName}_NotExists() {
+        SolrQueryBuilder.assertNotNullQuery("${column.name}", this.${column.uncapCamelName}Query);
+        this.${column.uncapCamelName}Query = SolrQueryBuilder.wrapGroupQuery(SolrQueryBuilder.concatEachCondition(Arrays.asList(this.${column.uncapCamelName}Query, SolrQueryBuilder.wrapNotGroupQuery(SolrQueryBuilder.queryBuilderForExists("${column.name}"), true)), SolrQueryLogicalOperator.OR));
+    }
+
+    public void set${column.capCamelName}_Equal(${column.type.replace("[]", "")} query) {
+#if(${column.type.replace("[]", "")} == "String")
+        if (DfStringUtil.is_NotNull_and_NotEmpty(query)) {
+#else
+        if (query != null) {
+#end
+            this.${column.uncapCamelName}Query = SolrQueryBuilder.queryBuilderForEqual("${column.name}", query.toString());
+        }
+    }
+
+    public void set${column.capCamelName}_NotEqual(${column.type.replace("[]", "")} query) {
+#if(${column.type.replace("[]", "")} == "String")
+        if (DfStringUtil.is_NotNull_and_NotEmpty(query)) {
+#else
+        if (query != null) {
+#end
+            this.${column.uncapCamelName}Query = SolrQueryBuilder.wrapNotGroupQuery(SolrQueryBuilder.queryBuilderForEqual("${column.name}", query.toString()), false);
+        }
+    }
+
+#if($column.nativeType == "string")
+    public void set${column.capCamelName}_InScope(Collection<String> queryList) {
+        this.set${column.capCamelName}_InScope(queryList, SolrQueryLogicalOperator.OR);
+    }
+
+    public void set${column.capCamelName}_InScope(Collection<String> queryList, SolrQueryLogicalOperator operator) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchWordList("${column.name}", queryList, operator);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+    public void set${column.capCamelName}_NotInScope(Collection<String> queryList) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchWordList("${column.name}", queryList, SolrQueryLogicalOperator.NOT);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+    public void set${column.capCamelName}_PrefixSearch(String query) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForPrefixSearch("${column.name}", query);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+    public void set${column.capCamelName}_RangeSearchFrom(String from) {
+        if (DfStringUtil.is_NotNull_and_NotEmpty(from)) {
+            set${column.capCamelName}_RangeSearch(from, null);
+        }
+    }
+
+    public void set${column.capCamelName}_RangeSearchTo(String to) {
+        if (DfStringUtil.is_NotNull_and_NotEmpty(to)) {
+            set${column.capCamelName}_RangeSearch(null, to);
+        }
+    }
+
+    public void set${column.capCamelName}_RangeSearch(String from, String to) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForRangeSearch("${column.name}", from, to);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+    public void set${column.capCamelName}_SetRangeSearch(String cd, String from, String to) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSetRangeSearch("${column.name}", cd, from, to, SET_RANGE_SEARCH_PADDING_LENGTH, PADDING_STR);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+    public void set${column.capCamelName}_SetRangeSearchInScope(Collection<SolrSetRangeSearchBean> beanList) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSetRangeSearchInScope("${column.name}", beanList, SET_RANGE_SEARCH_PADDING_LENGTH, PADDING_STR);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+#elseif($column.nativeType == "tlong" || $column.nativeType == "long")
+    public void set${column.capCamelName}_InScope(Collection<${column.type}> queryList) {
+        this.set${column.capCamelName}_InScope(queryList, SolrQueryLogicalOperator.OR);
+    }
+
+    public void set${column.capCamelName}_InScope(Collection<${column.type}> queryList, SolrQueryLogicalOperator operator) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchLongList("${column.name}", queryList, operator);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+    public void set${column.capCamelName}_NotInScope(Collection<${column.type}> queryList) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchLongList("${column.name}", queryList, SolrQueryLogicalOperator.NOT);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+    public void set${column.capCamelName}_RangeSearchFrom(${column.type} from) {
+        if (from != null) {
+            set${column.capCamelName}_RangeSearch(from, null);
+        }
+    }
+
+    public void set${column.capCamelName}_RangeSearchTo(${column.type} to) {
+        if (to != null) {
+            set${column.capCamelName}_RangeSearch(null, to);
+        }
+    }
+
+    public void set${column.capCamelName}_RangeSearch(${column.type} from, ${column.type} to) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForRangeSearch("${column.name}", from, to);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+#elseif($column.nativeType == "tint")
+    public void set${column.capCamelName}_InScope(Collection<${column.type}> queryList) {
+        this.set${column.capCamelName}_InScope(queryList, SolrQueryLogicalOperator.OR);
+    }
+
+    public void set${column.capCamelName}_InScope(Collection<${column.type}> queryList, SolrQueryLogicalOperator operator) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchIntegerList("${column.name}", queryList, operator);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+    public void set${column.capCamelName}_NotInScope(Collection<${column.type}> queryList) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchIntegerList("${column.name}", queryList, SolrQueryLogicalOperator.NOT);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+    public void set${column.capCamelName}_RangeSearchFrom(${column.type} from) {
+        if (from != null) {
+            set${column.capCamelName}_RangeSearch(from, null);
+        }
+    }
+
+    public void set${column.capCamelName}_RangeSearchTo(${column.type} to) {
+        if (to != null) {
+            set${column.capCamelName}_RangeSearch(null, to);
+        }
+    }
+
+    public void set${column.capCamelName}_RangeSearch(${column.type} from, ${column.type} to) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForRangeSearch("${column.name}", from, to);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+#elseif($column.nativeType == "boolean")
+#elseif($column.nativeType == "tdate")
+    public void set${column.capCamelName}_RangeSearchFrom(${column.type} from) {
+        if (from != null) {
+            set${column.capCamelName}_RangeSearch(from, null);
+        }
+    }
+
+    public void set${column.capCamelName}_RangeSearchTo(${column.type} to) {
+        if (to != null) {
+            set${column.capCamelName}_RangeSearch(null, to);
+        }
+    }
+
+    public void set${column.capCamelName}_RangeSearch(${column.type} from, ${column.type} to) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForRangeSearch("${column.name}", from, to);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+#elseif($column.nativeType == "tdouble")
+    public void set${column.capCamelName}_InScope(Collection<${column.type}> queryList) {
+        this.set${column.capCamelName}_InScope(queryList, SolrQueryLogicalOperator.OR);
+    }
+
+    public void set${column.capCamelName}_InScope(Collection<${column.type}> queryList, SolrQueryLogicalOperator operator) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchBigDecimalList("${column.name}", queryList, operator);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+    public void set${column.capCamelName}_NotInScope(Collection<${column.type}> queryList) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchBigDecimalList("${column.name}", queryList, SolrQueryLogicalOperator.NOT);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+    public void set${column.capCamelName}_RangeSearchFrom(${column.type} from) {
+        if (from != null) {
+            set${column.capCamelName}_RangeSearch(from, null);
+        }
+    }
+
+    public void set${column.capCamelName}_RangeSearchTo(${column.type} to) {
+        if (to != null) {
+            set${column.capCamelName}_RangeSearch(null, to);
+        }
+    }
+
+    public void set${column.capCamelName}_RangeSearch(${column.type} from, ${column.type} to) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForRangeSearch("${column.name}", from, to);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+#elseif($column.nativeType == "text_ja")
+    public void set${column.capCamelName}_FreewordSearch(${column.type} queryStrs, SolrQueryLogicalOperator operator) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForFreewordSearch("${column.name}", queryStrs, operator);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+    public void set${column.capCamelName}_FreewordSearch(Collection<${column.type}> queryList, SolrQueryLogicalOperator operator) {
+        String convertedQuery  = SolrQueryBuilder.queryBuilderForSearchWordList("${column.name}", queryList, operator);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+#elseif($column.nativeType == "text_cjk")
+    public void set${column.capCamelName}_FreewordSearch(${column.type} queryStrs, SolrQueryLogicalOperator operator) {
+        String convertedQuery = SolrQueryBuilder.queryBuilderForFreewordSearch("${column.name}", queryStrs, operator);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+    public void set${column.capCamelName}_FreewordSearch(Collection<${column.type}> queryList, SolrQueryLogicalOperator operator) {
+        String convertedQuery  = SolrQueryBuilder.queryBuilderForSearchWordList("${column.name}", queryList, operator);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.${column.uncapCamelName}Query = convertedQuery;
+        }
+    }
+
+#end
+#end
+#end
+   /**
+     * OR condition
+     * @param orQueryLambda ConditionBean function for Solr for generating OR-combined condition (NotNull)
+     */
+    public void orScopeQuery(SolrFQBCall<Solr${tableMap.schema}CFQ> orQueryLambda) {
+        Solr${tableMap.schema}CFQ queryBean = new Solr${tableMap.schema}CFQ();
+        orQueryLambda.callback(queryBean);
+        addNestQuery(queryBean, SolrQueryLogicalOperator.OR);
+    }
+
+   /**
+     * AND condition(s) nested in OR condition
+     * @param orQueryAndPartLambda ConditionBean function for Solr for generating OR-combined condition (NotNull)
+     */
+    public void orScopeQueryAndPart(SolrFQBCall<Solr${tableMap.schema}CFQ> orQueryAndPartLambda) {
+        Solr${tableMap.schema}CFQ queryBean = new Solr${tableMap.schema}CFQ();
+        orQueryAndPartLambda.callback(queryBean);
+        addNestQuery(queryBean, SolrQueryLogicalOperator.AND);
+    }
+
+    // ===================================================================================
+    //                                                                        Query Getter
+    //                                                                        ============
+    @Override
+    public List<String> getQueryList() {
+        List<String> queryList = new ArrayList<String>();
+        if (DfStringUtil.is_NotNull_and_NotEmpty(dismaxQuery)) {
+            queryList.add(dismaxQuery);
+        }
+#foreach ($column in $request.columnList)
+#if($column.indexed == true)
+        if (DfStringUtil.is_NotNull_and_NotEmpty(${column.uncapCamelName}Query)) {
+            queryList.add(${column.uncapCamelName}Query);
+        }
+
+#end
+#end
+        List<String> nestQueryList = getNestQueryList();
+        if (!nestQueryList.isEmpty()) {
+            queryList.addAll(nestQueryList);
+        }
+        return queryList;
+    }
+}

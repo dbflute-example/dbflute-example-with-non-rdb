@@ -1,0 +1,77 @@
+##
+## Copyright 2014-2016 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${manager.allClassCopyright}package ${request.package}.bsentity.index;
+
+import java.io.Serializable;
+
+import org.apache.solr.client.solrj.beans.Field;
+
+import org.dbflute.solr.entity.AbstractSolrIndexEntity;
+
+/**
+ * Base IndexEntity class of Solr schema "${tableMap.schema}."
+ * @author FreeGen
+ */
+public class SolrBs${tableMap.schema}Index extends AbstractSolrIndexEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+#foreach ($column in $request.columnList)
+#if($column.multiValued)
+    #set($multiTypeElementLength = $column.type.length() - 2)
+    #set($elementType = $column.type.substring(0, $multiTypeElementLength))
+    #set($propertyType = "java.util.List<${elementType}>")
+#else
+    #set($propertyType = $column.type)
+#end
+    /** ${column.name} (${column.nativeType}) */
+    @Field("${column.name}")
+    protected ${propertyType} ${column.uncapCamelName};
+
+#end
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+#foreach ($column in $request.columnList)
+#if($column.multiValued)
+    #set($multiTypeElementLength = $column.type.length() - 2)
+    #set($elementType = $column.type.substring(0, $multiTypeElementLength))
+    #set($propertyType = "java.util.List<${elementType}>")
+#else
+    #set($propertyType = $column.type)
+#end
+    public ${propertyType} get${column.capCamelName}() {
+#if(${column.multiValued})
+        if (this.${column.uncapCamelName} == null) { this.${column.uncapCamelName} = newMultiValuedList(); }
+#end
+        return this.${column.uncapCamelName};
+    }
+
+    public void set${column.capCamelName}(${propertyType} value) {
+        this.${column.uncapCamelName} = value;
+    }
+
+#if($column.multiValued)
+    public void add${column.capCamelName}($elementType value) {
+        get${column.capCamelName}().add(value);
+    }
+#end
+#end
+}

@@ -77,6 +77,9 @@ public interface NonrdbEnv {
     /** The key of the configuration. e.g. 10 */
     String JDBC_CONNECTION_POOLING_SIZE = "jdbc.connection.pooling.size";
 
+    /** The key of the configuration. e.g. http://localhost:8983/solr/example */
+    String SOLR_EXAMPLE_URL = "solr.example.url";
+
     /** The key of the configuration. e.g. localhost:8090/nonrdb */
     String SERVER_DOMAIN = "server.domain";
 
@@ -283,6 +286,14 @@ public interface NonrdbEnv {
     Integer getJdbcConnectionPoolingSizeAsInteger();
 
     /**
+     * Get the value for the key 'solr.example.url'. <br>
+     * The value is, e.g. http://localhost:8983/solr/example <br>
+     * comment: -------
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getSolrExampleUrl();
+
+    /**
      * Get the value for the key 'server.domain'. <br>
      * The value is, e.g. localhost:8090/nonrdb <br>
      * comment: domain to access this application from internet, e.g. for registration mail
@@ -389,6 +400,10 @@ public interface NonrdbEnv {
 
         public Integer getJdbcConnectionPoolingSizeAsInteger() {
             return getAsInteger(NonrdbEnv.JDBC_CONNECTION_POOLING_SIZE);
+        }
+
+        public String getSolrExampleUrl() {
+            return get(NonrdbEnv.SOLR_EXAMPLE_URL);
         }
 
         public String getServerDomain() {
