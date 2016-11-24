@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//DBFLUTE//DTD LastaDi 1.0//EN"
+    "http://dbflute.org/meta/lastadi10.dtd">
+<components namespace="solr-example">
+    <include path="lastaflute_assist.xml"/>
+
+    <component name="solrExampleBhv" class="jp.unext.laxample.solr.exbhv.SolrExampleBhv" />
+</components>

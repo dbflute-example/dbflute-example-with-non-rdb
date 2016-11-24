@@ -1,0 +1,24 @@
+ map:{
+    # ==========================================================================
+    #                                                              Solr(Example)
+    #                                                              =============
+    ; SolrExample = map:{
+        ; resourceMap = map:{
+            ; baseDir = ../src/main
+            ; resourceType = SOLR
+            ; resourceFile = playsolr/schema/example_schema.xml
+        }
+        ; outputMap = map:{
+            ; templateFile = unused
+            ; outputDirectory = ../src/main/java
+            ; package = org.docksidestage.solr
+            ; className = unused
+        }
+        ; tableMap = map:{
+            ; tablePath = map
+            ; schema = Example
+            ; configClass = org.docksidestage.mylasta.direction.NonrdbConfig
+            ; mappingMap = map:{ type = map:{ string = String; text_ja = String; tint = Integer; tlong = Long; float = Float; tdate = java.time.LocalDateTime; }}
+        }
+    }
+}

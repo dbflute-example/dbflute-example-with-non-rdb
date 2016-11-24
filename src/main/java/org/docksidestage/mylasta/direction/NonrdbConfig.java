@@ -29,6 +29,21 @@ public interface NonrdbConfig extends NonrdbEnv {
     /** The key of the configuration. e.g. Nonrdb */
     String DOMAIN_TITLE = "domain.title";
 
+    /** The key of the configuration. e.g. 10000 */
+    String SOLR_CONNECTION_TIMEOUT = "solr.connectionTimeout";
+
+    /** The key of the configuration. e.g. 10000 */
+    String SOLR_SOCKET_TIMEOUT = "solr.socketTimeout";
+
+    /** The key of the configuration. e.g. 32 */
+    String SOLR_DEFAULT_MAX_CONNECTIONS_PER_HOST = "solr.defaultMaxConnectionsPerHost";
+
+    /** The key of the configuration. e.g. 128 */
+    String SOLR_MAX_TOTAL_CONNECTIONS = "solr.maxTotalConnections";
+
+    /** The key of the configuration. e.g. 60000 */
+    String SOLR_ALIVE_CHECK_INTERVAL = "solr.aliveCheckInterval";
+
     /** The key of the configuration. e.g. / */
     String COOKIE_DEFAULT_PATH = "cookie.default.path";
 
@@ -72,6 +87,91 @@ public interface NonrdbConfig extends NonrdbEnv {
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      */
     String getDomainTitle();
+
+    /**
+     * Get the value for the key 'solr.connectionTimeout'. <br>
+     * The value is, e.g. 10000 <br>
+     * comment: Solr connection timeout
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getSolrConnectionTimeout();
+
+    /**
+     * Get the value for the key 'solr.connectionTimeout' as {@link Integer}. <br>
+     * The value is, e.g. 10000 <br>
+     * comment: Solr connection timeout
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    Integer getSolrConnectionTimeoutAsInteger();
+
+    /**
+     * Get the value for the key 'solr.socketTimeout'. <br>
+     * The value is, e.g. 10000 <br>
+     * comment: Solr socket timeout
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getSolrSocketTimeout();
+
+    /**
+     * Get the value for the key 'solr.socketTimeout' as {@link Integer}. <br>
+     * The value is, e.g. 10000 <br>
+     * comment: Solr socket timeout
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    Integer getSolrSocketTimeoutAsInteger();
+
+    /**
+     * Get the value for the key 'solr.defaultMaxConnectionsPerHost'. <br>
+     * The value is, e.g. 32 <br>
+     * comment: Solr default max connections per host
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getSolrDefaultMaxConnectionsPerHost();
+
+    /**
+     * Get the value for the key 'solr.defaultMaxConnectionsPerHost' as {@link Integer}. <br>
+     * The value is, e.g. 32 <br>
+     * comment: Solr default max connections per host
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    Integer getSolrDefaultMaxConnectionsPerHostAsInteger();
+
+    /**
+     * Get the value for the key 'solr.maxTotalConnections'. <br>
+     * The value is, e.g. 128 <br>
+     * comment: Solr max total connections
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getSolrMaxTotalConnections();
+
+    /**
+     * Get the value for the key 'solr.maxTotalConnections' as {@link Integer}. <br>
+     * The value is, e.g. 128 <br>
+     * comment: Solr max total connections
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    Integer getSolrMaxTotalConnectionsAsInteger();
+
+    /**
+     * Get the value for the key 'solr.aliveCheckInterval'. <br>
+     * The value is, e.g. 60000 <br>
+     * comment: Solr interval for checking aliveness
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getSolrAliveCheckInterval();
+
+    /**
+     * Get the value for the key 'solr.aliveCheckInterval' as {@link Integer}. <br>
+     * The value is, e.g. 60000 <br>
+     * comment: Solr interval for checking aliveness
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    Integer getSolrAliveCheckIntervalAsInteger();
 
     /**
      * Get the value for the key 'cookie.default.path'. <br>
@@ -138,6 +238,46 @@ public interface NonrdbConfig extends NonrdbEnv {
 
         public String getDomainTitle() {
             return get(NonrdbConfig.DOMAIN_TITLE);
+        }
+
+        public String getSolrConnectionTimeout() {
+            return get(NonrdbConfig.SOLR_CONNECTION_TIMEOUT);
+        }
+
+        public Integer getSolrConnectionTimeoutAsInteger() {
+            return getAsInteger(NonrdbConfig.SOLR_CONNECTION_TIMEOUT);
+        }
+
+        public String getSolrSocketTimeout() {
+            return get(NonrdbConfig.SOLR_SOCKET_TIMEOUT);
+        }
+
+        public Integer getSolrSocketTimeoutAsInteger() {
+            return getAsInteger(NonrdbConfig.SOLR_SOCKET_TIMEOUT);
+        }
+
+        public String getSolrDefaultMaxConnectionsPerHost() {
+            return get(NonrdbConfig.SOLR_DEFAULT_MAX_CONNECTIONS_PER_HOST);
+        }
+
+        public Integer getSolrDefaultMaxConnectionsPerHostAsInteger() {
+            return getAsInteger(NonrdbConfig.SOLR_DEFAULT_MAX_CONNECTIONS_PER_HOST);
+        }
+
+        public String getSolrMaxTotalConnections() {
+            return get(NonrdbConfig.SOLR_MAX_TOTAL_CONNECTIONS);
+        }
+
+        public Integer getSolrMaxTotalConnectionsAsInteger() {
+            return getAsInteger(NonrdbConfig.SOLR_MAX_TOTAL_CONNECTIONS);
+        }
+
+        public String getSolrAliveCheckInterval() {
+            return get(NonrdbConfig.SOLR_ALIVE_CHECK_INTERVAL);
+        }
+
+        public Integer getSolrAliveCheckIntervalAsInteger() {
+            return getAsInteger(NonrdbConfig.SOLR_ALIVE_CHECK_INTERVAL);
         }
 
         public String getCookieDefaultPath() {
