@@ -18,6 +18,15 @@ PagingResultBean<Product> productPage = productBhv.selectPage(cb -> {
 ```
 contributed by CodeLibs Project: https://github.com/codelibs
 
+## SolrFlute for Solr
+```java
+SolrPagingResultBean<SolrExample> result = solrExampleBhv.selectPage(cb -> {
+    cb.query().setLatestPurchaseDate_RangeSearchFrom(from);
+    cb.paging(10, 1);
+});
+```
+contributed by U-NEXT: http://video.unext.jp/
+
 # Quick Trial
 *ReplaceSchema
 ```java
