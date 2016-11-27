@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//DBFLUTE//DTD LastaDi 1.0//EN"
+    "http://dbflute.org/meta/lastadi10.dtd">
+<components namespace="kvs_cache-maihamadb">
+    <include path="lastaflute_assist.xml"/>
+    <include condition="#exists('#path')" path="my_included_kvs-cache.xml"/>
+    <include path="kvs/di/kvs-pool-examplekvs.xml"/>
+    <include path="dbflute.xml"/>
+
+    <component name="cacheTtl">provider.config().getKvsCacheMaihamadbTtlAsInteger()</component>
+    <component name="maihamadbKvsCacheFacade" class="org.docksidestage.kvs.cache.maihamadb.facade.MaihamadbKvsCacheFacade" />
+
+    <!-- The components of Behavior. -->
+    <component name="kvsProductBhv" class="org.docksidestage.kvs.cache.maihamadb.exbhv.KvsProductBhv"/>
+</components>

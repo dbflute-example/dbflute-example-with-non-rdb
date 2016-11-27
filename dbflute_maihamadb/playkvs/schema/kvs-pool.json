@@ -1,0 +1,3 @@
+{
+    "examplekvs": {"$comment": "Example Store", "$configClass": "org.docksidestage.mylasta.direction.NonrdbConfig"}
+}

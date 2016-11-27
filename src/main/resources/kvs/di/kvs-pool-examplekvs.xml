@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//DBFLUTE//DTD LastaDi 1.0//EN"
+    "http://dbflute.org/meta/lastadi10.dtd">
+<components namespace="kvs-examplekvs">
+    <include path="lastaflute_core.xml"/>
+
+    <component name="kvsRedisPool" class="org.dbflute.kvs.core.delegator.KvsRedisPool">
+        @org.docksidestage.kvs.pool.KvsRedisPoolFactory@createExamplekvs()
+    </component>
+
+    <component name="kvsStoreManager" class="org.dbflute.kvs.store.KvsStoreManagerImpl" />
+
+    <component name="kvsStoreDelegator">
+        provider.config().isKvsMock()
+                ? new org.dbflute.kvs.core.delegator.KvsLocalMapDelegator()
+                : new org.dbflute.kvs.store.delegator.KvsStoreRedisDelegator()
+        <property name="kvsRedisPool">kvsRedisPool</property>
+    </component>
+
+    <component name="kvsCacheManager" class="org.dbflute.kvs.cache.KvsCacheManagerImpl" />
+    <component name="kvsCacheBusinessAssist" class="org.dbflute.kvs.cache.KvsCacheBusinessAssist" />
+
+    <component name="kvsCacheDelegator">
+        provider.config().isKvsMock()
+                ? new org.dbflute.kvs.core.delegator.KvsLocalMapDelegator()
+                : new org.dbflute.kvs.cache.delegator.KvsCacheRedisDelegator()
+        <property name="kvsRedisPool">kvsRedisPool</property>
+    </component>
+</components>

@@ -1,0 +1,173 @@
+##
+## Copyright 2014-2016 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${manager.allClassCopyright}package org.dbflute.kvs.cache;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Resource;
+
+import org.dbflute.kvs.core.delegator.KvsDelegator;
+
+/**
+ * @author FreeGen
+ */
+public class KvsCacheManagerImpl implements KvsCacheManager {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    @Resource
+    private KvsDelegator kvsCacheDelegator;
+
+    // ===================================================================================
+    //                                                                                Get
+    //                                                                               =====
+    // -----------------------------------------------------
+    //                                                String
+    //                                                ------
+    @Override
+    public String findString(String key) {
+        return kvsCacheDelegator.findString(key);
+    }
+
+    @Override
+    public List<String> findMultiString(List<String> keyList) {
+        return kvsCacheDelegator.findMultiString(keyList);
+    }
+
+    // -----------------------------------------------------
+    //                                                  List
+    //                                                  ----
+    @Override
+    public List<String> findList(String key) {
+        return kvsCacheDelegator.findList(key);
+    }
+
+    @Override
+    public List<List<String>> findMultiList(List<String> keyList) {
+        return kvsCacheDelegator.findMultiList(keyList);
+    }
+
+    // -----------------------------------------------------
+    //                                                  Hash
+    //                                                  ----
+    @Override
+    public List<String> findHash(String key, Set<String> fieldList) {
+        return kvsCacheDelegator.findHash(key, fieldList);
+    }
+
+    @Override
+    public List<List<String>> findMultiHash(List<String> keyList, Set<String> fieldList) {
+        return kvsCacheDelegator.findMultiHash(keyList, fieldList);
+    }
+
+    // ===================================================================================
+    //                                                                            Register
+    //                                                                            ========
+    // -----------------------------------------------------
+    //                                                String
+    //                                                ------
+    @Override
+    public void registerString(String key, String value) {
+        kvsCacheDelegator.registerString(key, value);
+    }
+
+    @Override
+    public void registerString(String key, String value, LocalDateTime availableDateTime) {
+        kvsCacheDelegator.registerString(key, value, availableDateTime);
+    }
+
+    @Override
+    public void registerMultiString(Map<String, String> keyValueMap) {
+        kvsCacheDelegator.registerMultiString(keyValueMap);
+    }
+
+    @Override
+    public void registerMultiString(Map<String, String> keyValueMap, LocalDateTime availableDateTime) {
+        kvsCacheDelegator.registerMultiString(keyValueMap, availableDateTime);
+    }
+
+    // -----------------------------------------------------
+    //                                                  List
+    //                                                  ----
+    @Override
+    public void registerList(String key, List<String> value) {
+        kvsCacheDelegator.registerList(key, value);
+    }
+
+    @Override
+    public void registerList(String key, List<String> value, LocalDateTime availableDateTime) {
+        kvsCacheDelegator.registerList(key, value, availableDateTime);
+    }
+
+    @Override
+    public void registerMultiList(Map<String, List<String>> keyValueMap) {
+        kvsCacheDelegator.registerMultiList(keyValueMap);
+
+    }
+
+    @Override
+    public void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime availableDateTime) {
+        kvsCacheDelegator.registerMultiList(keyValueMap, availableDateTime);
+    }
+
+    // -----------------------------------------------------
+    //                                                  Hash
+    //                                                  ----
+    @Override
+    public void registerHash(String key, Map<String, String> fieldValueMap) {
+        kvsCacheDelegator.registerHash(key, fieldValueMap);
+    }
+
+    @Override
+    public void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime availableDateTime) {
+        kvsCacheDelegator.registerHash(key, fieldValueMap, availableDateTime);
+    }
+
+    @Override
+    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap) {
+        kvsCacheDelegator.registerMultiHash(keyValueMap);
+    }
+
+    @Override
+    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime availableDateTime) {
+        kvsCacheDelegator.registerMultiHash(keyValueMap, availableDateTime);
+    }
+
+    // ===================================================================================
+    //                                                                              Delete
+    //                                                                              ======
+    @Override
+    public void delete(String key) {
+        kvsCacheDelegator.delete(key);
+    }
+
+    @Override
+    public void delete(String... keys) {
+        kvsCacheDelegator.delete(keys);
+    }
+
+    // ===================================================================================
+    //                                                                               Other
+    //                                                                               =====
+    @Override
+    public int getNumActive() {
+        return kvsCacheDelegator.getNumActive();
+    }
+}

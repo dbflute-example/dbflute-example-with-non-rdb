@@ -1,0 +1,247 @@
+##
+## Copyright 2014-2016 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.bsentity.dbmeta;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.dbflute.kvs.store.cbean.KvsStoreConditionBean;
+import org.dbflute.kvs.store.entity.KvsStoreEntity;
+import org.dbflute.kvs.store.entity.dbmeta.AbstractKvsStoreDBMeta;
+import org.dbflute.util.DfAssertUtil;
+
+#if ($tableMap.suppressBehaviorGen != true)
+import ${request.package}.${tableMap.schema}.cbean.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB;
+#end
+import ${request.package}.${tableMap.schema}.exentity.Kvs$!{tableMap.schemaPrefix}${table.camelizedName};
+#if ($table.hasRefColumn)
+import ${request.package}.exentity.*;
+#end
+
+/**
+ * The DB meta of (${table.comment})${table.capCamelName}. (Singleton)
+ * @author FreeGen
+ */
+public class Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm extends AbstractKvsStoreDBMeta {
+
+    // ===================================================================================
+    //                                                                           Singleton
+    //                                                                           =========
+    /** ${table.comment}メタ。 */
+    private static final Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm INSTANCE = new Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm();
+
+    /**
+     * ${table.comment}メタを作成する。
+     */
+    private Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm() {
+    }
+
+    /**
+     * ${table.comment}メタを返す。
+     * @return ${table.comment}メタ
+     */
+    public static Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm getInstance() {
+        return INSTANCE;
+    }
+
+    // ===================================================================================
+    //                                                                       Current DBDef
+    //                                                                       =============
+    @Override
+    public String getProjectName() {
+        return "${tableMap.schema}";
+    }
+
+    @Override
+    public String getTableName() {
+        return "${table.camelizedName}";
+    }
+
+    @Override
+    public KvsStoreEntity newKvsStoreEntity() {
+        return new Kvs$!{tableMap.schemaPrefix}${table.camelizedName}();
+    }
+
+    @Override
+    public void acceptAllColumnMap(KvsStoreEntity entity, Map<String, ? extends Object> map) {
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName} ${table.uncapCamelName} = (Kvs$!{tableMap.schemaPrefix}${table.camelizedName}) entity;
+#foreach ($column in $table.columnList)
+#if ($column.isNormalColumn)
+#set ($javaNative = ${column.type})
+#elseif ($column.isRefColumn)
+#set ($javaNative = ${column.camelizedName})
+#end
+#if ($javaNative == 'boolean')
+        ${table.uncapCamelName}.set${column.capCamelName}(Boolean.valueOf((String) map.get("${column.uncapCamelName}")));
+#elseif ($javaNative == 'Integer' || $javaNative == 'Long')
+        ${table.uncapCamelName}.set${column.capCamelName}(org.dbflute.util.DfTypeUtil.to${javaNative}(map.get("${column.uncapCamelName}")));
+#elseif ($javaNative == 'java.time.LocalDate' || $javaNative == 'java.time.LocalDateTime')
+        ${table.uncapCamelName}.set${column.capCamelName}(parse${javaNative.replaceAll('.*\.', '')}((String) map.get("${column.uncapCamelName}")));
+#elseif ($javaNative == 'String')
+        ${table.uncapCamelName}.set${column.capCamelName}((${javaNative}) map.get("${column.uncapCamelName}"));
+#elseif ($javaNative.replaceAll('(java\.util\.List|java\.util\.Map|\<|\>|String|,| )', '').isEmpty())
+        @SuppressWarnings("unchecked")
+        ${javaNative} ${column.uncapCamelName}Temp = (${javaNative}) map.get("${column.uncapCamelName}");
+        ${table.uncapCamelName}.set${column.capCamelName}(${column.uncapCamelName}Temp);
+#elseif ($javaNative.matches('java\.util\.List\<([^<]*)\>'))
+        ${table.uncapCamelName}.set${column.capCamelName}(((java.util.List<?>) map.get("${column.uncapCamelName}")).stream().map(value -> {
+#set($genericsType = ${javaNative.replaceAll('java\.util\.List\<(.*)\>', '$1')})
+#if ($genericsType == 'java.time.LocalDate' || $genericsType == 'java.time.LocalDateTime')
+            return parse${genericsType.replaceAll('.*\.', '')}(value == null ? null : value.toString());
+#else
+            return org.dbflute.util.DfTypeUtil.to${genericsType}(value);
+#end
+        }).collect(java.util.stream.Collectors.toList()));
+#elseif ($javaNative.matches('java\.util\.Map\<([^<]*), ([^<]*)\>'))
+#set($genericsTypeKey = ${javaNative.replaceAll('java\.util\.List\<(.*)\>', '$1')})
+        ${table.uncapCamelName}.set${column.capCamelName}(((java.util.Map<?, ?>) map.get("${column.uncapCamelName}")).entrySet().stream().collect(java.util.stream.Collectors.toMap(key -> {
+#if ($genericsTypeKey == 'java.time.LocalDate' || $genericsTypeKey == 'java.time.LocalDateTime')
+            return parse${genericsTypeKey.replaceAll('.*\.', '')}(value == null ? null : value.toString());
+#else
+            return org.dbflute.util.DfTypeUtil.to${genericsTypeKey}(key);
+#end
+        } , value -> {
+#set($genericsTypeValue = ${javaNative.replaceAll('java\.util\.List\<(.*)\>', '$2')})
+#if ($genericsTypeValue == 'java.time.LocalDate' || $genericsTypeValue == 'java.time.LocalDateTime')
+            return parse${genericsTypeValue.replaceAll('.*\.', '')}(value);
+#else
+            return org.dbflute.util.DfTypeUtil.to${genericsTypeValue}(key);
+#end
+        })));
+#else
+        ${table.uncapCamelName}.set${column.capCamelName}((${javaNative}) map.get("${column.uncapCamelName}"));
+#end
+#end
+    }
+#if ($tableMap.suppressBehaviorGen != true)
+
+    @Override
+    public List<Object> extractKeyList(KvsStoreConditionBean cb) {
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB ${table.uncapCamelName}CB = (Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB) cb;
+
+        List<Object> keyList = new ArrayList<Object>();
+#foreach ($column in $table.columnList)
+#if ($column.kvsKey)
+        keyList.add(${table.uncapCamelName}CB.query().get${column.capCamelName}_Equal());
+#end
+#end
+        return keyList;
+    }
+#end
+
+    @Override
+    public List<Object> extractKeyList(KvsStoreEntity entity) {
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName} ${table.uncapCamelName} = (Kvs$!{tableMap.schemaPrefix}${table.camelizedName}) entity;
+
+        List<Object> keyList = new ArrayList<Object>();
+#foreach ($column in $table.columnList)
+#if ($column.kvsKey)
+        keyList.add(${table.uncapCamelName}.get${column.capCamelName}());
+#end
+#end
+        return keyList;
+    }
+
+    @Override
+    public Map<String, Object> extractAllColumnMap(KvsStoreEntity entity) {
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName} ${table.uncapCamelName} = (Kvs$!{tableMap.schemaPrefix}${table.camelizedName}) entity;
+
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
+#foreach ($column in $table.columnList)
+#if ($column.isNormalColumn)
+#set ($javaNative = ${column.type})
+#elseif ($column.isRefColumn)
+#set ($javaNative = ${column.camelizedName})
+#end
+#if ($javaNative == 'java.time.LocalDate')
+        map.put("${column.uncapCamelName}", formatLocalDate(${table.uncapCamelName}.get${column.capCamelName}()));
+#elseif ($javaNative == 'java.time.LocalDateTime')
+        map.put("${column.uncapCamelName}", formatLocalDateTime(${table.uncapCamelName}.get${column.capCamelName}()));
+#else
+        map.put("${column.uncapCamelName}", ${table.uncapCamelName}.get${column.capCamelName}());
+#end
+#end
+        return map;
+    }
+#if ($tableMap.suppressBehaviorGen != true)
+
+    @Override
+    public void validateKeyColumn(KvsStoreConditionBean cb) {
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB ${table.uncapCamelName}CB = (Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB) cb;
+
+#foreach ($column in $table.columnList)
+#if ($column.kvsKey)
+#if ($column.notNull)
+#if ($column.isNormalColumn)
+#set ($javaNative = ${column.type})
+#elseif ($column.isRefColumn)
+#set ($javaNative = ${column.camelizedName})
+#end
+#if ($javaNative == 'String')
+        DfAssertUtil.assertStringNotNullAndNotTrimmedEmpty("${column.uncapCamelName}", ${table.uncapCamelName}CB.query().get${column.capCamelName}_Equal());
+#else
+        DfAssertUtil.assertObjectNotNull("${column.uncapCamelName}", ${table.uncapCamelName}CB.query().get${column.capCamelName}_Equal());
+#end
+#end
+#end
+#end
+    }
+#end
+
+    @Override
+    public void validateKeyColumn(KvsStoreEntity entity) {
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName} ${table.uncapCamelName} = (Kvs$!{tableMap.schemaPrefix}${table.camelizedName}) entity;
+
+#foreach ($column in $table.columnList)
+#if ($column.kvsKey)
+#if ($column.notNull)
+#if ($column.isNormalColumn)
+#set ($javaNative = ${column.type})
+#elseif ($column.isRefColumn)
+#set ($javaNative = ${column.camelizedName})
+#end
+#if ($javaNative == 'String')
+        DfAssertUtil.assertStringNotNullAndNotTrimmedEmpty("${column.uncapCamelName}", ${table.uncapCamelName}.get${column.capCamelName}());
+#else
+        DfAssertUtil.assertObjectNotNull("${column.uncapCamelName}", ${table.uncapCamelName}.get${column.capCamelName}());
+#end
+#end
+#end
+#end
+    }
+
+    @Override
+    public void validateAllColumn(KvsStoreEntity entity) {
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName} ${table.uncapCamelName} = (Kvs$!{tableMap.schemaPrefix}${table.camelizedName}) entity;
+
+#foreach ($column in $table.columnList)
+#if ($column.notNull)
+#if ($column.isNormalColumn)
+#set ($javaNative = ${column.type})
+#elseif ($column.isRefColumn)
+#set ($javaNative = ${column.camelizedName})
+#end
+#if ($javaNative == 'String')
+        DfAssertUtil.assertStringNotNullAndNotTrimmedEmpty("${column.uncapCamelName}", ${table.uncapCamelName}.get${column.capCamelName}());
+#else
+        DfAssertUtil.assertObjectNotNull("${column.uncapCamelName}", ${table.uncapCamelName}.get${column.capCamelName}());
+#end
+#end
+#end
+    }
+}

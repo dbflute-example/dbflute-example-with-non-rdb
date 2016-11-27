@@ -24,9 +24,12 @@ import org.docksidestage.esflute.maihama.bsentity.dbmeta.MemberDbm;
 import org.docksidestage.esflute.maihama.cbean.MemberCB;
 import org.docksidestage.esflute.maihama.cbean.cq.MemberCQ;
 import org.docksidestage.esflute.maihama.cbean.cq.bs.BsMemberCQ;
+import org.docksidestage.esflute.maihama.cbean.ca.MemberCA;
+import org.docksidestage.esflute.maihama.cbean.ca.bs.BsMemberCA;
 import org.dbflute.cbean.ConditionQuery;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 
 /**
  * @author ESFlute (using FreeGen)
@@ -37,6 +40,7 @@ public class BsMemberCB extends EsAbstractConditionBean {
     //                                                                           Attribute
     //                                                                           =========
     protected BsMemberCQ _conditionQuery;
+    protected BsMemberCA _conditionAggregation;
     protected HpSpecification _specification;
 
     // ===================================================================================
@@ -93,6 +97,10 @@ public class BsMemberCB extends EsAbstractConditionBean {
             });
         }
 
+        if (_conditionAggregation != null) {
+            _conditionAggregation.getAggregationBuilderList().forEach(builder::addAggregation);
+        }
+
         if (_specification != null) {
             builder.setFetchSource(_specification.columnList.toArray(new String[_specification.columnList.size()]), null);
         }
@@ -120,6 +128,25 @@ public class BsMemberCB extends EsAbstractConditionBean {
     }
 
     // ===================================================================================
+    //                                                                         Aggregation
+    //                                                                         ===========
+    public BsMemberCA aggregation() {
+        assertAggregationPurpose();
+        return doGetConditionAggregation();
+    }
+
+    protected BsMemberCA doGetConditionAggregation() {
+        if (_conditionAggregation == null) {
+            _conditionAggregation = createLocalCA();
+        }
+        return _conditionAggregation;
+    }
+
+    protected BsMemberCA createLocalCA() {
+        return new MemberCA();
+    }
+
+    // ===================================================================================
     //                                                                             Specify
     //                                                                             =======
     public HpSpecification specify() {
@@ -131,6 +158,9 @@ public class BsMemberCB extends EsAbstractConditionBean {
     }
 
     protected void assertQueryPurpose() {
+    }
+
+    protected void assertAggregationPurpose() {
     }
 
     protected void assertSpecifyPurpose() {

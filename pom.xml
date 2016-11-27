@@ -22,6 +22,7 @@
 
 		<!-- Library for Extension -->
 		<solrj.version>6.3.0</solrj.version>
+		<kvs.redis.version>2.9.0</kvs.redis.version>
 
 		<!-- Partner Library -->
 		<slf4j.version>1.7.12</slf4j.version>
@@ -254,6 +255,11 @@
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-solrj</artifactId>
 			<version>${solrj.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>${kvs.redis.version}</version>
 		</dependency>
 
 		<!-- lastaflute -->

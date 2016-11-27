@@ -1,0 +1,120 @@
+##
+## Copyright 2014-2016 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${manager.allClassCopyright}package org.dbflute.cache;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.dbflute.Entity;
+import org.dbflute.bhv.BehaviorReadable;
+import org.dbflute.bhv.BehaviorSelector;
+import org.dbflute.cbean.ConditionBean;
+import org.dbflute.dbmeta.DBMeta;
+#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+import org.dbflute.saflute.core.magic.ThreadCacheContext;
+#end
+#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+import org.lastaflute.core.magic.ThreadCacheContext;
+#end
+
+/**
+ * @author FreeGen
+ */
+public class CachedThreadEntity {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final CachedThreadEntity _instance = new CachedThreadEntity();
+
+    public static CachedThreadEntity getInstance() {
+        return _instance;
+    }
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected Map<String, BehaviorSelector> _behaviorSelectorMap;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    protected CachedThreadEntity() {
+    }
+
+    // ===================================================================================
+    //                                                                                Init
+    //                                                                                ====
+    public void init(Map<String, BehaviorSelector> behaviorSelectorMap) {
+        _behaviorSelectorMap = behaviorSelectorMap;
+    }
+
+    // ===================================================================================
+    //                                                                        Entity Cache
+    //                                                                        ============
+    /**
+     * キャッシュマップからエンティティを検索する。<br>
+     * キャッシュマップにない場合は、DBから取得して、キャッシュマップに登録する。<br>
+     * ConditionBeanで生成されるSQLをキーにしてキャッシュされる。<br>
+     * 結果がnullでも、nullであることがキャッシュされる。(何度も呼び出されてSQLのバンバン投げられないように)
+     * @param cb 一件をヒットさせるためのConditionBean (NotNull)
+     * @return 検索された、もしくは、キャッシュから取得したエンティティ (NullAllowed: 検索されたデータがないとき)
+     */
+    @SuppressWarnings("unchecked")
+    public <ENTITY extends Entity> ENTITY findEntity(ConditionBean cb) {
+        final BehaviorReadable behavior = getBehaviorSelector(cb.asDBMeta()).byName(cb.asDBMeta().getTablePropertyName());
+
+        final Map<String, Entity> cacheMap = getCacheMap(behavior.getClass());
+        final String key = cb.toDisplaySql(); // 生成されるSQLがそのままキー (それにより、CBの条件に対して完全にユニークに)
+        if (cacheMap.containsKey(key)) {
+            return (ENTITY) cacheMap.get(key);
+        }
+
+        final Entity entity = behavior.readEntity(cb);
+        cacheMap.put(key, entity);
+
+        return (ENTITY) entity;
+    }
+
+    /**
+     * スレッドで管理するキャッシュマップを返す。
+     * @param behaviorClass behaviorクラス (NotNull)
+     * @return キャッシュマップ (NotNull)
+     */
+    protected <ENTITY extends Entity> Map<String, ENTITY> getCacheMap(Class<? extends BehaviorReadable> behaviorClass) {
+        final String key = CachedThreadEntity.class.getName();
+
+        @SuppressWarnings("unchecked")
+        Map<Class<? extends BehaviorReadable>, Map<String, ENTITY>> allCacheMap =
+                (Map<Class<? extends BehaviorReadable>, Map<String, ENTITY>>) ThreadCacheContext.getObject(key);
+        if (allCacheMap == null) {
+            allCacheMap = new HashMap<Class<? extends BehaviorReadable>, Map<String, ENTITY>>();
+            ThreadCacheContext.setObject(key, allCacheMap);
+        }
+
+        Map<String, ENTITY> cacheMap = allCacheMap.get(behaviorClass);
+        if (cacheMap == null) {
+            cacheMap = new HashMap<String, ENTITY>();
+            allCacheMap.put(behaviorClass, cacheMap);
+        }
+
+        return cacheMap;
+    }
+
+    protected BehaviorSelector getBehaviorSelector(DBMeta dbMeta) {
+        return _behaviorSelectorMap.get(dbMeta.getProjectName());
+    }
+}

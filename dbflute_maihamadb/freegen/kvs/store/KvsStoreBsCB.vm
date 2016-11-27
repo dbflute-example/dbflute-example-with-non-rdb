@@ -1,0 +1,77 @@
+##
+## Copyright 2014-2016 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.cbean.bs;
+
+import org.dbflute.kvs.store.cbean.KvsStoreConditionBean;
+import org.dbflute.kvs.store.entity.dbmeta.KvsStoreDBMeta;
+
+import ${request.package}.${tableMap.schema}.bsentity.dbmeta.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm;
+import ${request.package}.${tableMap.schema}.cbean.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB;
+import ${request.package}.${tableMap.schema}.cbean.cq.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CQ;
+#if ($table.hasRefColumn)
+import ${request.package}.${tableMap.schema}.entity.ex.*;
+#end
+
+/**
+ * The base condition-bean of (${table.comment})${table.capCamelName}.
+ * @author FreeGen
+ */
+public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CB implements KvsStoreConditionBean {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CQ _conditionQuery;
+
+    // ===================================================================================
+    //                                                                               Query
+    //                                                                               =====
+    public Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CQ query() {
+        return doGetConditionQuery();
+    }
+
+    protected Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CQ doGetConditionQuery() {
+        if (_conditionQuery == null) {
+            _conditionQuery = new Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CQ();
+        }
+        return _conditionQuery;
+    }
+
+    @Override
+    public KvsStoreDBMeta asDBMeta() {
+        return Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm.getInstance();
+    }
+
+#set ($acceptPkParameter = "")
+#foreach ($column in $table.columnList)
+#if ($column.kvsKey)
+#if ($velocityCount > 1)
+#set ($acceptPkParameter = $acceptPkParameter + ", ")
+#end
+#set ($acceptPkParameter = $acceptPkParameter + $column.type + " " + ${manager.initUncap($column.camelizedName)})
+#end
+#end
+    public Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB acceptPK($acceptPkParameter) {
+        Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CB cb = this;
+#foreach ($column in $table.columnList)
+#if ($column.kvsKey)
+        cb.query().set${column.camelizedName}_Equal(${manager.initUncap($column.camelizedName)});
+#end
+#end
+
+        return (Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB) this;
+    }
+}

@@ -24,9 +24,12 @@ import org.docksidestage.esflute.maihama.bsentity.dbmeta.ProductDbm;
 import org.docksidestage.esflute.maihama.cbean.ProductCB;
 import org.docksidestage.esflute.maihama.cbean.cq.ProductCQ;
 import org.docksidestage.esflute.maihama.cbean.cq.bs.BsProductCQ;
+import org.docksidestage.esflute.maihama.cbean.ca.ProductCA;
+import org.docksidestage.esflute.maihama.cbean.ca.bs.BsProductCA;
 import org.dbflute.cbean.ConditionQuery;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 
 /**
  * @author ESFlute (using FreeGen)
@@ -37,6 +40,7 @@ public class BsProductCB extends EsAbstractConditionBean {
     //                                                                           Attribute
     //                                                                           =========
     protected BsProductCQ _conditionQuery;
+    protected BsProductCA _conditionAggregation;
     protected HpSpecification _specification;
 
     // ===================================================================================
@@ -93,6 +97,10 @@ public class BsProductCB extends EsAbstractConditionBean {
             });
         }
 
+        if (_conditionAggregation != null) {
+            _conditionAggregation.getAggregationBuilderList().forEach(builder::addAggregation);
+        }
+
         if (_specification != null) {
             builder.setFetchSource(_specification.columnList.toArray(new String[_specification.columnList.size()]), null);
         }
@@ -120,6 +128,25 @@ public class BsProductCB extends EsAbstractConditionBean {
     }
 
     // ===================================================================================
+    //                                                                         Aggregation
+    //                                                                         ===========
+    public BsProductCA aggregation() {
+        assertAggregationPurpose();
+        return doGetConditionAggregation();
+    }
+
+    protected BsProductCA doGetConditionAggregation() {
+        if (_conditionAggregation == null) {
+            _conditionAggregation = createLocalCA();
+        }
+        return _conditionAggregation;
+    }
+
+    protected BsProductCA createLocalCA() {
+        return new ProductCA();
+    }
+
+    // ===================================================================================
     //                                                                             Specify
     //                                                                             =======
     public HpSpecification specify() {
@@ -131,6 +158,9 @@ public class BsProductCB extends EsAbstractConditionBean {
     }
 
     protected void assertQueryPurpose() {
+    }
+
+    protected void assertAggregationPurpose() {
     }
 
     protected void assertSpecifyPurpose() {

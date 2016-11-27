@@ -80,6 +80,27 @@ public interface NonrdbEnv {
     /** The key of the configuration. e.g. http://localhost:8983/solr/example */
     String SOLR_EXAMPLE_URL = "solr.example.url";
 
+    /** The key of the configuration. e.g. true */
+    String KVS_MOCK = "kvs.mock";
+
+    /** The key of the configuration. e.g. localhost */
+    String KVS_EXAMPLEKVS_HOST = "kvs.examplekvs.host";
+
+    /** The key of the configuration. e.g. 6379 */
+    String KVS_EXAMPLEKVS_PORT = "kvs.examplekvs.port";
+
+    /** The key of the configuration. e.g. 2000 */
+    String KVS_EXAMPLEKVS_TIMEOUT = "kvs.examplekvs.timeout";
+
+    /** The key of the configuration. e.g. 15 */
+    String KVS_EXAMPLEKVS_MAX_TOTAL = "kvs.examplekvs.maxTotal";
+
+    /** The key of the configuration. e.g. 15 */
+    String KVS_EXAMPLEKVS_MAX_IDLE = "kvs.examplekvs.maxIdle";
+
+    /** The key of the configuration. e.g. 15 */
+    String KVS_EXAMPLEKVS_MIN_IDLE = "kvs.examplekvs.minIdle";
+
     /** The key of the configuration. e.g. localhost:8090/nonrdb */
     String SERVER_DOMAIN = "server.domain";
 
@@ -294,6 +315,115 @@ public interface NonrdbEnv {
     String getSolrExampleUrl();
 
     /**
+     * Get the value for the key 'kvs.mock'. <br>
+     * The value is, e.g. true <br>
+     * comment: Whether to use mock for KVS
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getKvsMock();
+
+    /**
+     * Is the property for the key 'kvs.mock' true? <br>
+     * The value is, e.g. true <br>
+     * comment: Whether to use mock for KVS
+     * @return The determination, true or false. (if not found, exception but basically no way)
+     */
+    boolean isKvsMock();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.host'. <br>
+     * The value is, e.g. localhost <br>
+     * comment: Hostname
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getKvsExamplekvsHost();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.port'. <br>
+     * The value is, e.g. 6379 <br>
+     * comment: Port
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getKvsExamplekvsPort();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.port' as {@link Integer}. <br>
+     * The value is, e.g. 6379 <br>
+     * comment: Port
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    Integer getKvsExamplekvsPortAsInteger();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.timeout'. <br>
+     * The value is, e.g. 2000 <br>
+     * comment: Timeout for connection
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getKvsExamplekvsTimeout();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.timeout' as {@link Integer}. <br>
+     * The value is, e.g. 2000 <br>
+     * comment: Timeout for connection
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    Integer getKvsExamplekvsTimeoutAsInteger();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.maxTotal'. <br>
+     * The value is, e.g. 15 <br>
+     * comment: Max number of pooled connections
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getKvsExamplekvsMaxTotal();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.maxTotal' as {@link Integer}. <br>
+     * The value is, e.g. 15 <br>
+     * comment: Max number of pooled connections
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    Integer getKvsExamplekvsMaxTotalAsInteger();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.maxIdle'. <br>
+     * The value is, e.g. 15 <br>
+     * comment: Max number of idle connections
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getKvsExamplekvsMaxIdle();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.maxIdle' as {@link Integer}. <br>
+     * The value is, e.g. 15 <br>
+     * comment: Max number of idle connections
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    Integer getKvsExamplekvsMaxIdleAsInteger();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.minIdle'. <br>
+     * The value is, e.g. 15 <br>
+     * comment: Min number of idle connections
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getKvsExamplekvsMinIdle();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.minIdle' as {@link Integer}. <br>
+     * The value is, e.g. 15 <br>
+     * comment: Min number of idle connections
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    Integer getKvsExamplekvsMinIdleAsInteger();
+
+    /**
      * Get the value for the key 'server.domain'. <br>
      * The value is, e.g. localhost:8090/nonrdb <br>
      * comment: domain to access this application from internet, e.g. for registration mail
@@ -404,6 +534,58 @@ public interface NonrdbEnv {
 
         public String getSolrExampleUrl() {
             return get(NonrdbEnv.SOLR_EXAMPLE_URL);
+        }
+
+        public String getKvsMock() {
+            return get(NonrdbEnv.KVS_MOCK);
+        }
+
+        public boolean isKvsMock() {
+            return is(NonrdbEnv.KVS_MOCK);
+        }
+
+        public String getKvsExamplekvsHost() {
+            return get(NonrdbEnv.KVS_EXAMPLEKVS_HOST);
+        }
+
+        public String getKvsExamplekvsPort() {
+            return get(NonrdbEnv.KVS_EXAMPLEKVS_PORT);
+        }
+
+        public Integer getKvsExamplekvsPortAsInteger() {
+            return getAsInteger(NonrdbEnv.KVS_EXAMPLEKVS_PORT);
+        }
+
+        public String getKvsExamplekvsTimeout() {
+            return get(NonrdbEnv.KVS_EXAMPLEKVS_TIMEOUT);
+        }
+
+        public Integer getKvsExamplekvsTimeoutAsInteger() {
+            return getAsInteger(NonrdbEnv.KVS_EXAMPLEKVS_TIMEOUT);
+        }
+
+        public String getKvsExamplekvsMaxTotal() {
+            return get(NonrdbEnv.KVS_EXAMPLEKVS_MAX_TOTAL);
+        }
+
+        public Integer getKvsExamplekvsMaxTotalAsInteger() {
+            return getAsInteger(NonrdbEnv.KVS_EXAMPLEKVS_MAX_TOTAL);
+        }
+
+        public String getKvsExamplekvsMaxIdle() {
+            return get(NonrdbEnv.KVS_EXAMPLEKVS_MAX_IDLE);
+        }
+
+        public Integer getKvsExamplekvsMaxIdleAsInteger() {
+            return getAsInteger(NonrdbEnv.KVS_EXAMPLEKVS_MAX_IDLE);
+        }
+
+        public String getKvsExamplekvsMinIdle() {
+            return get(NonrdbEnv.KVS_EXAMPLEKVS_MIN_IDLE);
+        }
+
+        public Integer getKvsExamplekvsMinIdleAsInteger() {
+            return getAsInteger(NonrdbEnv.KVS_EXAMPLEKVS_MIN_IDLE);
         }
 
         public String getServerDomain() {

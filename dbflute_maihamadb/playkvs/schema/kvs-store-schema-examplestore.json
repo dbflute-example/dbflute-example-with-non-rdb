@@ -1,0 +1,10 @@
+{
+    "store_example": {
+        "$comment": "Description about this KVS store",
+        "$type": "table",
+        "egkey": { "type": "String", "comment": "this column will be used as (a part of) KVS key", "kvsKey": true, "notNull": true},
+        "egId": { "type": "Integer", "comment": "id", "notNull": true},
+        "egName": { "type": "String", "comment": "name", "notNull": true},
+        "expireDatetime": { "type": "java.time.LocalDateTime", "comment": "time to live", "notNull": true}
+    }
+}

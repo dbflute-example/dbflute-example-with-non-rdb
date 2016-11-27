@@ -22,6 +22,7 @@ import org.docksidestage.esflute.maihama.allcommon.EsAbstractConditionQuery;
 import org.docksidestage.esflute.maihama.cbean.cq.MemberCQ;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 
 /**
@@ -47,6 +48,23 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
     // ===================================================================================
     //                                                                       Query Control
     //                                                                       =============
+    public void functionScore(OperatorCall<MemberCQ> queryLambda, ScoreFunctionCall<ScoreFunctionCreator<MemberCQ>> functionsLambda,
+            final ConditionOptionCall<FunctionScoreQueryBuilder> opLambda) {
+        MemberCQ cq = new MemberCQ();
+        queryLambda.callback(cq);
+        final FunctionScoreQueryBuilder builder = regFunctionScoreQ(cq.getQuery());
+        if (functionsLambda != null) {
+            functionsLambda.callback((cqLambda, scoreFunctionBuilder) -> {
+                MemberCQ cf = new MemberCQ();
+                cqLambda.callback(cf);
+                builder.add(cf.getQuery(), scoreFunctionBuilder);
+            });
+        }
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
+
     public void filtered(FilteredCall<MemberCQ, MemberCQ> filteredLambda) {
         filtered(filteredLambda, null);
     }
@@ -282,6 +300,16 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
         }
     }
 
+    public void setAccount_SpanTerm(String account) {
+        setAccount_SpanTerm("account", null);
+    }
+
+    public void setAccount_SpanTerm(String account, ConditionOptionCall<SpanTermQueryBuilder> opLambda) {
+        SpanTermQueryBuilder builder = regSpanTermQ("account", account);
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
     public void setAccount_GreaterThan(String account) {
         setAccount_GreaterThan(account, null);
     }
@@ -489,6 +517,16 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
         }
     }
 
+    public void setName_SpanTerm(String name) {
+        setName_SpanTerm("name", null);
+    }
+
+    public void setName_SpanTerm(String name, ConditionOptionCall<SpanTermQueryBuilder> opLambda) {
+        SpanTermQueryBuilder builder = regSpanTermQ("name", name);
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
     public void setName_GreaterThan(String name) {
         setName_GreaterThan(name, null);
     }

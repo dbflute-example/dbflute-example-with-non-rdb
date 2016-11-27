@@ -1,0 +1,166 @@
+/*
+ * Copyright 2015-2016 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
+package org.dbflute.kvs.store;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * @author FreeGen
+ */
+public interface KvsStoreManager {
+
+    // ===================================================================================
+    //                                                                                Get
+    //                                                                               =====
+    // -----------------------------------------------------
+    //                                                String
+    //                                                ------
+    /**
+     * keyに対応した文字列をKVSから取得する。
+     * @param key 取得したい値のKey値 (NotNull)
+     * @return 指定されたKeyでKVS上に保持されている文字列 (NullAllowed)
+     */
+    String findString(String key);
+
+    /**
+     * keyリストに対応した文字列リストをKVSから取得する。
+     * @param keyList 取得したい値のKey値リスト (NotNull)
+     * @return 指定されたKeyでKVS上に保持されている文字列リスト (NotNull)
+     */
+    List<String> findMultiString(List<String> keyList);
+
+    // -----------------------------------------------------
+    //                                                  List
+    //                                                  ----
+    /**
+     * keyに対応した文字列リストをKVSから取得する。
+     * @param key 取得したい値のKey値 (NotNull)
+     * @return 指定されたKeyでKVS上に保持されている文字列リスト (NotNull)
+     */
+    List<String> findList(String key);
+
+    List<List<String>> findMultiList(List<String> keyList);
+
+    // -----------------------------------------------------
+    //                                                  Hash
+    //                                                  ----
+    List<String> findHash(String key, Set<String> fieldList);
+
+    List<List<String>> findMultiHash(List<String> keyList, Set<String> fieldList);
+
+    // ===================================================================================
+    //                                                                            Register
+    //                                                                            ========
+    // -----------------------------------------------------
+    //                                                String
+    //                                                ------
+    /**
+     * 指定したkeyで値をKVSに保存する。
+     * @param key KVSに値を保存するKey (NotNull)
+     * @param value 指定されたkeyでKVS上に保存される値 (NotNull)
+     */
+    void registerString(String key, String value);
+
+    /**
+     * 有効期限を設定して指定したkeyで値をKVSに保存する。
+     * @param key KVSへの登録キー (NotNull)
+     * @param value 指定されたkeyでKVS上に保存される値 (NotNull)
+     * @param availableDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     */
+    void registerString(String key, String value, LocalDateTime availableDateTime);
+
+    /**
+     * 指定したKeyで値をKVSに保存する。
+     * @param keyValueMap KVSへの登録キー、値のMAP (NotNull)
+     */
+    void registerMultiString(Map<String, String> keyValueMap);
+
+    /**
+     * 有効期限を設定して指定したKeyで値をKVSに保存する。
+     * @param keyValueMap KVSへの登録キー、値のMAP (NotNull)
+     * @param availableDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     */
+    void registerMultiString(Map<String, String> keyValueMap, LocalDateTime availableDateTime);
+
+    // -----------------------------------------------------
+    //                                                  List
+    //                                                  ----
+    /**
+     * 指定したKeyで値をKVSに保存する。
+     * @param key KVSに値を保存するKey (NotNull)
+     * @param value 指定されたkeyでKVS上に保存される値 (NotNull)
+     */
+    void registerList(String key, List<String> value);
+
+    /**
+     * 有効期限を設定して指定したKeyで値をKVSに保存する。
+     * @param key KVSへの登録キー (NotNull)
+     * @param value 指定されたkeyでKVS上に保存される値 (NotNull)
+     * @param availableDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     */
+    void registerList(String key, List<String> value, LocalDateTime availableDateTime);
+
+    /**
+     * 指定したKeyで文字列リストをKVSに保存する。
+     * @param keyValueMap KVSへの登録キー、値のMAP (NotNull)
+     */
+    void registerMultiList(Map<String, List<String>> keyValueMap);
+
+    /**
+     * 有効期限を設定して指定したKeyで文字列リストをKVSに保存する。
+     * @param keyValueMap KVSへの登録キー、値のMAP (NotNull)
+     * @param availableDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     */
+    void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime availableDateTime);
+
+    // -----------------------------------------------------
+    //                                                  Hash
+    //                                                  ----
+    void registerHash(String key, Map<String, String> fieldValueMap);
+
+    void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime availableDateTime);
+
+    void registerMultiHash(Map<String, Map<String, String>> keyValueMap);
+
+    void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime availableDateTime);
+
+    // ===================================================================================
+    //                                                                              Delete
+    //                                                                              ======
+    /**
+     * 指定されたキーのエントリを削除する。
+     * @param key 削除対象のキー (NotNull)
+     */
+    void delete(String key);
+
+    /**
+     * 指定されたキーのエントリを削除する。
+     * @param keys 削除対象のキー (NotNull)
+     */
+    void delete(String... keys);
+
+    // ===================================================================================
+    //                                                                               Other
+    //                                                                               =====
+    /**
+     * アクティブな数を返す。
+     * @return アクティブな数
+     */
+    int getNumActive();
+}

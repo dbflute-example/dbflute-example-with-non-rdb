@@ -44,6 +44,30 @@ public interface NonrdbConfig extends NonrdbEnv {
     /** The key of the configuration. e.g. 60000 */
     String SOLR_ALIVE_CHECK_INTERVAL = "solr.aliveCheckInterval";
 
+    /** The key of the configuration. e.g. -1 */
+    String KVS_EXAMPLEKVS_MAX_WAIT_MILLIS = "kvs.examplekvs.maxWaitMillis";
+
+    /** The key of the configuration. e.g. 60000 */
+    String KVS_EXAMPLEKVS_MIN_EVICTABLE_IDLE_TIME_MILLIS = "kvs.examplekvs.minEvictableIdleTimeMillis";
+
+    /** The key of the configuration. e.g. 30000 */
+    String KVS_EXAMPLEKVS_SOFT_MIN_EVICTABLE_IDLE_TIME_MILLIS = "kvs.examplekvs.softMinEvictableIdleTimeMillis";
+
+    /** The key of the configuration. e.g. 10 */
+    String KVS_EXAMPLEKVS_NUM_TESTS_PER_EVICTION_RUN = "kvs.examplekvs.numTestsPerEvictionRun";
+
+    /** The key of the configuration. e.g. true */
+    String KVS_EXAMPLEKVS_TEST_ON_BORROW = "kvs.examplekvs.testOnBorrow";
+
+    /** The key of the configuration. e.g. false */
+    String KVS_EXAMPLEKVS_TEST_ON_RETURN = "kvs.examplekvs.testOnReturn";
+
+    /** The key of the configuration. e.g. true */
+    String KVS_EXAMPLEKVS_TEST_WHILE_IDLE = "kvs.examplekvs.testWhileIdle";
+
+    /** The key of the configuration. e.g. 30000 */
+    String KVS_EXAMPLEKVS_TIME_BETWEEN_EVICTION_RUNS_MILLIS = "kvs.examplekvs.timeBetweenEvictionRunsMillis";
+
     /** The key of the configuration. e.g. / */
     String COOKIE_DEFAULT_PATH = "cookie.default.path";
 
@@ -174,6 +198,139 @@ public interface NonrdbConfig extends NonrdbEnv {
     Integer getSolrAliveCheckIntervalAsInteger();
 
     /**
+     * Get the value for the key 'kvs.examplekvs.maxWaitMillis'. <br>
+     * The value is, e.g. -1 <br>
+     * comment: Max latency to get connection to kvs (milliseconds)
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getKvsExamplekvsMaxWaitMillis();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.maxWaitMillis' as {@link Integer}. <br>
+     * The value is, e.g. -1 <br>
+     * comment: Max latency to get connection to kvs (milliseconds)
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    Integer getKvsExamplekvsMaxWaitMillisAsInteger();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.minEvictableIdleTimeMillis'. <br>
+     * The value is, e.g. 60000 <br>
+     * comment: TTL for idle connection (milliseconds)
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getKvsExamplekvsMinEvictableIdleTimeMillis();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.minEvictableIdleTimeMillis' as {@link Integer}. <br>
+     * The value is, e.g. 60000 <br>
+     * comment: TTL for idle connection (milliseconds)
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    Integer getKvsExamplekvsMinEvictableIdleTimeMillisAsInteger();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.softMinEvictableIdleTimeMillis'. <br>
+     * The value is, e.g. 30000 <br>
+     * comment: Soft TTL for idle connection (milliseconds)
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getKvsExamplekvsSoftMinEvictableIdleTimeMillis();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.softMinEvictableIdleTimeMillis' as {@link Integer}. <br>
+     * The value is, e.g. 30000 <br>
+     * comment: Soft TTL for idle connection (milliseconds)
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    Integer getKvsExamplekvsSoftMinEvictableIdleTimeMillisAsInteger();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.numTestsPerEvictionRun'. <br>
+     * The value is, e.g. 10 <br>
+     * comment: Max number of idle connections per monitoring process
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getKvsExamplekvsNumTestsPerEvictionRun();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.numTestsPerEvictionRun' as {@link Integer}. <br>
+     * The value is, e.g. 10 <br>
+     * comment: Max number of idle connections per monitoring process
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    Integer getKvsExamplekvsNumTestsPerEvictionRunAsInteger();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.testOnBorrow'. <br>
+     * The value is, e.g. true <br>
+     * comment: Should check if connection is available before getting connection
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getKvsExamplekvsTestOnBorrow();
+
+    /**
+     * Is the property for the key 'kvs.examplekvs.testOnBorrow' true? <br>
+     * The value is, e.g. true <br>
+     * comment: Should check if connection is available before getting connection
+     * @return The determination, true or false. (if not found, exception but basically no way)
+     */
+    boolean isKvsExamplekvsTestOnBorrow();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.testOnReturn'. <br>
+     * The value is, e.g. false <br>
+     * comment: Should check if connection is available before returning connection
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getKvsExamplekvsTestOnReturn();
+
+    /**
+     * Is the property for the key 'kvs.examplekvs.testOnReturn' true? <br>
+     * The value is, e.g. false <br>
+     * comment: Should check if connection is available before returning connection
+     * @return The determination, true or false. (if not found, exception but basically no way)
+     */
+    boolean isKvsExamplekvsTestOnReturn();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.testWhileIdle'. <br>
+     * The value is, e.g. true <br>
+     * comment: Should check if idle connections are available
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getKvsExamplekvsTestWhileIdle();
+
+    /**
+     * Is the property for the key 'kvs.examplekvs.testWhileIdle' true? <br>
+     * The value is, e.g. true <br>
+     * comment: Should check if idle connections are available
+     * @return The determination, true or false. (if not found, exception but basically no way)
+     */
+    boolean isKvsExamplekvsTestWhileIdle();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.timeBetweenEvictionRunsMillis'. <br>
+     * The value is, e.g. 30000 <br>
+     * comment: Monitoring interval for idle connections in connection pool (milliseconds)
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getKvsExamplekvsTimeBetweenEvictionRunsMillis();
+
+    /**
+     * Get the value for the key 'kvs.examplekvs.timeBetweenEvictionRunsMillis' as {@link Integer}. <br>
+     * The value is, e.g. 30000 <br>
+     * comment: Monitoring interval for idle connections in connection pool (milliseconds)
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    Integer getKvsExamplekvsTimeBetweenEvictionRunsMillisAsInteger();
+
+    /**
      * Get the value for the key 'cookie.default.path'. <br>
      * The value is, e.g. / <br>
      * comment: The default path of cookie (basically '/' if no context path)
@@ -278,6 +435,70 @@ public interface NonrdbConfig extends NonrdbEnv {
 
         public Integer getSolrAliveCheckIntervalAsInteger() {
             return getAsInteger(NonrdbConfig.SOLR_ALIVE_CHECK_INTERVAL);
+        }
+
+        public String getKvsExamplekvsMaxWaitMillis() {
+            return get(NonrdbConfig.KVS_EXAMPLEKVS_MAX_WAIT_MILLIS);
+        }
+
+        public Integer getKvsExamplekvsMaxWaitMillisAsInteger() {
+            return getAsInteger(NonrdbConfig.KVS_EXAMPLEKVS_MAX_WAIT_MILLIS);
+        }
+
+        public String getKvsExamplekvsMinEvictableIdleTimeMillis() {
+            return get(NonrdbConfig.KVS_EXAMPLEKVS_MIN_EVICTABLE_IDLE_TIME_MILLIS);
+        }
+
+        public Integer getKvsExamplekvsMinEvictableIdleTimeMillisAsInteger() {
+            return getAsInteger(NonrdbConfig.KVS_EXAMPLEKVS_MIN_EVICTABLE_IDLE_TIME_MILLIS);
+        }
+
+        public String getKvsExamplekvsSoftMinEvictableIdleTimeMillis() {
+            return get(NonrdbConfig.KVS_EXAMPLEKVS_SOFT_MIN_EVICTABLE_IDLE_TIME_MILLIS);
+        }
+
+        public Integer getKvsExamplekvsSoftMinEvictableIdleTimeMillisAsInteger() {
+            return getAsInteger(NonrdbConfig.KVS_EXAMPLEKVS_SOFT_MIN_EVICTABLE_IDLE_TIME_MILLIS);
+        }
+
+        public String getKvsExamplekvsNumTestsPerEvictionRun() {
+            return get(NonrdbConfig.KVS_EXAMPLEKVS_NUM_TESTS_PER_EVICTION_RUN);
+        }
+
+        public Integer getKvsExamplekvsNumTestsPerEvictionRunAsInteger() {
+            return getAsInteger(NonrdbConfig.KVS_EXAMPLEKVS_NUM_TESTS_PER_EVICTION_RUN);
+        }
+
+        public String getKvsExamplekvsTestOnBorrow() {
+            return get(NonrdbConfig.KVS_EXAMPLEKVS_TEST_ON_BORROW);
+        }
+
+        public boolean isKvsExamplekvsTestOnBorrow() {
+            return is(NonrdbConfig.KVS_EXAMPLEKVS_TEST_ON_BORROW);
+        }
+
+        public String getKvsExamplekvsTestOnReturn() {
+            return get(NonrdbConfig.KVS_EXAMPLEKVS_TEST_ON_RETURN);
+        }
+
+        public boolean isKvsExamplekvsTestOnReturn() {
+            return is(NonrdbConfig.KVS_EXAMPLEKVS_TEST_ON_RETURN);
+        }
+
+        public String getKvsExamplekvsTestWhileIdle() {
+            return get(NonrdbConfig.KVS_EXAMPLEKVS_TEST_WHILE_IDLE);
+        }
+
+        public boolean isKvsExamplekvsTestWhileIdle() {
+            return is(NonrdbConfig.KVS_EXAMPLEKVS_TEST_WHILE_IDLE);
+        }
+
+        public String getKvsExamplekvsTimeBetweenEvictionRunsMillis() {
+            return get(NonrdbConfig.KVS_EXAMPLEKVS_TIME_BETWEEN_EVICTION_RUNS_MILLIS);
+        }
+
+        public Integer getKvsExamplekvsTimeBetweenEvictionRunsMillisAsInteger() {
+            return getAsInteger(NonrdbConfig.KVS_EXAMPLEKVS_TIME_BETWEEN_EVICTION_RUNS_MILLIS);
         }
 
         public String getCookieDefaultPath() {
