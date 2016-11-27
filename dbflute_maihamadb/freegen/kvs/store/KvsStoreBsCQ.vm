@@ -1,0 +1,119 @@
+##
+## Copyright 2014-2016 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+#set ($kvsKeyCount = 0)
+#foreach ($column in $table.columnList)
+#if ($column.kvsKey)
+#set ($kvsKeyCount = $kvsKeyCount + 1)
+#end
+#end
+${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.cbean.cq.bs;
+
+#if ($kvsKeyCount == 1)
+import java.util.Collection;
+
+#end
+/**
+ * The base condition-query of (${table.comment})${table.capCamelName}.
+ * @author FreeGen
+ */
+public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+#foreach ($column in $table.columnList)
+#if ($column.kvsKey)
+#if ($column.isNormalColumn)
+#set ($javaNative = ${column.type})
+#elseif ($column.isRefColumn)
+#set ($javaNative = ${column.camelizedName})
+#end
+    /** ${column.name}: ${column.comment} */
+#if ($column.default)
+    protected ${javaNative} _${column.uncapCamelName} = ${column.default};
+#else
+    protected ${javaNative} _${column.uncapCamelName};
+#end
+
+#if ($kvsKeyCount == 1)
+    protected Collection<${javaNative}> _${column.uncapCamelName}List;
+
+#end    
+#end
+#end
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+#foreach ($column in $table.columnList)
+#if ($column.kvsKey)
+#if ($column.isNormalColumn)
+#set ($javaNative = ${column.type})
+#elseif ($column.isRefColumn)
+#set ($javaNative = ${column.camelizedName})
+#end
+    /**
+     * ${column.comment}を返す。
+     * @return ${column.comment}
+     */
+    public ${javaNative} get${column.capCamelName}_Equal() {
+#if ($javaNative.startsWith('java.util.Map') || $javaNative.startsWith('java.util.List'))
+        if (_${column.uncapCamelName} == null) {
+            _${column.uncapCamelName} = new ${javaNative.replaceAll('^java\.util\.List', 'java\.util\.ArrayList').replaceAll('^java\.util\.Map', 'java\.util\.LinkedHashMap')}();
+        }
+#end
+        return _${column.uncapCamelName};
+    }
+
+    /**
+     * ${column.comment}を設定する。
+     * @param ${column.uncapCamelName} ${column.comment}
+     */
+    public void set${column.capCamelName}_Equal(${javaNative} ${column.uncapCamelName}) {
+        _${column.uncapCamelName} = ${column.uncapCamelName};
+    }
+
+#end
+#end
+#if ($kvsKeyCount == 1)
+#foreach ($column in $table.columnList)
+#if ($column.kvsKey)
+    public Collection<${column.type}> xdfget${column.camelizedName}List() {
+        return _${column.uncapCamelName}List;
+    }
+
+    public void set${column.camelizedName}_inScope(Collection<${column.type}> ${column.uncapCamelName}List) {
+        _${column.uncapCamelName}List = ${column.uncapCamelName}List;
+    }
+
+#end
+#end
+#end
+    @Override
+    public String toString() {
+        String delimiter = ", ";
+        StringBuilder sb = new StringBuilder();
+#foreach ($column in $table.columnList)
+#if ($column.kvsKey)
+        sb.append(delimiter).append(_${column.uncapCamelName});
+#end
+#end
+        if (sb.length() > delimiter.length()) {
+            sb.delete(0, delimiter.length());
+        }
+        sb.insert(0, super.toString() + "{").append("}");
+        return sb.toString();
+    }
+}

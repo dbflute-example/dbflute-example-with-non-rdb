@@ -6,7 +6,7 @@ $manager.info("requestList: ${requestList.size()}")
 $request.enableOutputDirectory()
 $manager.makeDirectory($request.generateDirPath)
 
-#if (!$request.isResourceTypeSolr())
+#if (!$request.isResourceTypeJsonSchema() && !$request.isResourceTypeSolr())
   ##
   ## <<<  Normal Gen  >>>
   ##
@@ -26,3 +26,5 @@ $manager.makeDirectory($request.generateDirPath)
 #end
 
 #parse("./solr/ControlFreeGenSolrJava.vm")
+#parse("./kvs/ControlFreeGenKvsJava.vm")
+#parse("./dbfluteOptional/ControlFreeGenDbfluteOptionalJava.vm")

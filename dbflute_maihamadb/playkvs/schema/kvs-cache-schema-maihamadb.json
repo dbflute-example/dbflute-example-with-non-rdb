@@ -1,0 +1,16 @@
+{
+    "product": {
+        "$comment": "Product",
+        "productId": {
+            "$comment": "ID",
+            "many": false,
+            "kvsKeys": ["PRODUCT_ID"]
+        },
+        "categoryCode": {
+            "$comment": "Category code of each product",
+            "many": true,
+            "kvsKeys": ["PRODUCT_CATEGORY_CODE"],
+            "orderBy": ["REGULAR_PRICE", "PRODUCT_ID"] 
+        }
+    }
+}

@@ -22,6 +22,7 @@ import org.docksidestage.esflute.maihama.allcommon.EsAbstractConditionQuery;
 import org.docksidestage.esflute.maihama.cbean.cq.ProductCQ;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.dbflute.exception.IllegalConditionBeanOperationException;
 
 /**
@@ -47,6 +48,23 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     // ===================================================================================
     //                                                                       Query Control
     //                                                                       =============
+    public void functionScore(OperatorCall<ProductCQ> queryLambda, ScoreFunctionCall<ScoreFunctionCreator<ProductCQ>> functionsLambda,
+            final ConditionOptionCall<FunctionScoreQueryBuilder> opLambda) {
+        ProductCQ cq = new ProductCQ();
+        queryLambda.callback(cq);
+        final FunctionScoreQueryBuilder builder = regFunctionScoreQ(cq.getQuery());
+        if (functionsLambda != null) {
+            functionsLambda.callback((cqLambda, scoreFunctionBuilder) -> {
+                ProductCQ cf = new ProductCQ();
+                cqLambda.callback(cf);
+                builder.add(cf.getQuery(), scoreFunctionBuilder);
+            });
+        }
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
+
     public void filtered(FilteredCall<ProductCQ, ProductCQ> filteredLambda) {
         filtered(filteredLambda, null);
     }
@@ -456,6 +474,16 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         }
     }
 
+    public void setProductCategory_SpanTerm(String productCategory) {
+        setProductCategory_SpanTerm("product_category", null);
+    }
+
+    public void setProductCategory_SpanTerm(String productCategory, ConditionOptionCall<SpanTermQueryBuilder> opLambda) {
+        SpanTermQueryBuilder builder = regSpanTermQ("product_category", productCategory);
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
     public void setProductCategory_GreaterThan(String productCategory) {
         setProductCategory_GreaterThan(productCategory, null);
     }
@@ -663,6 +691,16 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         }
     }
 
+    public void setProductCategoryCode_SpanTerm(String productCategoryCode) {
+        setProductCategoryCode_SpanTerm("product_category_code", null);
+    }
+
+    public void setProductCategoryCode_SpanTerm(String productCategoryCode, ConditionOptionCall<SpanTermQueryBuilder> opLambda) {
+        SpanTermQueryBuilder builder = regSpanTermQ("product_category_code", productCategoryCode);
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
     public void setProductCategoryCode_GreaterThan(String productCategoryCode) {
         setProductCategoryCode_GreaterThan(productCategoryCode, null);
     }
@@ -870,6 +908,16 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         }
     }
 
+    public void setProductDescription_SpanTerm(String productDescription) {
+        setProductDescription_SpanTerm("product_description", null);
+    }
+
+    public void setProductDescription_SpanTerm(String productDescription, ConditionOptionCall<SpanTermQueryBuilder> opLambda) {
+        SpanTermQueryBuilder builder = regSpanTermQ("product_description", productDescription);
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
     public void setProductDescription_GreaterThan(String productDescription) {
         setProductDescription_GreaterThan(productDescription, null);
     }
@@ -1077,6 +1125,16 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         }
     }
 
+    public void setProductHandleCode_SpanTerm(String productHandleCode) {
+        setProductHandleCode_SpanTerm("product_handle_code", null);
+    }
+
+    public void setProductHandleCode_SpanTerm(String productHandleCode, ConditionOptionCall<SpanTermQueryBuilder> opLambda) {
+        SpanTermQueryBuilder builder = regSpanTermQ("product_handle_code", productHandleCode);
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
     public void setProductHandleCode_GreaterThan(String productHandleCode) {
         setProductHandleCode_GreaterThan(productHandleCode, null);
     }
@@ -1284,6 +1342,16 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         }
     }
 
+    public void setProductName_SpanTerm(String productName) {
+        setProductName_SpanTerm("product_name", null);
+    }
+
+    public void setProductName_SpanTerm(String productName, ConditionOptionCall<SpanTermQueryBuilder> opLambda) {
+        SpanTermQueryBuilder builder = regSpanTermQ("product_name", productName);
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
     public void setProductName_GreaterThan(String productName) {
         setProductName_GreaterThan(productName, null);
     }
@@ -1491,6 +1559,16 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         }
     }
 
+    public void setProductStatus_SpanTerm(String productStatus) {
+        setProductStatus_SpanTerm("product_status", null);
+    }
+
+    public void setProductStatus_SpanTerm(String productStatus, ConditionOptionCall<SpanTermQueryBuilder> opLambda) {
+        SpanTermQueryBuilder builder = regSpanTermQ("product_status", productStatus);
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
     public void setProductStatus_GreaterThan(String productStatus) {
         setProductStatus_GreaterThan(productStatus, null);
     }
@@ -1698,6 +1776,16 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         }
     }
 
+    public void setProductStatusCode_SpanTerm(String productStatusCode) {
+        setProductStatusCode_SpanTerm("product_status_code", null);
+    }
+
+    public void setProductStatusCode_SpanTerm(String productStatusCode, ConditionOptionCall<SpanTermQueryBuilder> opLambda) {
+        SpanTermQueryBuilder builder = regSpanTermQ("product_status_code", productStatusCode);
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
     public void setProductStatusCode_GreaterThan(String productStatusCode) {
         setProductStatusCode_GreaterThan(productStatusCode, null);
     }
@@ -2079,6 +2167,16 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         }
     }
 
+    public void setRegisterUser_SpanTerm(String registerUser) {
+        setRegisterUser_SpanTerm("register_user", null);
+    }
+
+    public void setRegisterUser_SpanTerm(String registerUser, ConditionOptionCall<SpanTermQueryBuilder> opLambda) {
+        SpanTermQueryBuilder builder = regSpanTermQ("register_user", registerUser);
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
     public void setRegisterUser_GreaterThan(String registerUser) {
         setRegisterUser_GreaterThan(registerUser, null);
     }
@@ -2634,6 +2732,16 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         }
     }
 
+    public void setUpdateUser_SpanTerm(String updateUser) {
+        setUpdateUser_SpanTerm("update_user", null);
+    }
+
+    public void setUpdateUser_SpanTerm(String updateUser, ConditionOptionCall<SpanTermQueryBuilder> opLambda) {
+        SpanTermQueryBuilder builder = regSpanTermQ("update_user", updateUser);
+        if (opLambda != null) {
+            opLambda.callback(builder);
+        }
+    }
     public void setUpdateUser_GreaterThan(String updateUser) {
         setUpdateUser_GreaterThan(updateUser, null);
     }

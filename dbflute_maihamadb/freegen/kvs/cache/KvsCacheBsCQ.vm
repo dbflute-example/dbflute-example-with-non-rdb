@@ -1,0 +1,112 @@
+##
+## Copyright 2014-2016 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.cbean.cq.bs;
+
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Predicate;
+
+import org.dbflute.dbmeta.info.ColumnInfo;
+import org.dbflute.util.DfCollectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ${tableMap.dbflutePackage}.bsentity.dbmeta.${table.capCamelName}Dbm;
+import ${tableMap.dbflutePackage}.exentity.${table.capCamelName};
+
+/**
+ * The base condition-query of (${table.comment})${table.capCamelName}.
+ * @author FreeGen
+ */
+public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Logger logger = LoggerFactory.getLogger(Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ.class);
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected ${table.camelizedName}Dbm dbMeta = ${table.camelizedName}Dbm.getInstance();
+    protected Comparator<${table.camelizedName}> orderBy;
+    protected Map<ColumnInfo, Object> columnEqualValue = DfCollectionUtil.newHashMap();
+    protected Map<ColumnInfo, Boolean> columnOrderBy = DfCollectionUtil.newHashMap();
+
+    // ===================================================================================
+    //                                                                           Condition
+    //                                                                           =========
+#set ($targetdb = $tableMap.databaseMap.maindb.instance)
+#set ($dbTable = $targetdb.getTable($table.uncapCamelName))
+#foreach ($dbColumn in $dbTable.columnList)
+#set ($initCapName = ${manager.initCap($dbColumn.javaName)})
+#set ($fieldName =  ${manager.initUncap($dbColumn.javaName)})
+    public void set${initCapName}_Equal(${dbColumn.javaNative} ${fieldName}) {
+        columnEqualValue.put(dbMeta.column${initCapName}(), ${fieldName});
+    }
+
+    public void addOrderBy_${initCapName}_Asc() {
+        columnOrderBy.put(dbMeta.column${initCapName}(), true);
+
+        orderBy = (orderBy == null) ? //
+                Comparator.comparing(${table.capCamelName}::get${initCapName}, Comparator.naturalOrder())
+                : orderBy.thenComparing(${table.capCamelName}::get${initCapName}, Comparator.naturalOrder());
+    }
+
+    public void addOrderBy_${initCapName}_Desc() {
+        columnOrderBy.put(dbMeta.column${initCapName}(), false);
+
+        orderBy = (orderBy == null) ? //
+                Comparator.comparing(${table.capCamelName}::get${initCapName}, Comparator.reverseOrder())
+                : orderBy.thenComparing(${table.capCamelName}::get${initCapName}, Comparator.reverseOrder());
+    }
+
+#end
+    // ===================================================================================
+    //                                                                        Assist Logic
+    //                                                                        ============
+    public Comparator<${table.camelizedName}> getOrderByComparator() {
+        return orderBy;
+    }
+
+    public Predicate<${table.camelizedName}> getWherePredicate() {
+        return entity -> {
+            for (Entry<ColumnInfo, Object> entry : columnEqualValue.entrySet()) {
+                Object value = entry.getKey().read(entity);
+                logger.debug("filter [{}] CB[{}] = RECORD[{}]\n", entry.getKey().getColumnDbName(), entry.getValue(), value);
+
+                if (value == null) {
+                    return false;
+                }
+
+                if (!value.equals(entry.getValue())) {
+                    return false;
+                }
+            }
+
+            return true;
+        };
+    }
+
+    public Map<ColumnInfo, Object> xdfgetColumnEqualValue() {
+        return columnEqualValue;
+    }
+
+    public Map<ColumnInfo, Boolean> xdfgetColumnOrderBy() {
+        return columnOrderBy;
+    }
+}

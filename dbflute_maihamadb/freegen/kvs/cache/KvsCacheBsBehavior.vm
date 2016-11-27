@@ -1,0 +1,331 @@
+##
+## Copyright 2014-2016 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+#set ($_existsSingleKvsKeyMethod = false)
+#set ($_existsCompositeKvsKeyMethod = false)
+#foreach ($column in $table.columnList)
+#if (!$column.many)
+#set ($_existsSingleKvsKeyMethod = true)
+#end
+#if ($column.many)
+#set ($_existsCompositeKvsKeyMethod = true)
+#end
+#end
+${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.bsbhv;
+
+#if ($tableMap.suppressBehaviorBasicMethodGen != 'true')
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.annotation.Resource;
+
+import org.dbflute.dbmeta.info.ColumnInfo;
+import org.dbflute.kvs.cache.bhv.AbstractKvsCacheBehaviorWritable;
+#if ($_existsSingleKvsKeyMethod)
+import org.dbflute.optional.OptionalEntity;
+#end
+import org.dbflute.util.DfCollectionUtil;
+
+import ${tableMap.dbflutePackage}.bsentity.dbmeta.$!{tableMap.schemaPrefix}${table.camelizedName}Dbm;
+import ${tableMap.dbflutePackage}.cbean.$!{tableMap.schemaPrefix}${table.camelizedName}CB;
+import ${tableMap.dbflutePackage}.exentity.$!{tableMap.schemaPrefix}${table.camelizedName};
+import ${request.package}.${tableMap.schema}.cbean.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB;
+import ${request.package}.${tableMap.schema}.facade.${manager.initCap($tableMap.schema)}KvsCacheFacade;
+#else
+import javax.annotation.Resource;
+
+import ${request.package}.${tableMap.schema}.facade.${manager.initCap($tableMap.schema)}KvsCacheFacade;
+#end
+
+/**
+ * The behavior of (${table.comment})${table.capCamelName}.
+ * @author FreeGen
+ */
+public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv extends AbstractKvsCacheBehaviorWritable<${table.camelizedName}, ${table.camelizedName}CB, Kvs${table.camelizedName}CB> {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** ${manager.initCap($tableMap.schema)}KvsCacheFacade. */
+    @Resource
+    private ${manager.initCap($tableMap.schema)}KvsCacheFacade ${tableMap.schema}KvsCacheFacade;
+
+#if ($tableMap.suppressBehaviorBasicMethodGen != 'true')
+    /**
+     * Handle the meta as DBMeta, that has all info of the table.
+     * @return DBMeta instance (NotNull)
+     */
+    public $!{tableMap.schemaPrefix}${table.camelizedName}Dbm asDBMeta() {
+        return $!{tableMap.schemaPrefix}${table.camelizedName}Dbm.getInstance();
+    }
+#foreach ($column in $table.columnList)
+
+    // ===================================================================================
+    //                                                              ${column.capCamelName}
+    //                                                              ======================
+#if (!$column.many)
+    /**
+     * Select the entity by the condition-bean.<br>
+     * It returns non-null Optional entity, so you should...
+     * <ul>
+     *   <li>use alwaysPresent() if the data is always present as your business rule</li>
+     *   <li>use ifPresent() and orElse() if it might be empty</li>
+     * </ul>
+     * <pre>
+     * <span style="color: #0000C0">kvs$!{tableMap.schemaPrefix}${table.camelizedName}Bhv</span>.<span style="color: #CC4747">selectEntityBy${column.capCamelName}</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #3F7E5E">// Setting query condition to the key column is required</span>
+     *     <span style="color: #553000">cb</span>.query().set${column.capCamelName}_Equal(1);
+     *     <span style="color: #3F7E5E">// Condition for other column(s) can be set if necessary</span>
+     *     <span style="color: #553000">cb</span>.query().set...
+     * }).<span style="color: #CC4747">alwaysPresent</span>(<span style="color: #553000">${table.uncapCamelName}</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ...
+     * });
+     * </pre>
+     * @param cbLambda The callback for condition-bean of Kvs$!{tableMap.schemaPrefix}${table.camelizedName} (NotNull)
+     * @return The optional entity selected by the condition (NotNull: if no data, empty entity)
+     */
+    public OptionalEntity<$!{tableMap.schemaPrefix}${table.camelizedName}> selectEntityBy${column.capCamelName}(Consumer<Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB> cbLambda) {
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB = createCB(cbLambda);
+        ${table.camelizedName}CB cb = adjustKvsConditionBeanOf${column.capCamelName}(kvsCB);
+
+        OptionalEntity<${table.camelizedName}> optEntity = ${tableMap.schema}KvsCacheFacade.findEntity(createKvsKeyListOf${column.capCamelName}(kvsCB), cb);
+
+        return Stream.of(optEntity)
+                .filter(OptionalEntity::isPresent)
+                .map(OptionalEntity::get)
+                .filter(kvsCB.query().getWherePredicate())
+                .findFirst()
+                .map(OptionalEntity::of)
+                .orElse(OptionalEntity.empty());
+    }
+
+    // KVS CB から ${column.capCamelName} 用の ${table.camelizedName}CB を作成して返します。
+    protected ${table.camelizedName}CB adjustKvsConditionBeanOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB) {
+        ${table.camelizedName}CB cb = new ${table.camelizedName}CB();
+        addKvsConditionOf${column.capCamelName}(kvsCB, cb);
+
+        return cb;
+    }
+
+    // ${column.capCamelName} で DB に使う条件のみを kvsCB から取り出し cb に設定します。
+    protected void addKvsConditionOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB, ${table.camelizedName}CB cb) {
+        addDefaultWhereOf${column.capCamelName}(kvsCB, cb);
+    }
+
+    // ${column.capCamelName} 用の キー条件を CB に設定します。
+    protected void addDefaultWhereOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB, ${table.camelizedName}CB cb) {
+        Map<ColumnInfo, Object> columnEqualValue = kvsCB.query().xdfgetColumnEqualValue();
+
+#foreach ($kvsKey in $column.kvsKeys)
+#set ($name = $manager.camelize($kvsKey))
+#set ($fieldName = ${manager.initUncap($name)})
+        Object ${fieldName} = columnEqualValue.get(asDBMeta().column${name}());
+        if (${fieldName} == null) {
+            throw new IllegalStateException("'set${column.capCamelName}_Equal()' has not been called.");
+        }
+        cb.query().invokeQueryEqual("${fieldName}", ${fieldName});
+#end
+    }
+#else
+    /**
+     * Select the entity List by the condition-bean.
+     * <pre>
+     * ListResultBean&lt;SakuhinDetail&gt; sakuhinDetailList = <span style="color: #0000C0">kvsSakuhinDetailBhv</span>.<span style="color: #CC4747">selectListByProductionCountrySakuhin</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #3F7E5E">// Setting query condition to the key column(s) is required</span>
+     *     <span style="color: #553000">cb</span>.query().setDisplayProductionCountry_Equal(countryName);
+     *     <span style="color: #553000">cb</span>.query().setSakuhinKana_LikeSearch(...);
+     * });
+     * sakuhinDetailList.forEach(<span style="color: #553000">detail</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ... = <span style="color: #553000">detail</span>.get...;
+     * });
+     * </pre>
+     * @param cbLambda The callback for condition-bean of Kvs$!{tableMap.schemaPrefix}${table.camelizedName} (NotNull)
+     * @return The List of entities selected by the condition (NotNull: if no data, empty list)
+     */
+    public List<$!{tableMap.schemaPrefix}${table.camelizedName}> selectListBy${column.capCamelName}(Consumer<Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB> cbLambda) {
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB = createCB(cbLambda);
+        ${table.camelizedName}CB cb = adjustKvsConditionBeanOf${column.capCamelName}(kvsCB);
+
+        List<${table.camelizedName}> list = ${tableMap.schema}KvsCacheFacade.findList(createKvsKeyListOf${column.capCamelName}(kvsCB), cb);
+
+        Predicate<${table.camelizedName}> filter = kvsCB.query().getWherePredicate();
+        Comparator<${table.camelizedName}> sorted = kvsCB.query().getOrderByComparator();
+
+        Stream<${table.camelizedName}> stream = list.stream().filter(filter);
+
+        if (sorted != null) {
+            stream = stream.sorted(sorted);
+        }
+
+        if (kvsCB.xgetFetchFirst().isPresent()) {
+            stream = stream.limit(kvsCB.xgetFetchFirst().get());
+        }
+
+        return stream.collect(Collectors.toList());
+    }
+
+    // KVS CB から ${column.capCamelName} 用の ${table.camelizedName}CB を作成して返します。
+    protected ${table.camelizedName}CB adjustKvsConditionBeanOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB) {
+        ${table.camelizedName}CB cb = new ${table.camelizedName}CB();
+        addKvsConditionOf${column.capCamelName}(kvsCB, cb);
+
+        return cb;
+    }
+
+    // ${column.capCamelName} で DB に使う条件のみを kvsCB から取り出し cb に設定します。
+    protected void addKvsConditionOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB, ${table.camelizedName}CB cb) {
+        addDefaultWhereOf${column.capCamelName}(kvsCB, cb);
+        addDefaultOrderByOf${column.capCamelName}(cb);
+        kvsCB.xgetFetchFirst().ifPresent(fetchSize -> cb.fetchFirst(fetchSize));
+    }
+
+    // ${column.capCamelName} 用の キー条件を CB に設定します。
+    protected void addDefaultWhereOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB, ${table.camelizedName}CB cb) {
+        Map<ColumnInfo, Object> columnEqualValue = kvsCB.query().xdfgetColumnEqualValue();
+
+#foreach ($kvsKey in $column.kvsKeys)
+#set ($name = $manager.camelize($kvsKey))
+#set ($fieldName = ${manager.initUncap($name)})
+        Object ${fieldName} = columnEqualValue.get(asDBMeta().column${name}());
+        if (${fieldName} == null) {
+            throw new IllegalStateException("'set${column.capCamelName}_Equal()' has not been called.");
+        }
+        cb.query().invokeQueryEqual("${fieldName}", ${fieldName});
+#end
+    }
+
+    // ${column.capCamelName} 用のデフォルトソート順を CB に設定します。
+    protected void addDefaultOrderByOf${column.capCamelName}(${table.camelizedName}CB cb) {
+#foreach ($order in $column.orderBy)
+#set ($ascDesc = "Asc")
+#foreach($value in $order.split(' '))
+#if($velocityCount == 1)
+#set ($methodName = $value)
+#elseif($velocityCount == 2 && $value.equalsIgnoreCase("DESC"))
+#set ($ascDesc = "Desc")
+#end
+#end
+        cb.query().addOrderBy_${manager.camelize($methodName)}_${ascDesc}();
+#end
+    }
+
+    /**
+     * ${column.capCamelName} 用のデフォルトソート順を Comparator で取得します。
+     */
+    protected Comparator<${table.camelizedName}> createDefaultOrderByOf${column.capCamelName}() {
+#foreach ($order in $column.orderBy)
+#set ($methodName = "")
+#set ($ascDesc = "Comparator.naturalOrder()")
+#foreach($value in $order.split(' '))
+#if($velocityCount == 1)
+#set ($methodName = $value)
+#elseif($velocityCount == 2 && $value.equalsIgnoreCase("DESC"))
+#set ($ascDesc = "Comparator.reverseOrder()")
+#end
+#end
+#if ($velocityCount == 1)
+        Comparator<${table.camelizedName}> comparator = Comparator.comparing(${table.camelizedName}::get${manager.camelize($methodName)}, $ascDesc);
+#else
+        comparator.thenComparing(${table.camelizedName}::get${manager.camelize($methodName)}, Comparator.naturalOrder());
+#end
+#end
+        return comparator;
+    }
+#end
+
+    /**
+     * Insert or update the entity.
+     * <pre>
+     * <span style="color: #0000C0">kvsSakuhinBhv</span>.<span style="color: #CC4747">insertOrUpdateBySakuhinId</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     Sakuhin sakuhin = <span style="color: #70226C">new</span> Sakuhin();
+     *     <span style="color: #3F7E5E">// If you are going to update or the KVS-key which is not primary key in RDB is specified, set key-column(s)</span>
+     *     <span style="color: #3F7E5E">// e.g.) sakuhin.setProductionYear(year);</span>
+     *     <span style="color: #3F7E5E">// Set value for insert/update</span>
+     *     sakuhin.set...;
+     *     ...
+     *     <span style="color: #70226C">return</span> sakuhin;
+     * });
+     * </pre>
+     * @param entityLambda The handler of entity row of $!{tableMap.schemaPrefix}${table.camelizedName} (NotNull)
+     * @return The Entity used to insert/update with automatically-set column value (NotNull)
+     */
+    public $!{tableMap.schemaPrefix}${table.camelizedName} insertOrUpdateBy${column.capCamelName}(Supplier<$!{tableMap.schemaPrefix}${table.camelizedName}> entityLambda) {
+        $!{tableMap.schemaPrefix}${table.camelizedName} ${table.uncapCamelName} = entityLambda.get();
+        ${tableMap.schema}KvsCacheFacade.insertOrUpdate(createKvsKeyListOf${column.capCamelName}(${table.uncapCamelName}), ${table.uncapCamelName});
+
+        return ${table.uncapCamelName};
+    }
+
+    /**
+     * Delete the entity.
+     * <pre>
+     * <span style="color: #0000C0">kvsSakuhinBhv</span>.<span style="color: #CC4747">deleteBySakuhinId</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     Sakuhin sakuhin = <span style="color: #70226C">new</span> Sakuhin();
+     *     <span style="color: #3F7E5E">// Set KVS-key(s)</span>
+     *     sakuhin.setSakuhinId(<span style="color: #553000">sakuhinId</span>);
+     *     <span style="color: #70226C">return</span> sakuhin;
+     * });
+     * </pre>
+     * @param entityLambda The handler of entity row of $!{tableMap.schemaPrefix}${table.camelizedName} (NotNull)
+     * @return The Entity used to delete (NotNull)
+     */
+    public $!{tableMap.schemaPrefix}${table.camelizedName} deleteBy${column.capCamelName}(Supplier<$!{tableMap.schemaPrefix}${table.camelizedName}> entityLambda) {
+        $!{tableMap.schemaPrefix}${table.camelizedName} ${table.uncapCamelName} = entityLambda.get();
+        ${tableMap.schema}KvsCacheFacade.delete(createKvsKeyListOf${column.capCamelName}(${table.uncapCamelName}), ${table.uncapCamelName});
+
+        return ${table.uncapCamelName};
+    }
+
+    protected List<Object> createKvsKeyListOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB) {
+        List<Object> kvsKeyList = DfCollectionUtil.newArrayList();
+        kvsKeyList.add("${column.name}");
+
+        Map<ColumnInfo, Object> columnEqualValue = kvsCB.query().xdfgetColumnEqualValue();
+
+#foreach ($kvsKey in $column.kvsKeys)
+#set ($fieldName = ${manager.initUncap($manager.camelize($kvsKey))}) 
+        // $fieldName
+        Object $fieldName = columnEqualValue.get(asDBMeta().column${manager.camelize($kvsKey)}());
+        if ($fieldName == null) {
+            throw new IllegalStateException("'set${manager.camelize($kvsKey)}_Equal()' has not been called.");
+        }
+        kvsKeyList.add($fieldName);
+
+#end
+        return kvsKeyList;
+    }
+
+    protected List<Object> createKvsKeyListOf${column.capCamelName}($!{tableMap.schemaPrefix}${table.camelizedName} ${table.uncapCamelName}) {
+        List<Object> kvsKeyList = DfCollectionUtil.newArrayList();
+        kvsKeyList.add("${column.name}");
+#foreach ($kvsKey in $column.kvsKeys)
+        kvsKeyList.add(${table.uncapCamelName}.get${manager.camelize($kvsKey)}());
+#end
+        return kvsKeyList;
+    }
+#end
+
+    @Override
+    public Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB newConditionBean() {
+        return new Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB();
+    }
+#end
+}

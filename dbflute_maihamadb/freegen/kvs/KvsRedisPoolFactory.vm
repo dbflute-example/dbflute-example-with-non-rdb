@@ -1,0 +1,65 @@
+##
+## Copyright 2014-2016 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${manager.allClassCopyright}package ${request.package};
+
+import org.dbflute.kvs.core.delegator.KvsRedisPool;
+#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+import org.dbflute.saflute.core.util.ContainerUtil;
+#end
+#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+import org.lastaflute.core.util.ContainerUtil;
+#end
+
+import redis.clients.jedis.JedisPoolConfig;
+
+/**
+ * KvsRedisPoolFactory.
+ * @author FreeGen
+ */
+public class KvsRedisPoolFactory {
+
+#foreach ($table in $request.tableList)
+    /**
+     * create ${table.uncapCamelName}(${table.comment}) pool.
+     * @return ${table.uncapCamelName}(${table.comment}) pool
+     */
+    public static KvsRedisPool create${table.camelizedName}() {
+        ${table.configClass} config =
+                ContainerUtil.getComponent(${table.configClass}.class);
+
+        JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
+        jedisPoolConfig.setMaxWaitMillis(config.getKvs${table.camelizedName}MaxWaitMillisAsInteger());
+        jedisPoolConfig.setMinEvictableIdleTimeMillis(config.getKvs${table.camelizedName}MinEvictableIdleTimeMillisAsInteger());
+        jedisPoolConfig.setSoftMinEvictableIdleTimeMillis(config.getKvs${table.camelizedName}SoftMinEvictableIdleTimeMillisAsInteger());
+        jedisPoolConfig.setNumTestsPerEvictionRun(config.getKvs${table.camelizedName}NumTestsPerEvictionRunAsInteger());
+        jedisPoolConfig.setTestOnBorrow(config.isKvs${table.camelizedName}TestOnBorrow());
+        jedisPoolConfig.setTestOnReturn(config.isKvs${table.camelizedName}TestOnReturn());
+        jedisPoolConfig.setTestWhileIdle(config.isKvs${table.camelizedName}TestWhileIdle());
+        jedisPoolConfig.setTimeBetweenEvictionRunsMillis(config.getKvs${table.camelizedName}TimeBetweenEvictionRunsMillisAsInteger());
+        jedisPoolConfig.setMaxTotal(config.getKvs${table.camelizedName}MaxTotalAsInteger());
+        jedisPoolConfig.setMaxIdle(config.getKvs${table.camelizedName}MaxIdleAsInteger());
+        jedisPoolConfig.setMinIdle(config.getKvs${table.camelizedName}MinIdleAsInteger());
+
+        KvsRedisPool kvsRedisPool = new KvsRedisPool();
+        kvsRedisPool.setJedisPoolConfig(jedisPoolConfig);
+        kvsRedisPool.setHost(config.getKvs${table.camelizedName}Host());
+        kvsRedisPool.setPort(config.getKvs${table.camelizedName}PortAsInteger());
+        kvsRedisPool.setTimeout(config.getKvs${table.camelizedName}TimeoutAsInteger());
+
+        return kvsRedisPool;
+    }
+#end
+}

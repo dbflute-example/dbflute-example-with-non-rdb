@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//DBFLUTE//DTD LastaDi 1.0//EN"
+    "http://dbflute.org/meta/lastadi10.dtd">
+<components namespace="kvs_store-examplestore">
+    <include condition="#exists('#path')" path="my_included_kvs-store.xml"/>
+    <include path="kvs/di/kvs-pool-examplekvs.xml"/>
+
+    <component name="examplestoreKvsStoreFacade" class="org.docksidestage.kvs.store.examplestore.facade.ExamplestoreKvsStoreFacade" />
+
+    <!-- The components of Behavior. -->
+    <component name="kvsEgStoreExampleBhv" class="org.docksidestage.kvs.store.examplestore.exbhv.KvsEgStoreExampleBhv"/>
+</components>

@@ -1,0 +1,108 @@
+##
+## Copyright 2014-2016 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.bsentity;
+
+import java.io.Serializable;
+
+import org.dbflute.kvs.store.entity.KvsStoreEntity;
+import org.dbflute.kvs.store.entity.dbmeta.KvsStoreDBMeta;
+
+import ${request.package}.${tableMap.schema}.bsentity.dbmeta.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm;
+#if ($table.hasRefColumn)
+import ${request.package}.${tableMap.schema}.entity.ex.*;
+#end
+
+/**
+ * The entity of (${table.comment})${table.capCamelName}.
+ * @author FreeGen
+ */
+public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName} implements KvsStoreEntity, Serializable {
+
+    /** The serial version UID for object serialization. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+#foreach ($column in $table.columnList)
+#if ($column.isNormalColumn)
+#set ($javaNative = ${column.type})
+#elseif ($column.isRefColumn)
+#set ($javaNative = ${column.camelizedName})
+#end
+    /** ${column.name}: ${column.comment} */
+#if ($column.default)
+    protected ${javaNative} _${column.uncapCamelName} = ${column.default};
+#else
+    protected ${javaNative} _${column.uncapCamelName};
+#end
+
+#end
+    // [Referrers] *comment only
+#foreach ($referrer in $table.referrerList)
+    // o ${referrer.name}
+#end
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+#foreach ($column in $table.columnList)
+#if ($column.isNormalColumn)
+#set ($javaNative = ${column.type})
+#elseif ($column.isRefColumn)
+#set ($javaNative = ${column.camelizedName})
+#end
+    /**
+     * ${column.comment}を返す。
+     * @return ${column.comment}
+     */
+    public ${javaNative} get${column.capCamelName}() {
+#if ($javaNative.startsWith('java.util.Map') || $javaNative.startsWith('java.util.List'))
+        if (_${column.uncapCamelName} == null) {
+            _${column.uncapCamelName} = new ${javaNative.replaceAll('^java\.util\.List', 'java\.util\.ArrayList').replaceAll('^java\.util\.Map', 'java\.util\.LinkedHashMap')}();
+        }
+#end
+        return _${column.uncapCamelName};
+    }
+
+    /**
+     * ${column.comment}を設定する。
+     * @param ${column.uncapCamelName} ${column.comment}
+     */
+    public void set${column.capCamelName}(${javaNative} ${column.uncapCamelName}) {
+        _${column.uncapCamelName} = ${column.uncapCamelName};
+    }
+
+#end
+    @Override
+    public KvsStoreDBMeta asDBMeta() {
+        return Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm.getInstance();
+    }
+
+    @Override
+    public String toString() {
+        String delimiter = ", ";
+        StringBuilder sb = new StringBuilder();
+#foreach ($column in $table.columnList)
+        sb.append(delimiter).append(get${column.capCamelName}());
+#end
+        if (sb.length() > delimiter.length()) {
+            sb.delete(0, delimiter.length());
+        }
+        sb.insert(0, super.toString() + "{").append("}");
+        return sb.toString();
+    }
+}

@@ -21,4 +21,74 @@
             ; mappingMap = map:{ type = map:{ string = String; text_ja = String; tint = Integer; tlong = Long; float = Float; tdate = java.time.LocalDateTime; }}
         }
     }
+    # ==========================================================================
+    #                                                                   Kvs Pool
+    #                                                                   ========
+    ; KvsPool = map:{
+        ; resourceMap = map:{
+            ; baseDir = ../src/main
+            ; resourceType = JSON_SCHEMA
+            ; resourceFile = playkvs/schema/kvs-pool.json
+        }
+        ; outputMap = map:{
+            ; templateFile = unused
+            ; outputDirectory = $$baseDir$$/java
+            ; package = org.docksidestage.kvs.pool
+            ; className = unused
+        }
+        ; tableMap = map:{
+            ; tablePath = map
+        }
+    }
+    # ==========================================================================
+    #                                                    Kvs Store(examplestore)
+    #                                                    =======================
+    ; KvsStoreExampleStore = map:{
+        ; resourceMap = map:{
+            ; baseDir = ../src/main
+            ; resourceType = JSON_SCHEMA
+            ; resourceFile = playkvs/schema/kvs-store-schema-examplestore.json
+        }
+        ; outputMap = map:{
+            ; templateFile = unused
+            ; outputDirectory = $$baseDir$$/java
+            ; package = org.docksidestage.kvs.store
+            ; className = unused
+        }
+        ; tableMap = map:{
+            ; tablePath = map
+            ; schema = examplestore
+            ; schemaPrefix = Eg
+            ; kvsPoolDiFile = kvs/di/kvs-pool-examplekvs.xml
+        }
+    }
+    # ==========================================================================
+    #                                                       Kvs Cache(maihamadb)
+    #                                                       ====================
+    ; KvsCacheExampledb = map:{
+        ; resourceMap = map:{
+            ; baseDir = ../src/main
+            ; resourceType = JSON_SCHEMA
+            ; resourceFile = playkvs/schema/kvs-cache-schema-maihamadb.json
+        }
+        ; outputMap = map:{
+            ; templateFile = unused
+            ; outputDirectory = $$baseDir$$/java
+            ; package = org.docksidestage.kvs.cache
+            ; className = unused
+        }
+        ; tableMap = map:{
+            ; tablePath = map
+            ; schema = maihamadb
+            ; schemaPrefix =
+            ; kvsPoolDiFile = kvs/di/kvs-pool-examplekvs.xml
+            ; dbfluteDiFile = dbflute.xml
+            ; dbflutePackage = org.docksidestage.dbflute
+            ; databaseMap = map:{
+                ; maindb = map:{
+                    ; schemaFile = ./schema/project-schema-maihamadb.xml
+                }
+            }
+        }
+    }
 }

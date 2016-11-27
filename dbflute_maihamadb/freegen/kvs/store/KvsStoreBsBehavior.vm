@@ -1,0 +1,185 @@
+##
+## Copyright 2014-2016 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+#set ($kvsKeyCount = 0)
+#foreach ($column in $table.columnList)
+#if ($column.kvsKey)
+#set ($kvsKeyCount = $kvsKeyCount + 1)
+#end
+#end
+${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.bsbhv;
+
+#if ($kvsKeyCount == 1)
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+
+import org.dbflute.optional.OptionalEntity;
+import org.dbflute.util.DfCollectionUtil;
+#else
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import javax.annotation.Resource;
+
+import org.dbflute.optional.OptionalEntity;
+#end
+
+import ${request.package}.${tableMap.schema}.bsentity.dbmeta.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm;
+import ${request.package}.${tableMap.schema}.cbean.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB;
+import ${request.package}.${tableMap.schema}.exentity.Kvs$!{tableMap.schemaPrefix}${table.camelizedName};
+import ${request.package}.${tableMap.schema}.facade.${manager.initCap($tableMap.schema)}KvsStoreFacade;
+
+/**
+ * The behavior of (${table.comment})${table.capCamelName}.
+ * @author FreeGen
+ */
+public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv {
+
+    /** ${manager.initCap($tableMap.schema)}KvsStoreFacade. */
+    @Resource
+    private ${manager.initCap($tableMap.schema)}KvsStoreFacade ${tableMap.schema}KvsStoreFacade;
+
+    /**
+     * Handle the meta as DBMeta, that has all info of the table.
+     * @return DBMeta instance (NotNull)
+     */
+    public Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm asDBMeta() {
+        return Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm.getInstance();
+    }
+
+    /**
+     * Select the entity by the condition-bean.<br>
+     * It returns non-null Optional entity, so you should...
+     * <ul>
+     *   <li>use alwaysPresent() if the data is always present as your business rule</li>
+     *   <li>use ifPresent() and orElse() if it might be empty</li>
+     * </ul>
+     * <pre>
+     * <span style="color: #0000C0">kvs$!{tableMap.schemaPrefix}${table.camelizedName}Bhv</span>.<span style="color: #CC4747">selectEntity</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.acceptKey(<span style="color: #553000">key</span>);
+     * }).<span style="color: #CC4747">ifPresent</span>(<span style="color: #553000">${table.uncapCamelName}</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #3F7E5E">// Called if present</span>
+     *     ... = <span style="color: #553000">${table.uncapCamelName}</span>.get...;
+     * }).<span style="color: #CC4747">orElse</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #3F7E5E">// Called if not present</span>
+     *     ...
+     * });
+     * </pre>
+     * @param cbLambda The callback for condition-bean of Kvs$!{tableMap.schemaPrefix}${table.camelizedName}. (NotNull)
+     * @return The optional entity selected by the condition. (NotNull: if no data, empty entity)
+     */
+    public OptionalEntity<Kvs$!{tableMap.schemaPrefix}${table.camelizedName}> selectEntity(Consumer<Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB> cbLambda) {
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB cb = new Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB();
+        cbLambda.accept(cb);
+
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm kvs$!{tableMap.schemaPrefix}${table.uncapCamelName}Dbm = asDBMeta();
+        kvs$!{tableMap.schemaPrefix}${table.uncapCamelName}Dbm.validateKeyColumn(cb);
+
+        return ${tableMap.schema}KvsStoreFacade.findEntity(kvs$!{tableMap.schemaPrefix}${table.uncapCamelName}Dbm, kvs$!{tableMap.schemaPrefix}${table.uncapCamelName}Dbm.extractKeyList(cb));
+    }
+
+## TODO kvskey が１つの時だけ使えるようにした複数考慮してない
+#foreach ($column in $table.columnList)
+#if ($kvsKeyCount == 1 && $column.kvsKey)
+    /**
+     * Select the entity List by the condition-bean.
+     * <pre>
+     * List&lt;Kvs$!{tableMap.schemaPrefix}${table.camelizedName}&gt; kvs${table.camelizedName}List = <span style="color: #0000C0">kvs$!{tableMap.schemaPrefix}${table.camelizedName}Bhv</span>.<span style="color: #CC4747">selectList</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.query().set${column.capCamelName}_inScope(<span style="color: #553000">keyList</span>);
+     * });
+     * kvs${table.camelizedName}List.forEach(<span style="color: #553000">${table.uncapCamelName}</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ... = <span style="color: #553000">${table.uncapCamelName}</span>.get...;
+     * });
+     * </pre>
+     * @param cbLambda The callback for condition-bean of Kvs$!{tableMap.schemaPrefix}${table.camelizedName} (NotNull)
+     * @return The List of entities selected by the condition (NotNull: if no data, empty list)
+     */
+    public List<Kvs$!{tableMap.schemaPrefix}${table.camelizedName}> selectList(Consumer<Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB> cbLambda) {
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB cb = new Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB();
+        cbLambda.accept(cb);
+
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm dbMeta = asDBMeta();
+
+        List<List<Object>> keyListList = cb.query().xdfget${column.camelizedName}List().stream().map(value -> {
+            List<Object> keyList = DfCollectionUtil.newArrayList(value);
+            return keyList;
+        }).collect(Collectors.toList());
+
+        return ${tableMap.schema}KvsStoreFacade.findEntityMap(dbMeta, keyListList)
+                .entrySet()
+                .stream()
+                .map(entry -> (Kvs$!{tableMap.schemaPrefix}${table.camelizedName}) entry.getValue())
+                .collect(Collectors.toList());
+    }
+
+#end
+#end
+#if ($kvsKeyCount != 1)
+    /** KVSキーが複数存在するため、現在の仕様では selectList は作成されません。 */
+
+#end
+    /**
+     * Insert or update the entity.
+     * <pre>
+     * <span style="color: #0000C0">kvsCalcEvaluationBhv</span>.<span style="color: #CC4747">insertOrUpdate</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     KvsCalcEvaluation evaluation = <span style="color: #70226C">new</span> KvsCalcEvaluation();
+     *     <span style="color: #3F7E5E">// Setting KVS-key(s) is required</span>
+     *     evaluation.setSakuhinPublicCode(<span style="color: #553000">sakuhinCode</span>);
+     *     evaluation.setPlatformPublicCode(<span style="color: #553000">platformCode</span>);
+     *     <span style="color: #3F7E5E">// Set other column value(s) for insert/update</span>
+     *     evaluation.set...;
+     *     ...
+     *     <span style="color: #70226C">return</span> evaluation;
+     * });
+     * </pre>
+     * @param entityLambda The handler of entity row of Kvs$!{tableMap.schemaPrefix}${table.camelizedName} (NotNull)
+     * @return The Entity used to insert/update with automatically-set column value (NotNull)
+     */
+    public Kvs$!{tableMap.schemaPrefix}${table.camelizedName} insertOrUpdate(Supplier<Kvs$!{tableMap.schemaPrefix}${table.camelizedName}> entityLambda) {
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName} ${table.uncapCamelName} = entityLambda.get();
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm ${table.uncapCamelName}Dbm = asDBMeta();
+        ${table.uncapCamelName}Dbm.validateAllColumn(${table.uncapCamelName});
+        ${tableMap.schema}KvsStoreFacade.insertOrUpdate(${table.uncapCamelName}Dbm, ${table.uncapCamelName}Dbm.extractKeyList(${table.uncapCamelName}), ${table.uncapCamelName});
+
+        return ${table.uncapCamelName};
+    }
+
+    /**
+     * Delete the entity.
+     * <pre>
+     * <span style="color: #0000C0">kvsCalcEvaluationBhv</span>.<span style="color: #CC4747">delete</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     KvsCalcEvaluation evaluation = <span style="color: #70226C">new</span> KvsCalcEvaluation();
+     *     <span style="color: #3F7E5E">// Set KVS-key(s)</span>
+     *     evaluation.setSakuhinPublicCode(<span style="color: #553000">sakuhinCode</span>);
+     *     evaluation.setPlatformPublicCode(<span style="color: #553000">platformCode</span>);
+     *     <span style="color: #70226C">return</span> evaluation;
+     * });
+     * </pre>
+     * @param entityLambda The handler of entity row of Kvs$!{tableMap.schemaPrefix}${table.camelizedName} (NotNull)
+     * @return The Entity used to delete (NotNull)
+     */
+    public Kvs$!{tableMap.schemaPrefix}${table.camelizedName} delete(Supplier<Kvs$!{tableMap.schemaPrefix}${table.camelizedName}> entityLambda) {
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName} ${table.uncapCamelName} = entityLambda.get();
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm ${table.uncapCamelName}Dbm = asDBMeta();
+        ${table.uncapCamelName}Dbm.validateKeyColumn(${table.uncapCamelName});
+        ${tableMap.schema}KvsStoreFacade.delete(${table.uncapCamelName}Dbm, ${table.uncapCamelName}Dbm.extractKeyList(${table.uncapCamelName}));
+
+        return ${table.uncapCamelName};
+    }
+}
