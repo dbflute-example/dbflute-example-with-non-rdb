@@ -27,7 +27,7 @@ SolrPagingResultBean<SolrExample> result = solrExampleBhv.selectPage(cb -> {
 ```
 contributed by U-NEXT: http://video.unext.jp/
 
-## KvsFlute for KVS (Redis)
+## KVSFlute for KVS (Redis)
 ```java
 OptionalEntity<Product> result = kvsProductBhv.selectEntityByProductId(cb -> {
     cb.query().setProductId_Equal(productId);
