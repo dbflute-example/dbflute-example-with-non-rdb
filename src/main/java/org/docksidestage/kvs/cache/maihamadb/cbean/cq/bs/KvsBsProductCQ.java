@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 import org.dbflute.dbmeta.info.ColumnInfo;
+import org.dbflute.kvs.core.assertion.KvsAssertion;
 import org.dbflute.util.DfCollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,7 @@ public abstract class KvsBsProductCQ {
     //                                                                           Condition
     //                                                                           =========
     public void setProductId_Equal(Integer productId) {
+        KvsAssertion.assertNullQuery("productId", columnEqualValue.get(dbMeta.columnProductId()));
         columnEqualValue.put(dbMeta.columnProductId(), productId);
     }
 
@@ -71,6 +73,7 @@ public abstract class KvsBsProductCQ {
     }
 
     public void setProductName_Equal(String productName) {
+        KvsAssertion.assertNullQuery("productName", columnEqualValue.get(dbMeta.columnProductName()));
         columnEqualValue.put(dbMeta.columnProductName(), productName);
     }
 
@@ -91,6 +94,7 @@ public abstract class KvsBsProductCQ {
     }
 
     public void setProductHandleCode_Equal(String productHandleCode) {
+        KvsAssertion.assertNullQuery("productHandleCode", columnEqualValue.get(dbMeta.columnProductHandleCode()));
         columnEqualValue.put(dbMeta.columnProductHandleCode(), productHandleCode);
     }
 
@@ -111,6 +115,7 @@ public abstract class KvsBsProductCQ {
     }
 
     public void setProductCategoryCode_Equal(String productCategoryCode) {
+        KvsAssertion.assertNullQuery("productCategoryCode", columnEqualValue.get(dbMeta.columnProductCategoryCode()));
         columnEqualValue.put(dbMeta.columnProductCategoryCode(), productCategoryCode);
     }
 
@@ -131,6 +136,7 @@ public abstract class KvsBsProductCQ {
     }
 
     public void setProductStatusCode_Equal(String productStatusCode) {
+        KvsAssertion.assertNullQuery("productStatusCode", columnEqualValue.get(dbMeta.columnProductStatusCode()));
         columnEqualValue.put(dbMeta.columnProductStatusCode(), productStatusCode);
     }
 
@@ -151,6 +157,7 @@ public abstract class KvsBsProductCQ {
     }
 
     public void setRegularPrice_Equal(Integer regularPrice) {
+        KvsAssertion.assertNullQuery("regularPrice", columnEqualValue.get(dbMeta.columnRegularPrice()));
         columnEqualValue.put(dbMeta.columnRegularPrice(), regularPrice);
     }
 
@@ -171,6 +178,7 @@ public abstract class KvsBsProductCQ {
     }
 
     public void setRegisterDatetime_Equal(java.time.LocalDateTime registerDatetime) {
+        KvsAssertion.assertNullQuery("registerDatetime", columnEqualValue.get(dbMeta.columnRegisterDatetime()));
         columnEqualValue.put(dbMeta.columnRegisterDatetime(), registerDatetime);
     }
 
@@ -191,6 +199,7 @@ public abstract class KvsBsProductCQ {
     }
 
     public void setRegisterUser_Equal(String registerUser) {
+        KvsAssertion.assertNullQuery("registerUser", columnEqualValue.get(dbMeta.columnRegisterUser()));
         columnEqualValue.put(dbMeta.columnRegisterUser(), registerUser);
     }
 
@@ -211,6 +220,7 @@ public abstract class KvsBsProductCQ {
     }
 
     public void setUpdateDatetime_Equal(java.time.LocalDateTime updateDatetime) {
+        KvsAssertion.assertNullQuery("updateDatetime", columnEqualValue.get(dbMeta.columnUpdateDatetime()));
         columnEqualValue.put(dbMeta.columnUpdateDatetime(), updateDatetime);
     }
 
@@ -231,6 +241,7 @@ public abstract class KvsBsProductCQ {
     }
 
     public void setUpdateUser_Equal(String updateUser) {
+        KvsAssertion.assertNullQuery("updateUser", columnEqualValue.get(dbMeta.columnUpdateUser()));
         columnEqualValue.put(dbMeta.columnUpdateUser(), updateUser);
     }
 
@@ -251,6 +262,7 @@ public abstract class KvsBsProductCQ {
     }
 
     public void setVersionNo_Equal(Long versionNo) {
+        KvsAssertion.assertNullQuery("versionNo", columnEqualValue.get(dbMeta.columnVersionNo()));
         columnEqualValue.put(dbMeta.columnVersionNo(), versionNo);
     }
 

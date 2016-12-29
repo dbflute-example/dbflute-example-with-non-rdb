@@ -25,6 +25,8 @@ ${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.cbean.
 import java.util.Collection;
 
 #end
+import org.dbflute.kvs.core.assertion.KvsAssertion;
+
 /**
  * The base condition-query of (${table.comment})${table.capCamelName}.
  * @author FreeGen
@@ -82,6 +84,10 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ {
      * @param ${column.uncapCamelName} ${column.comment}
      */
     public void set${column.capCamelName}_Equal(${javaNative} ${column.uncapCamelName}) {
+        KvsAssertion.assertNullQuery("${column.uncapCamelName}", _${column.uncapCamelName});
+#if ($kvsKeyCount == 1)
+        KvsAssertion.assertNullQuery("${column.uncapCamelName}", _${column.uncapCamelName}List);
+#end    
         _${column.uncapCamelName} = ${column.uncapCamelName};
     }
 
@@ -95,6 +101,8 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ {
     }
 
     public void set${column.camelizedName}_inScope(Collection<${column.type}> ${column.uncapCamelName}List) {
+        KvsAssertion.assertNullQuery("${column.uncapCamelName}", _${column.uncapCamelName});
+        KvsAssertion.assertNullQuery("${column.uncapCamelName}", _${column.uncapCamelName}List);
         _${column.uncapCamelName}List = ${column.uncapCamelName}List;
     }
 

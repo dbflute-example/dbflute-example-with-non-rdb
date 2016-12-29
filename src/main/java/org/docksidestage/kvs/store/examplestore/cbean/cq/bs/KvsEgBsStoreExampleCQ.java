@@ -17,6 +17,8 @@ package org.docksidestage.kvs.store.examplestore.cbean.cq.bs;
 
 import java.util.Collection;
 
+import org.dbflute.kvs.core.assertion.KvsAssertion;
+
 /**
  * The base condition-query of (Description about this KVS store)StoreExample.
  * @author FreeGen
@@ -47,6 +49,8 @@ public abstract class KvsEgBsStoreExampleCQ {
      * @param egkey this column will be used as (a part of) KVS key
      */
     public void setEgkey_Equal(String egkey) {
+        KvsAssertion.assertNullQuery("egkey", _egkey);
+        KvsAssertion.assertNullQuery("egkey", _egkeyList);
         _egkey = egkey;
     }
 
@@ -55,6 +59,8 @@ public abstract class KvsEgBsStoreExampleCQ {
     }
 
     public void setEgkey_inScope(Collection<String> egkeyList) {
+        KvsAssertion.assertNullQuery("egkey", _egkey);
+        KvsAssertion.assertNullQuery("egkey", _egkeyList);
         _egkeyList = egkeyList;
     }
 
