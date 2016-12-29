@@ -55,15 +55,12 @@ public class SolrExampleTest extends UnitNonrdbTestCase {
         // ## Act ##
         SolrFacetResultBean result = solrExampleBhv.selectFacetQuery(cb -> {
             cb.query().setProductName_Equal("foo");
-            cb.addFacetQuery(qb -> {
-                qb.setLatestPurchaseDate_RangeSearchTo(toLocalDateTime("2015/12/31"));
-                qb.setLatestPurchaseDate_RangeSearch(toLocalDateTime("2016/1/1"), toLocalDateTime("2016/3/31"));
-                qb.setLatestPurchaseDate_RangeSearch(toLocalDateTime("2016/4/1"), toLocalDateTime("2016/6/30"));
-                qb.setLatestPurchaseDate_RangeSearch(toLocalDateTime("2016/7/1"), toLocalDateTime("2016/9/30"));
-                qb.setLatestPurchaseDate_RangeSearch(toLocalDateTime("2016/10/1"), toLocalDateTime("2016/12/31"));
-                qb.setLatestPurchaseDate_RangeSearchFrom(toLocalDateTime("2017/1/1"));
-            });
-            cb.query().addOrderBy_ProductName_Asc();
+            cb.addFacetQuery(qb -> qb.setLatestPurchaseDate_RangeSearchTo(toLocalDateTime("2015/12/31")));
+            cb.addFacetQuery(qb -> qb.setLatestPurchaseDate_RangeSearch(toLocalDateTime("2016/1/1"), toLocalDateTime("2016/3/31")));
+            cb.addFacetQuery(qb -> qb.setLatestPurchaseDate_RangeSearch(toLocalDateTime("2016/4/1"), toLocalDateTime("2016/6/30")));
+            cb.addFacetQuery(qb -> qb.setLatestPurchaseDate_RangeSearch(toLocalDateTime("2016/7/1"), toLocalDateTime("2016/9/30")));
+            cb.addFacetQuery(qb -> qb.setLatestPurchaseDate_RangeSearch(toLocalDateTime("2016/10/1"), toLocalDateTime("2016/12/31")));
+            cb.addFacetQuery(qb -> qb.setLatestPurchaseDate_RangeSearchFrom(toLocalDateTime("2017/1/1")));
         });
 
         // ## Assert ##

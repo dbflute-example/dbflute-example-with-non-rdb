@@ -781,9 +781,20 @@ public class SolrQueryBuilder {
         return DATE_TIME_FORMATTER.format(new HandyDate(date).addHour(timeZoneDiff).getLocalDateTime());
     }
 
+    public static void assertNullQuery(String fieldName, String query) {
+        if (fieldName == null) {
+            String msg = "fieldName should not be null: fieldName=null query=" + query;
+            throw new IllegalArgumentException(msg);
+        }
+        if (query != null) {
+            String msg = "Query for this field is already registered: fieldName:query=" + query;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
     public static void assertNotNullQuery(String fieldName, String query) {
         if (fieldName == null) {
-            String msg = "The value should not be null: fieldName=null query=" + query;
+            String msg = "fieldName should not be null: fieldName=null query=" + query;
             throw new IllegalArgumentException(msg);
         }
         if (query == null) {
