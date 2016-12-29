@@ -463,7 +463,7 @@ public class KvsCacheBusinessAssist {
     protected <ENTITY extends Entity> ENTITY selectEntityWithDeletedCheck(BehaviorSelector selector, List<ColumnInfo> columnInfoList,
             ConditionBean cb) {
         logger.debug("tableName={}, specifiedColumnInfoSet={}", cb.asTableDbName(), columnInfoList);
-        final BehaviorReadable readable = selector.byName(cb.asTableDbName()); // Fetch abstracted Behavior
+        final BehaviorReadable readable = selector.byName(cb.asTableDbName()); // Fetch abstract Behavior
         columnInfoList.forEach(columnInfo -> {
             if (columnInfo.canBeNullObject()) {
                 cb.invokeSpecifyColumn(columnInfo.getPropertyName());
@@ -477,7 +477,7 @@ public class KvsCacheBusinessAssist {
     protected <ENTITY extends Entity> OptionalEntity<ENTITY> selectEntity(BehaviorSelector selector, List<ColumnInfo> columnInfoList,
             ConditionBean cb) {
         logger.debug("tableName={}, specifiedColumnInfoSet={}", cb.asTableDbName(), columnInfoList);
-        final BehaviorReadable readable = selector.byName(cb.asTableDbName()); // Fetch abstracted Behavior
+        final BehaviorReadable readable = selector.byName(cb.asTableDbName()); // Fetch abstract Behavior
         columnInfoList.forEach(columnInfo -> {
             if (columnInfo.canBeNullObject()) {
                 cb.invokeSpecifyColumn(columnInfo.getPropertyName());
@@ -504,7 +504,7 @@ public class KvsCacheBusinessAssist {
      * @return A list of entities (NotNull)
      */
     protected List<Entity> selectList(BehaviorSelector selector, List<ColumnInfo> columnInfoList, ConditionBean cb) {
-        final BehaviorReadable readable = selector.byName(cb.asTableDbName()); // Fetch abstracted Behavior
+        final BehaviorReadable readable = selector.byName(cb.asTableDbName()); // Fetch abstract Behavior
         columnInfoList.forEach(columnInfo -> {
             if (columnInfo.canBeNullObject()) {
                 cb.invokeSpecifyColumn(columnInfo.getPropertyName());
@@ -518,13 +518,13 @@ public class KvsCacheBusinessAssist {
     //                                                                    Insert Or Update
     //                                                                    ================
     /**
-     * Update a row in RDB corresponding to specified entity to the assigned entity.
+     * Insert/Update a row into(in) RDB corresponding to specified entity to the assigned entity.
      * @param selector Selector corresponding to the DB to connect to (NotNull）
-     * @param entity An entity that contains data to be updated (NotNull)
+     * @param entity An entity to be inserted or updated (NotNull)
      * @param <ENTITY> Entity of DBFlute
      */
     protected <ENTITY extends Entity> void insertOrUpdate(BehaviorSelector selector, ENTITY entity) {
-        final BehaviorWritable writable = (BehaviorWritable) selector.byName(entity.asTableDbName()); // Fetch abstracted Behavior
+        final BehaviorWritable writable = (BehaviorWritable) selector.byName(entity.asTableDbName()); // Fetch abstract Behavior
         writable.createOrModify(entity, null, null);
     }
 
@@ -541,7 +541,7 @@ public class KvsCacheBusinessAssist {
      * @throws EntityDuplicatedException (thrown when the number of deleted rows is two or more)
      */
     protected <ENTITY extends Entity> int queryDelete(BehaviorSelector selector, ENTITY entity) throws EntityDuplicatedException {
-        final BehaviorWritable writable = (BehaviorWritable) selector.byName(entity.asTableDbName()); // Fetch abstracted Behavior
+        final BehaviorWritable writable = (BehaviorWritable) selector.byName(entity.asTableDbName()); // Fetch abstract Behavior
         // rangeRemove() is used to return 0 when no value is deleted.
         // The primary key of assigned Entity is set to cb to identify 
         // the row to delete in following process.
@@ -563,7 +563,7 @@ public class KvsCacheBusinessAssist {
      * @return The number of deleted rows(0 or1)
      */
     protected <ENTITY extends Entity> int queryDelete(BehaviorSelector selector, ConditionBean cb) {
-        final BehaviorWritable writable = (BehaviorWritable) selector.byName(cb.asTableDbName()); // Fetch abstracted Behavior
+        final BehaviorWritable writable = (BehaviorWritable) selector.byName(cb.asTableDbName()); // Fetch abstract Behavior
         final int deleteCount = writable.rangeRemove(cb, null);
         return deleteCount;
     }

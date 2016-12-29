@@ -85,8 +85,8 @@
             ; dbfluteDiFile = dbflute.xml
             ; dbflutePackage = org.docksidestage.dbflute
             ; databaseMap = map:{
-                ; maindb = map:{
-                    ; schemaFile = ./schema/project-schema-maihamadb.xml
+                ; maihamadb = map:{
+                    ; schemaDir = ./schema
                 }
             }
         }
