@@ -6,6 +6,6 @@
 	<include path="esclient.xml"/>
 
 	<!-- The components of Behavior. -->
-	<component name="product" class="org.docksidestage.esflute.maihama.exbhv.ProductBhv"/>
 	<component name="member" class="org.docksidestage.esflute.maihama.exbhv.MemberBhv"/>
+	<component name="product" class="org.docksidestage.esflute.maihama.exbhv.ProductBhv"/>
 </components>

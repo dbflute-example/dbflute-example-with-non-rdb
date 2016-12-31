@@ -74,7 +74,7 @@ public class EsProductAddAction extends NonrdbBaseAction {
     //                                                                              ======
     private void addProduct(EsProductAddForm form) {
         productBhv.insert(mappingToEntity(form), op -> {
-            op.setRefresh(true);
+            op.setRefreshPolicy("true");
         });
     }
 

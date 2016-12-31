@@ -16,6 +16,8 @@
 package org.docksidestage.esflute.maihama.cbean.cq.bs;
 
 import java.time.*;
+import java.util.ArrayList;
+
 import java.util.Collection;
 
 import org.docksidestage.esflute.maihama.allcommon.EsAbstractConditionQuery;
@@ -23,7 +25,7 @@ import org.docksidestage.esflute.maihama.cbean.cq.ProductCQ;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
-import org.dbflute.exception.IllegalConditionBeanOperationException;
+import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder.FilterFunctionBuilder;
 
 /**
  * @author ESFlute (using FreeGen)
@@ -52,14 +54,15 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
             final ConditionOptionCall<FunctionScoreQueryBuilder> opLambda) {
         ProductCQ cq = new ProductCQ();
         queryLambda.callback(cq);
-        final FunctionScoreQueryBuilder builder = regFunctionScoreQ(cq.getQuery());
+        final Collection<FilterFunctionBuilder> list = new ArrayList<>();
         if (functionsLambda != null) {
             functionsLambda.callback((cqLambda, scoreFunctionBuilder) -> {
                 ProductCQ cf = new ProductCQ();
                 cqLambda.callback(cf);
-                builder.add(cf.getQuery(), scoreFunctionBuilder);
+                list.add(new FilterFunctionBuilder(cf.getQuery(), scoreFunctionBuilder));
             });
         }
+        final FunctionScoreQueryBuilder builder = regFunctionScoreQ(cq.getQuery(), list);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -238,8 +241,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setLatestPurchaseDate_MatchPhrase(latestPurchaseDate, null);
     }
 
-    public void setLatestPurchaseDate_MatchPhrase(LocalDateTime latestPurchaseDate, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhraseQ("latest_purchase_date", latestPurchaseDate);
+    public void setLatestPurchaseDate_MatchPhrase(LocalDateTime latestPurchaseDate, ConditionOptionCall<MatchPhraseQueryBuilder> opLambda) {
+        MatchPhraseQueryBuilder builder = regMatchPhraseQ("latest_purchase_date", latestPurchaseDate);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -249,8 +252,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setLatestPurchaseDate_MatchPhrasePrefix(latestPurchaseDate, null);
     }
 
-    public void setLatestPurchaseDate_MatchPhrasePrefix(LocalDateTime latestPurchaseDate, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhrasePrefixQ("latest_purchase_date", latestPurchaseDate);
+    public void setLatestPurchaseDate_MatchPhrasePrefix(LocalDateTime latestPurchaseDate, ConditionOptionCall<MatchPhrasePrefixQueryBuilder> opLambda) {
+        MatchPhrasePrefixQueryBuilder builder = regMatchPhrasePrefixQ("latest_purchase_date", latestPurchaseDate);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -260,8 +263,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setLatestPurchaseDate_Fuzzy(latestPurchaseDate, null);
     }
 
-    public void setLatestPurchaseDate_Fuzzy(LocalDateTime latestPurchaseDate, ConditionOptionCall<FuzzyQueryBuilder> opLambda) {
-        FuzzyQueryBuilder builder = regFuzzyQ("latest_purchase_date", latestPurchaseDate);
+    public void setLatestPurchaseDate_Fuzzy(LocalDateTime latestPurchaseDate, ConditionOptionCall<MatchQueryBuilder> opLambda) {
+        MatchQueryBuilder builder = regFuzzyQ("latest_purchase_date", latestPurchaseDate);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -272,7 +275,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setLatestPurchaseDate_GreaterThan(LocalDateTime latestPurchaseDate, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("latest_purchase_date", ConditionKey.CK_GREATER_THAN, latestPurchaseDate);
+        final Object _value = toRangeLocalDateTimeString(latestPurchaseDate, "date_optional_time");
+        RangeQueryBuilder builder = regRangeQ("latest_purchase_date", ConditionKey.CK_GREATER_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -283,7 +287,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setLatestPurchaseDate_LessThan(LocalDateTime latestPurchaseDate, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("latest_purchase_date", ConditionKey.CK_LESS_THAN, latestPurchaseDate);
+        final Object _value = toRangeLocalDateTimeString(latestPurchaseDate, "date_optional_time");
+        RangeQueryBuilder builder = regRangeQ("latest_purchase_date", ConditionKey.CK_LESS_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -294,7 +299,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setLatestPurchaseDate_GreaterEqual(LocalDateTime latestPurchaseDate, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("latest_purchase_date", ConditionKey.CK_GREATER_EQUAL, latestPurchaseDate);
+        final Object _value = toRangeLocalDateTimeString(latestPurchaseDate, "date_optional_time");
+        RangeQueryBuilder builder = regRangeQ("latest_purchase_date", ConditionKey.CK_GREATER_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -305,7 +311,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setLatestPurchaseDate_LessEqual(LocalDateTime latestPurchaseDate, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("latest_purchase_date", ConditionKey.CK_LESS_EQUAL, latestPurchaseDate);
+        final Object _value = toRangeLocalDateTimeString(latestPurchaseDate, "date_optional_time");
+        RangeQueryBuilder builder = regRangeQ("latest_purchase_date", ConditionKey.CK_LESS_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -342,6 +349,7 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         regOBD("latest_purchase_date");
         return this;
     }
+
 
     public void setProductCategory_Equal(String productCategory) {
         setProductCategory_Term(productCategory, null);
@@ -412,8 +420,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductCategory_MatchPhrase(productCategory, null);
     }
 
-    public void setProductCategory_MatchPhrase(String productCategory, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhraseQ("product_category", productCategory);
+    public void setProductCategory_MatchPhrase(String productCategory, ConditionOptionCall<MatchPhraseQueryBuilder> opLambda) {
+        MatchPhraseQueryBuilder builder = regMatchPhraseQ("product_category", productCategory);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -423,8 +431,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductCategory_MatchPhrasePrefix(productCategory, null);
     }
 
-    public void setProductCategory_MatchPhrasePrefix(String productCategory, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhrasePrefixQ("product_category", productCategory);
+    public void setProductCategory_MatchPhrasePrefix(String productCategory, ConditionOptionCall<MatchPhrasePrefixQueryBuilder> opLambda) {
+        MatchPhrasePrefixQueryBuilder builder = regMatchPhrasePrefixQ("product_category", productCategory);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -434,8 +442,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductCategory_Fuzzy(productCategory, null);
     }
 
-    public void setProductCategory_Fuzzy(String productCategory, ConditionOptionCall<FuzzyQueryBuilder> opLambda) {
-        FuzzyQueryBuilder builder = regFuzzyQ("product_category", productCategory);
+    public void setProductCategory_Fuzzy(String productCategory, ConditionOptionCall<MatchQueryBuilder> opLambda) {
+        MatchQueryBuilder builder = regFuzzyQ("product_category", productCategory);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -489,7 +497,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductCategory_GreaterThan(String productCategory, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_category", ConditionKey.CK_GREATER_THAN, productCategory);
+        final Object _value = productCategory;
+        RangeQueryBuilder builder = regRangeQ("product_category", ConditionKey.CK_GREATER_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -500,7 +509,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductCategory_LessThan(String productCategory, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_category", ConditionKey.CK_LESS_THAN, productCategory);
+        final Object _value = productCategory;
+        RangeQueryBuilder builder = regRangeQ("product_category", ConditionKey.CK_LESS_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -511,7 +521,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductCategory_GreaterEqual(String productCategory, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_category", ConditionKey.CK_GREATER_EQUAL, productCategory);
+        final Object _value = productCategory;
+        RangeQueryBuilder builder = regRangeQ("product_category", ConditionKey.CK_GREATER_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -522,7 +533,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductCategory_LessEqual(String productCategory, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_category", ConditionKey.CK_LESS_EQUAL, productCategory);
+        final Object _value = productCategory;
+        RangeQueryBuilder builder = regRangeQ("product_category", ConditionKey.CK_LESS_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -559,6 +571,7 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         regOBD("product_category");
         return this;
     }
+
 
     public void setProductCategoryCode_Equal(String productCategoryCode) {
         setProductCategoryCode_Term(productCategoryCode, null);
@@ -629,8 +642,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductCategoryCode_MatchPhrase(productCategoryCode, null);
     }
 
-    public void setProductCategoryCode_MatchPhrase(String productCategoryCode, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhraseQ("product_category_code", productCategoryCode);
+    public void setProductCategoryCode_MatchPhrase(String productCategoryCode, ConditionOptionCall<MatchPhraseQueryBuilder> opLambda) {
+        MatchPhraseQueryBuilder builder = regMatchPhraseQ("product_category_code", productCategoryCode);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -640,8 +653,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductCategoryCode_MatchPhrasePrefix(productCategoryCode, null);
     }
 
-    public void setProductCategoryCode_MatchPhrasePrefix(String productCategoryCode, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhrasePrefixQ("product_category_code", productCategoryCode);
+    public void setProductCategoryCode_MatchPhrasePrefix(String productCategoryCode, ConditionOptionCall<MatchPhrasePrefixQueryBuilder> opLambda) {
+        MatchPhrasePrefixQueryBuilder builder = regMatchPhrasePrefixQ("product_category_code", productCategoryCode);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -651,8 +664,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductCategoryCode_Fuzzy(productCategoryCode, null);
     }
 
-    public void setProductCategoryCode_Fuzzy(String productCategoryCode, ConditionOptionCall<FuzzyQueryBuilder> opLambda) {
-        FuzzyQueryBuilder builder = regFuzzyQ("product_category_code", productCategoryCode);
+    public void setProductCategoryCode_Fuzzy(String productCategoryCode, ConditionOptionCall<MatchQueryBuilder> opLambda) {
+        MatchQueryBuilder builder = regFuzzyQ("product_category_code", productCategoryCode);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -706,7 +719,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductCategoryCode_GreaterThan(String productCategoryCode, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_category_code", ConditionKey.CK_GREATER_THAN, productCategoryCode);
+        final Object _value = productCategoryCode;
+        RangeQueryBuilder builder = regRangeQ("product_category_code", ConditionKey.CK_GREATER_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -717,7 +731,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductCategoryCode_LessThan(String productCategoryCode, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_category_code", ConditionKey.CK_LESS_THAN, productCategoryCode);
+        final Object _value = productCategoryCode;
+        RangeQueryBuilder builder = regRangeQ("product_category_code", ConditionKey.CK_LESS_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -728,7 +743,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductCategoryCode_GreaterEqual(String productCategoryCode, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_category_code", ConditionKey.CK_GREATER_EQUAL, productCategoryCode);
+        final Object _value = productCategoryCode;
+        RangeQueryBuilder builder = regRangeQ("product_category_code", ConditionKey.CK_GREATER_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -739,7 +755,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductCategoryCode_LessEqual(String productCategoryCode, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_category_code", ConditionKey.CK_LESS_EQUAL, productCategoryCode);
+        final Object _value = productCategoryCode;
+        RangeQueryBuilder builder = regRangeQ("product_category_code", ConditionKey.CK_LESS_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -776,6 +793,7 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         regOBD("product_category_code");
         return this;
     }
+
 
     public void setProductDescription_Equal(String productDescription) {
         setProductDescription_Term(productDescription, null);
@@ -846,8 +864,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductDescription_MatchPhrase(productDescription, null);
     }
 
-    public void setProductDescription_MatchPhrase(String productDescription, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhraseQ("product_description", productDescription);
+    public void setProductDescription_MatchPhrase(String productDescription, ConditionOptionCall<MatchPhraseQueryBuilder> opLambda) {
+        MatchPhraseQueryBuilder builder = regMatchPhraseQ("product_description", productDescription);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -857,8 +875,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductDescription_MatchPhrasePrefix(productDescription, null);
     }
 
-    public void setProductDescription_MatchPhrasePrefix(String productDescription, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhrasePrefixQ("product_description", productDescription);
+    public void setProductDescription_MatchPhrasePrefix(String productDescription, ConditionOptionCall<MatchPhrasePrefixQueryBuilder> opLambda) {
+        MatchPhrasePrefixQueryBuilder builder = regMatchPhrasePrefixQ("product_description", productDescription);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -868,8 +886,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductDescription_Fuzzy(productDescription, null);
     }
 
-    public void setProductDescription_Fuzzy(String productDescription, ConditionOptionCall<FuzzyQueryBuilder> opLambda) {
-        FuzzyQueryBuilder builder = regFuzzyQ("product_description", productDescription);
+    public void setProductDescription_Fuzzy(String productDescription, ConditionOptionCall<MatchQueryBuilder> opLambda) {
+        MatchQueryBuilder builder = regFuzzyQ("product_description", productDescription);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -923,7 +941,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductDescription_GreaterThan(String productDescription, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_description", ConditionKey.CK_GREATER_THAN, productDescription);
+        final Object _value = productDescription;
+        RangeQueryBuilder builder = regRangeQ("product_description", ConditionKey.CK_GREATER_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -934,7 +953,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductDescription_LessThan(String productDescription, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_description", ConditionKey.CK_LESS_THAN, productDescription);
+        final Object _value = productDescription;
+        RangeQueryBuilder builder = regRangeQ("product_description", ConditionKey.CK_LESS_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -945,7 +965,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductDescription_GreaterEqual(String productDescription, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_description", ConditionKey.CK_GREATER_EQUAL, productDescription);
+        final Object _value = productDescription;
+        RangeQueryBuilder builder = regRangeQ("product_description", ConditionKey.CK_GREATER_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -956,7 +977,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductDescription_LessEqual(String productDescription, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_description", ConditionKey.CK_LESS_EQUAL, productDescription);
+        final Object _value = productDescription;
+        RangeQueryBuilder builder = regRangeQ("product_description", ConditionKey.CK_LESS_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -984,15 +1006,7 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         }
     }
 
-    public BsProductCQ addOrderBy_ProductDescription_Asc() {
-        regOBA("product_description");
-        return this;
-    }
 
-    public BsProductCQ addOrderBy_ProductDescription_Desc() {
-        regOBD("product_description");
-        return this;
-    }
 
     public void setProductHandleCode_Equal(String productHandleCode) {
         setProductHandleCode_Term(productHandleCode, null);
@@ -1063,8 +1077,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductHandleCode_MatchPhrase(productHandleCode, null);
     }
 
-    public void setProductHandleCode_MatchPhrase(String productHandleCode, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhraseQ("product_handle_code", productHandleCode);
+    public void setProductHandleCode_MatchPhrase(String productHandleCode, ConditionOptionCall<MatchPhraseQueryBuilder> opLambda) {
+        MatchPhraseQueryBuilder builder = regMatchPhraseQ("product_handle_code", productHandleCode);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1074,8 +1088,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductHandleCode_MatchPhrasePrefix(productHandleCode, null);
     }
 
-    public void setProductHandleCode_MatchPhrasePrefix(String productHandleCode, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhrasePrefixQ("product_handle_code", productHandleCode);
+    public void setProductHandleCode_MatchPhrasePrefix(String productHandleCode, ConditionOptionCall<MatchPhrasePrefixQueryBuilder> opLambda) {
+        MatchPhrasePrefixQueryBuilder builder = regMatchPhrasePrefixQ("product_handle_code", productHandleCode);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1085,8 +1099,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductHandleCode_Fuzzy(productHandleCode, null);
     }
 
-    public void setProductHandleCode_Fuzzy(String productHandleCode, ConditionOptionCall<FuzzyQueryBuilder> opLambda) {
-        FuzzyQueryBuilder builder = regFuzzyQ("product_handle_code", productHandleCode);
+    public void setProductHandleCode_Fuzzy(String productHandleCode, ConditionOptionCall<MatchQueryBuilder> opLambda) {
+        MatchQueryBuilder builder = regFuzzyQ("product_handle_code", productHandleCode);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1140,7 +1154,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductHandleCode_GreaterThan(String productHandleCode, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_handle_code", ConditionKey.CK_GREATER_THAN, productHandleCode);
+        final Object _value = productHandleCode;
+        RangeQueryBuilder builder = regRangeQ("product_handle_code", ConditionKey.CK_GREATER_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1151,7 +1166,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductHandleCode_LessThan(String productHandleCode, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_handle_code", ConditionKey.CK_LESS_THAN, productHandleCode);
+        final Object _value = productHandleCode;
+        RangeQueryBuilder builder = regRangeQ("product_handle_code", ConditionKey.CK_LESS_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1162,7 +1178,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductHandleCode_GreaterEqual(String productHandleCode, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_handle_code", ConditionKey.CK_GREATER_EQUAL, productHandleCode);
+        final Object _value = productHandleCode;
+        RangeQueryBuilder builder = regRangeQ("product_handle_code", ConditionKey.CK_GREATER_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1173,7 +1190,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductHandleCode_LessEqual(String productHandleCode, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_handle_code", ConditionKey.CK_LESS_EQUAL, productHandleCode);
+        final Object _value = productHandleCode;
+        RangeQueryBuilder builder = regRangeQ("product_handle_code", ConditionKey.CK_LESS_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1210,6 +1228,7 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         regOBD("product_handle_code");
         return this;
     }
+
 
     public void setProductName_Equal(String productName) {
         setProductName_Term(productName, null);
@@ -1280,8 +1299,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductName_MatchPhrase(productName, null);
     }
 
-    public void setProductName_MatchPhrase(String productName, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhraseQ("product_name", productName);
+    public void setProductName_MatchPhrase(String productName, ConditionOptionCall<MatchPhraseQueryBuilder> opLambda) {
+        MatchPhraseQueryBuilder builder = regMatchPhraseQ("product_name", productName);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1291,8 +1310,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductName_MatchPhrasePrefix(productName, null);
     }
 
-    public void setProductName_MatchPhrasePrefix(String productName, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhrasePrefixQ("product_name", productName);
+    public void setProductName_MatchPhrasePrefix(String productName, ConditionOptionCall<MatchPhrasePrefixQueryBuilder> opLambda) {
+        MatchPhrasePrefixQueryBuilder builder = regMatchPhrasePrefixQ("product_name", productName);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1302,8 +1321,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductName_Fuzzy(productName, null);
     }
 
-    public void setProductName_Fuzzy(String productName, ConditionOptionCall<FuzzyQueryBuilder> opLambda) {
-        FuzzyQueryBuilder builder = regFuzzyQ("product_name", productName);
+    public void setProductName_Fuzzy(String productName, ConditionOptionCall<MatchQueryBuilder> opLambda) {
+        MatchQueryBuilder builder = regFuzzyQ("product_name", productName);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1357,7 +1376,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductName_GreaterThan(String productName, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_name", ConditionKey.CK_GREATER_THAN, productName);
+        final Object _value = productName;
+        RangeQueryBuilder builder = regRangeQ("product_name", ConditionKey.CK_GREATER_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1368,7 +1388,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductName_LessThan(String productName, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_name", ConditionKey.CK_LESS_THAN, productName);
+        final Object _value = productName;
+        RangeQueryBuilder builder = regRangeQ("product_name", ConditionKey.CK_LESS_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1379,7 +1400,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductName_GreaterEqual(String productName, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_name", ConditionKey.CK_GREATER_EQUAL, productName);
+        final Object _value = productName;
+        RangeQueryBuilder builder = regRangeQ("product_name", ConditionKey.CK_GREATER_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1390,7 +1412,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductName_LessEqual(String productName, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_name", ConditionKey.CK_LESS_EQUAL, productName);
+        final Object _value = productName;
+        RangeQueryBuilder builder = regRangeQ("product_name", ConditionKey.CK_LESS_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1418,13 +1441,14 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         }
     }
 
-    public BsProductCQ addOrderBy_ProductName_Asc() {
-        regOBA("product_name");
+
+    public BsProductCQ addOrderBy_ProductName_raw_Asc() {
+        regOBA("product_name.raw");
         return this;
     }
 
-    public BsProductCQ addOrderBy_ProductName_Desc() {
-        regOBD("product_name");
+    public BsProductCQ addOrderBy_ProductName_raw_Desc() {
+        regOBD("product_name.raw");
         return this;
     }
 
@@ -1497,8 +1521,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductStatus_MatchPhrase(productStatus, null);
     }
 
-    public void setProductStatus_MatchPhrase(String productStatus, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhraseQ("product_status", productStatus);
+    public void setProductStatus_MatchPhrase(String productStatus, ConditionOptionCall<MatchPhraseQueryBuilder> opLambda) {
+        MatchPhraseQueryBuilder builder = regMatchPhraseQ("product_status", productStatus);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1508,8 +1532,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductStatus_MatchPhrasePrefix(productStatus, null);
     }
 
-    public void setProductStatus_MatchPhrasePrefix(String productStatus, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhrasePrefixQ("product_status", productStatus);
+    public void setProductStatus_MatchPhrasePrefix(String productStatus, ConditionOptionCall<MatchPhrasePrefixQueryBuilder> opLambda) {
+        MatchPhrasePrefixQueryBuilder builder = regMatchPhrasePrefixQ("product_status", productStatus);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1519,8 +1543,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductStatus_Fuzzy(productStatus, null);
     }
 
-    public void setProductStatus_Fuzzy(String productStatus, ConditionOptionCall<FuzzyQueryBuilder> opLambda) {
-        FuzzyQueryBuilder builder = regFuzzyQ("product_status", productStatus);
+    public void setProductStatus_Fuzzy(String productStatus, ConditionOptionCall<MatchQueryBuilder> opLambda) {
+        MatchQueryBuilder builder = regFuzzyQ("product_status", productStatus);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1574,7 +1598,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductStatus_GreaterThan(String productStatus, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_status", ConditionKey.CK_GREATER_THAN, productStatus);
+        final Object _value = productStatus;
+        RangeQueryBuilder builder = regRangeQ("product_status", ConditionKey.CK_GREATER_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1585,7 +1610,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductStatus_LessThan(String productStatus, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_status", ConditionKey.CK_LESS_THAN, productStatus);
+        final Object _value = productStatus;
+        RangeQueryBuilder builder = regRangeQ("product_status", ConditionKey.CK_LESS_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1596,7 +1622,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductStatus_GreaterEqual(String productStatus, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_status", ConditionKey.CK_GREATER_EQUAL, productStatus);
+        final Object _value = productStatus;
+        RangeQueryBuilder builder = regRangeQ("product_status", ConditionKey.CK_GREATER_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1607,7 +1634,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductStatus_LessEqual(String productStatus, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_status", ConditionKey.CK_LESS_EQUAL, productStatus);
+        final Object _value = productStatus;
+        RangeQueryBuilder builder = regRangeQ("product_status", ConditionKey.CK_LESS_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1644,6 +1672,7 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         regOBD("product_status");
         return this;
     }
+
 
     public void setProductStatusCode_Equal(String productStatusCode) {
         setProductStatusCode_Term(productStatusCode, null);
@@ -1714,8 +1743,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductStatusCode_MatchPhrase(productStatusCode, null);
     }
 
-    public void setProductStatusCode_MatchPhrase(String productStatusCode, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhraseQ("product_status_code", productStatusCode);
+    public void setProductStatusCode_MatchPhrase(String productStatusCode, ConditionOptionCall<MatchPhraseQueryBuilder> opLambda) {
+        MatchPhraseQueryBuilder builder = regMatchPhraseQ("product_status_code", productStatusCode);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1725,8 +1754,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductStatusCode_MatchPhrasePrefix(productStatusCode, null);
     }
 
-    public void setProductStatusCode_MatchPhrasePrefix(String productStatusCode, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhrasePrefixQ("product_status_code", productStatusCode);
+    public void setProductStatusCode_MatchPhrasePrefix(String productStatusCode, ConditionOptionCall<MatchPhrasePrefixQueryBuilder> opLambda) {
+        MatchPhrasePrefixQueryBuilder builder = regMatchPhrasePrefixQ("product_status_code", productStatusCode);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1736,8 +1765,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setProductStatusCode_Fuzzy(productStatusCode, null);
     }
 
-    public void setProductStatusCode_Fuzzy(String productStatusCode, ConditionOptionCall<FuzzyQueryBuilder> opLambda) {
-        FuzzyQueryBuilder builder = regFuzzyQ("product_status_code", productStatusCode);
+    public void setProductStatusCode_Fuzzy(String productStatusCode, ConditionOptionCall<MatchQueryBuilder> opLambda) {
+        MatchQueryBuilder builder = regFuzzyQ("product_status_code", productStatusCode);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1791,7 +1820,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductStatusCode_GreaterThan(String productStatusCode, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_status_code", ConditionKey.CK_GREATER_THAN, productStatusCode);
+        final Object _value = productStatusCode;
+        RangeQueryBuilder builder = regRangeQ("product_status_code", ConditionKey.CK_GREATER_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1802,7 +1832,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductStatusCode_LessThan(String productStatusCode, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_status_code", ConditionKey.CK_LESS_THAN, productStatusCode);
+        final Object _value = productStatusCode;
+        RangeQueryBuilder builder = regRangeQ("product_status_code", ConditionKey.CK_LESS_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1813,7 +1844,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductStatusCode_GreaterEqual(String productStatusCode, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_status_code", ConditionKey.CK_GREATER_EQUAL, productStatusCode);
+        final Object _value = productStatusCode;
+        RangeQueryBuilder builder = regRangeQ("product_status_code", ConditionKey.CK_GREATER_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1824,7 +1856,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setProductStatusCode_LessEqual(String productStatusCode, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("product_status_code", ConditionKey.CK_LESS_EQUAL, productStatusCode);
+        final Object _value = productStatusCode;
+        RangeQueryBuilder builder = regRangeQ("product_status_code", ConditionKey.CK_LESS_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1861,6 +1894,7 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         regOBD("product_status_code");
         return this;
     }
+
 
     public void setRegisterDatetime_Equal(LocalDateTime registerDatetime) {
         setRegisterDatetime_Term(registerDatetime, null);
@@ -1931,8 +1965,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setRegisterDatetime_MatchPhrase(registerDatetime, null);
     }
 
-    public void setRegisterDatetime_MatchPhrase(LocalDateTime registerDatetime, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhraseQ("register_datetime", registerDatetime);
+    public void setRegisterDatetime_MatchPhrase(LocalDateTime registerDatetime, ConditionOptionCall<MatchPhraseQueryBuilder> opLambda) {
+        MatchPhraseQueryBuilder builder = regMatchPhraseQ("register_datetime", registerDatetime);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1942,8 +1976,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setRegisterDatetime_MatchPhrasePrefix(registerDatetime, null);
     }
 
-    public void setRegisterDatetime_MatchPhrasePrefix(LocalDateTime registerDatetime, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhrasePrefixQ("register_datetime", registerDatetime);
+    public void setRegisterDatetime_MatchPhrasePrefix(LocalDateTime registerDatetime, ConditionOptionCall<MatchPhrasePrefixQueryBuilder> opLambda) {
+        MatchPhrasePrefixQueryBuilder builder = regMatchPhrasePrefixQ("register_datetime", registerDatetime);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1953,8 +1987,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setRegisterDatetime_Fuzzy(registerDatetime, null);
     }
 
-    public void setRegisterDatetime_Fuzzy(LocalDateTime registerDatetime, ConditionOptionCall<FuzzyQueryBuilder> opLambda) {
-        FuzzyQueryBuilder builder = regFuzzyQ("register_datetime", registerDatetime);
+    public void setRegisterDatetime_Fuzzy(LocalDateTime registerDatetime, ConditionOptionCall<MatchQueryBuilder> opLambda) {
+        MatchQueryBuilder builder = regFuzzyQ("register_datetime", registerDatetime);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1965,7 +1999,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setRegisterDatetime_GreaterThan(LocalDateTime registerDatetime, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("register_datetime", ConditionKey.CK_GREATER_THAN, registerDatetime);
+        final Object _value = toRangeLocalDateTimeString(registerDatetime, "date_optional_time");
+        RangeQueryBuilder builder = regRangeQ("register_datetime", ConditionKey.CK_GREATER_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1976,7 +2011,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setRegisterDatetime_LessThan(LocalDateTime registerDatetime, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("register_datetime", ConditionKey.CK_LESS_THAN, registerDatetime);
+        final Object _value = toRangeLocalDateTimeString(registerDatetime, "date_optional_time");
+        RangeQueryBuilder builder = regRangeQ("register_datetime", ConditionKey.CK_LESS_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1987,7 +2023,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setRegisterDatetime_GreaterEqual(LocalDateTime registerDatetime, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("register_datetime", ConditionKey.CK_GREATER_EQUAL, registerDatetime);
+        final Object _value = toRangeLocalDateTimeString(registerDatetime, "date_optional_time");
+        RangeQueryBuilder builder = regRangeQ("register_datetime", ConditionKey.CK_GREATER_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -1998,7 +2035,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setRegisterDatetime_LessEqual(LocalDateTime registerDatetime, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("register_datetime", ConditionKey.CK_LESS_EQUAL, registerDatetime);
+        final Object _value = toRangeLocalDateTimeString(registerDatetime, "date_optional_time");
+        RangeQueryBuilder builder = regRangeQ("register_datetime", ConditionKey.CK_LESS_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2035,6 +2073,7 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         regOBD("register_datetime");
         return this;
     }
+
 
     public void setRegisterUser_Equal(String registerUser) {
         setRegisterUser_Term(registerUser, null);
@@ -2105,8 +2144,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setRegisterUser_MatchPhrase(registerUser, null);
     }
 
-    public void setRegisterUser_MatchPhrase(String registerUser, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhraseQ("register_user", registerUser);
+    public void setRegisterUser_MatchPhrase(String registerUser, ConditionOptionCall<MatchPhraseQueryBuilder> opLambda) {
+        MatchPhraseQueryBuilder builder = regMatchPhraseQ("register_user", registerUser);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2116,8 +2155,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setRegisterUser_MatchPhrasePrefix(registerUser, null);
     }
 
-    public void setRegisterUser_MatchPhrasePrefix(String registerUser, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhrasePrefixQ("register_user", registerUser);
+    public void setRegisterUser_MatchPhrasePrefix(String registerUser, ConditionOptionCall<MatchPhrasePrefixQueryBuilder> opLambda) {
+        MatchPhrasePrefixQueryBuilder builder = regMatchPhrasePrefixQ("register_user", registerUser);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2127,8 +2166,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setRegisterUser_Fuzzy(registerUser, null);
     }
 
-    public void setRegisterUser_Fuzzy(String registerUser, ConditionOptionCall<FuzzyQueryBuilder> opLambda) {
-        FuzzyQueryBuilder builder = regFuzzyQ("register_user", registerUser);
+    public void setRegisterUser_Fuzzy(String registerUser, ConditionOptionCall<MatchQueryBuilder> opLambda) {
+        MatchQueryBuilder builder = regFuzzyQ("register_user", registerUser);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2182,7 +2221,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setRegisterUser_GreaterThan(String registerUser, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("register_user", ConditionKey.CK_GREATER_THAN, registerUser);
+        final Object _value = registerUser;
+        RangeQueryBuilder builder = regRangeQ("register_user", ConditionKey.CK_GREATER_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2193,7 +2233,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setRegisterUser_LessThan(String registerUser, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("register_user", ConditionKey.CK_LESS_THAN, registerUser);
+        final Object _value = registerUser;
+        RangeQueryBuilder builder = regRangeQ("register_user", ConditionKey.CK_LESS_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2204,7 +2245,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setRegisterUser_GreaterEqual(String registerUser, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("register_user", ConditionKey.CK_GREATER_EQUAL, registerUser);
+        final Object _value = registerUser;
+        RangeQueryBuilder builder = regRangeQ("register_user", ConditionKey.CK_GREATER_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2215,7 +2257,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setRegisterUser_LessEqual(String registerUser, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("register_user", ConditionKey.CK_LESS_EQUAL, registerUser);
+        final Object _value = registerUser;
+        RangeQueryBuilder builder = regRangeQ("register_user", ConditionKey.CK_LESS_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2252,6 +2295,7 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         regOBD("register_user");
         return this;
     }
+
 
     public void setRegularPrice_Equal(Integer regularPrice) {
         setRegularPrice_Term(regularPrice, null);
@@ -2322,8 +2366,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setRegularPrice_MatchPhrase(regularPrice, null);
     }
 
-    public void setRegularPrice_MatchPhrase(Integer regularPrice, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhraseQ("regular_price", regularPrice);
+    public void setRegularPrice_MatchPhrase(Integer regularPrice, ConditionOptionCall<MatchPhraseQueryBuilder> opLambda) {
+        MatchPhraseQueryBuilder builder = regMatchPhraseQ("regular_price", regularPrice);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2333,8 +2377,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setRegularPrice_MatchPhrasePrefix(regularPrice, null);
     }
 
-    public void setRegularPrice_MatchPhrasePrefix(Integer regularPrice, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhrasePrefixQ("regular_price", regularPrice);
+    public void setRegularPrice_MatchPhrasePrefix(Integer regularPrice, ConditionOptionCall<MatchPhrasePrefixQueryBuilder> opLambda) {
+        MatchPhrasePrefixQueryBuilder builder = regMatchPhrasePrefixQ("regular_price", regularPrice);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2344,8 +2388,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setRegularPrice_Fuzzy(regularPrice, null);
     }
 
-    public void setRegularPrice_Fuzzy(Integer regularPrice, ConditionOptionCall<FuzzyQueryBuilder> opLambda) {
-        FuzzyQueryBuilder builder = regFuzzyQ("regular_price", regularPrice);
+    public void setRegularPrice_Fuzzy(Integer regularPrice, ConditionOptionCall<MatchQueryBuilder> opLambda) {
+        MatchQueryBuilder builder = regFuzzyQ("regular_price", regularPrice);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2356,7 +2400,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setRegularPrice_GreaterThan(Integer regularPrice, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("regular_price", ConditionKey.CK_GREATER_THAN, regularPrice);
+        final Object _value = regularPrice;
+        RangeQueryBuilder builder = regRangeQ("regular_price", ConditionKey.CK_GREATER_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2367,7 +2412,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setRegularPrice_LessThan(Integer regularPrice, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("regular_price", ConditionKey.CK_LESS_THAN, regularPrice);
+        final Object _value = regularPrice;
+        RangeQueryBuilder builder = regRangeQ("regular_price", ConditionKey.CK_LESS_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2378,7 +2424,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setRegularPrice_GreaterEqual(Integer regularPrice, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("regular_price", ConditionKey.CK_GREATER_EQUAL, regularPrice);
+        final Object _value = regularPrice;
+        RangeQueryBuilder builder = regRangeQ("regular_price", ConditionKey.CK_GREATER_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2389,7 +2436,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setRegularPrice_LessEqual(Integer regularPrice, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("regular_price", ConditionKey.CK_LESS_EQUAL, regularPrice);
+        final Object _value = regularPrice;
+        RangeQueryBuilder builder = regRangeQ("regular_price", ConditionKey.CK_LESS_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2426,6 +2474,7 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         regOBD("regular_price");
         return this;
     }
+
 
     public void setUpdateDatetime_Equal(LocalDateTime updateDatetime) {
         setUpdateDatetime_Term(updateDatetime, null);
@@ -2496,8 +2545,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setUpdateDatetime_MatchPhrase(updateDatetime, null);
     }
 
-    public void setUpdateDatetime_MatchPhrase(LocalDateTime updateDatetime, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhraseQ("update_datetime", updateDatetime);
+    public void setUpdateDatetime_MatchPhrase(LocalDateTime updateDatetime, ConditionOptionCall<MatchPhraseQueryBuilder> opLambda) {
+        MatchPhraseQueryBuilder builder = regMatchPhraseQ("update_datetime", updateDatetime);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2507,8 +2556,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setUpdateDatetime_MatchPhrasePrefix(updateDatetime, null);
     }
 
-    public void setUpdateDatetime_MatchPhrasePrefix(LocalDateTime updateDatetime, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhrasePrefixQ("update_datetime", updateDatetime);
+    public void setUpdateDatetime_MatchPhrasePrefix(LocalDateTime updateDatetime, ConditionOptionCall<MatchPhrasePrefixQueryBuilder> opLambda) {
+        MatchPhrasePrefixQueryBuilder builder = regMatchPhrasePrefixQ("update_datetime", updateDatetime);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2518,8 +2567,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setUpdateDatetime_Fuzzy(updateDatetime, null);
     }
 
-    public void setUpdateDatetime_Fuzzy(LocalDateTime updateDatetime, ConditionOptionCall<FuzzyQueryBuilder> opLambda) {
-        FuzzyQueryBuilder builder = regFuzzyQ("update_datetime", updateDatetime);
+    public void setUpdateDatetime_Fuzzy(LocalDateTime updateDatetime, ConditionOptionCall<MatchQueryBuilder> opLambda) {
+        MatchQueryBuilder builder = regFuzzyQ("update_datetime", updateDatetime);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2530,7 +2579,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setUpdateDatetime_GreaterThan(LocalDateTime updateDatetime, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("update_datetime", ConditionKey.CK_GREATER_THAN, updateDatetime);
+        final Object _value = toRangeLocalDateTimeString(updateDatetime, "date_optional_time");
+        RangeQueryBuilder builder = regRangeQ("update_datetime", ConditionKey.CK_GREATER_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2541,7 +2591,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setUpdateDatetime_LessThan(LocalDateTime updateDatetime, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("update_datetime", ConditionKey.CK_LESS_THAN, updateDatetime);
+        final Object _value = toRangeLocalDateTimeString(updateDatetime, "date_optional_time");
+        RangeQueryBuilder builder = regRangeQ("update_datetime", ConditionKey.CK_LESS_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2552,7 +2603,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setUpdateDatetime_GreaterEqual(LocalDateTime updateDatetime, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("update_datetime", ConditionKey.CK_GREATER_EQUAL, updateDatetime);
+        final Object _value = toRangeLocalDateTimeString(updateDatetime, "date_optional_time");
+        RangeQueryBuilder builder = regRangeQ("update_datetime", ConditionKey.CK_GREATER_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2563,7 +2615,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setUpdateDatetime_LessEqual(LocalDateTime updateDatetime, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("update_datetime", ConditionKey.CK_LESS_EQUAL, updateDatetime);
+        final Object _value = toRangeLocalDateTimeString(updateDatetime, "date_optional_time");
+        RangeQueryBuilder builder = regRangeQ("update_datetime", ConditionKey.CK_LESS_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2600,6 +2653,7 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         regOBD("update_datetime");
         return this;
     }
+
 
     public void setUpdateUser_Equal(String updateUser) {
         setUpdateUser_Term(updateUser, null);
@@ -2670,8 +2724,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setUpdateUser_MatchPhrase(updateUser, null);
     }
 
-    public void setUpdateUser_MatchPhrase(String updateUser, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhraseQ("update_user", updateUser);
+    public void setUpdateUser_MatchPhrase(String updateUser, ConditionOptionCall<MatchPhraseQueryBuilder> opLambda) {
+        MatchPhraseQueryBuilder builder = regMatchPhraseQ("update_user", updateUser);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2681,8 +2735,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setUpdateUser_MatchPhrasePrefix(updateUser, null);
     }
 
-    public void setUpdateUser_MatchPhrasePrefix(String updateUser, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhrasePrefixQ("update_user", updateUser);
+    public void setUpdateUser_MatchPhrasePrefix(String updateUser, ConditionOptionCall<MatchPhrasePrefixQueryBuilder> opLambda) {
+        MatchPhrasePrefixQueryBuilder builder = regMatchPhrasePrefixQ("update_user", updateUser);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2692,8 +2746,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         setUpdateUser_Fuzzy(updateUser, null);
     }
 
-    public void setUpdateUser_Fuzzy(String updateUser, ConditionOptionCall<FuzzyQueryBuilder> opLambda) {
-        FuzzyQueryBuilder builder = regFuzzyQ("update_user", updateUser);
+    public void setUpdateUser_Fuzzy(String updateUser, ConditionOptionCall<MatchQueryBuilder> opLambda) {
+        MatchQueryBuilder builder = regFuzzyQ("update_user", updateUser);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2747,7 +2801,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setUpdateUser_GreaterThan(String updateUser, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("update_user", ConditionKey.CK_GREATER_THAN, updateUser);
+        final Object _value = updateUser;
+        RangeQueryBuilder builder = regRangeQ("update_user", ConditionKey.CK_GREATER_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2758,7 +2813,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setUpdateUser_LessThan(String updateUser, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("update_user", ConditionKey.CK_LESS_THAN, updateUser);
+        final Object _value = updateUser;
+        RangeQueryBuilder builder = regRangeQ("update_user", ConditionKey.CK_LESS_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2769,7 +2825,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setUpdateUser_GreaterEqual(String updateUser, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("update_user", ConditionKey.CK_GREATER_EQUAL, updateUser);
+        final Object _value = updateUser;
+        RangeQueryBuilder builder = regRangeQ("update_user", ConditionKey.CK_GREATER_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2780,7 +2837,8 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
     }
 
     public void setUpdateUser_LessEqual(String updateUser, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("update_user", ConditionKey.CK_LESS_EQUAL, updateUser);
+        final Object _value = updateUser;
+        RangeQueryBuilder builder = regRangeQ("update_user", ConditionKey.CK_LESS_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -2817,5 +2875,6 @@ public abstract class BsProductCQ extends EsAbstractConditionQuery {
         regOBD("update_user");
         return this;
     }
+
 
 }

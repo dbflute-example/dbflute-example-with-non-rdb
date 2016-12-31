@@ -50,7 +50,7 @@ public class EsProductDeleteAction extends NonrdbBaseAction {
         });
         productBhv.selectByPK(form.productId).ifPresent(entity -> {
             productBhv.delete(entity, op -> {
-                op.setRefresh(true);
+                op.setRefreshPolicy("true");
             });
         }).orElse(() -> {
             throw responseManager.new404("Not found the product: " + form.productId);

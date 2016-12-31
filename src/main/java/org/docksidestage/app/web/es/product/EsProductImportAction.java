@@ -73,7 +73,7 @@ public class EsProductImportAction extends NonrdbBaseAction {
             product.setUpdateDatetime(entity.getUpdateDatetime());
             product.setUpdateUser(entity.getUpdateUser());
             productBhv.insert(product, op -> {
-                op.setRefresh(true);
+                op.setRefreshPolicy("true");
             });
         });
         return redirect(EsProductListAction.class);

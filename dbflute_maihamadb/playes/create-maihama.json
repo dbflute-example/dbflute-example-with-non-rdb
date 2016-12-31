@@ -1,5 +1,24 @@
 {
     "mappings" : {
+      "member" : {
+        "_all" : {
+          "enabled" : false
+        },
+        "properties" : {
+          "account" : {
+            "type" : "keyword"
+          },
+          "name" : {
+            "type" : "text",
+            "fields" : {
+              "raw" : {
+                "type" : "keyword"
+              }
+            },
+            "analyzer" : "standard"
+          }
+        }
+      },
       "product" : {
         "_all" : {
           "enabled" : false
@@ -10,46 +29,40 @@
             "format" : "date_optional_time"
           },
           "product_category" : {
-            "type" : "string",
-            "index" : "not_analyzed"
+            "type" : "keyword"
           },
           "product_category_code" : {
-            "type" : "string",
-            "index" : "not_analyzed"
+            "type" : "keyword"
           },
           "product_description" : {
-            "type" : "string",
+            "type" : "text",
             "analyzer" : "standard"
           },
           "product_handle_code" : {
-            "type" : "string",
-            "index" : "not_analyzed"
+            "type" : "keyword"
           },
           "product_name" : {
-            "type" : "string",
-            "analyzer" : "standard",
+            "type" : "text",
+            "fielddata" : true,
             "fields" : {
               "raw" : {
-                "type" : "string",
-                "index" : "not_analyzed"
+                "type" : "keyword"
               }
-            }
+            },
+            "analyzer" : "standard"
           },
           "product_status" : {
-            "type" : "string",
-            "index" : "not_analyzed"
+            "type" : "keyword"
           },
           "product_status_code" : {
-            "type" : "string",
-            "index" : "not_analyzed"
+            "type" : "keyword"
           },
           "register_datetime" : {
             "type" : "date",
             "format" : "date_optional_time"
           },
           "register_user" : {
-            "type" : "string",
-            "index" : "not_analyzed"
+            "type" : "keyword"
           },
           "regular_price" : {
             "type" : "integer"
@@ -59,29 +72,7 @@
             "format" : "date_optional_time"
           },
           "update_user" : {
-            "type" : "string",
-            "index" : "not_analyzed"
-          }
-        }
-      },
-      "member" : {
-        "_all" : {
-          "enabled" : false
-        },
-        "properties" : {
-          "account" : {
-            "type" : "string",
-            "index" : "not_analyzed"
-          },
-          "name" : {
-            "type" : "string",
-            "analyzer" : "standard",
-            "fields" : {
-              "raw" : {
-                "type" : "string",
-                "index" : "not_analyzed"
-              }
-            }
+            "type" : "keyword"
           }
         }
       }

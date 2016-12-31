@@ -205,7 +205,7 @@ table.child, table.child td, table.child th {
 			<td class="filecell"><strong>../src/main/resources/nonrdb_env.properties</strong></td>
 			<td class="envtypecell">-</td>
 			<td class="langtypecell">-</td>
-			<td class="sizecell">19</td>
+			<td class="sizecell">27</td>
 			<td>&nbsp;</td>
 			<td class="markcell">-</td>
 			<td class="markcell">-</td>
@@ -214,22 +214,48 @@ table.child, table.child td, table.child th {
 			<td class="filecell">../src/main/resources/nonrdb_env_integration.properties</td>
 			<td class="envtypecell">integration</td>
 			<td class="langtypecell">-</td>
-			<td class="sizecell">18</td>
-			<td>&nbsp;</td>
+			<td class="sizecell">26</td>
 			<td>&nbsp;</td>
 			<td class="keylistcell">
+				<p class="diffprop">kvs.exampledb.host</p>
+				<p class="diffprop">kvs.exampledb.port</p>
+				<p class="diffprop">kvs.exampledb.timeout</p>
+				<p class="diffprop">kvs.exampledb.maxTotal</p>
+				<p class="diffprop">kvs.exampledb.maxIdle</p>
+				<p class="diffprop">kvs.exampledb.minIdle</p>
+			</td>
+			<td class="keylistcell">
 				<p class="diffprop">mail.address.support</p>
+				<p class="diffprop">kvs.examplekvs.host</p>
+				<p class="diffprop">kvs.examplekvs.port</p>
+				<p class="diffprop">kvs.examplekvs.timeout</p>
+				<p class="diffprop">kvs.examplekvs.maxTotal</p>
+				<p class="diffprop">kvs.examplekvs.maxIdle</p>
+				<p class="diffprop">kvs.examplekvs.minIdle</p>
 			</td>
 		</tr>
 		<tr>
 			<td class="filecell">../src/main/resources/nonrdb_env_production.properties</td>
 			<td class="envtypecell">production</td>
 			<td class="langtypecell">-</td>
-			<td class="sizecell">18</td>
-			<td>&nbsp;</td>
+			<td class="sizecell">26</td>
 			<td>&nbsp;</td>
 			<td class="keylistcell">
+				<p class="diffprop">kvs.exampledb.host</p>
+				<p class="diffprop">kvs.exampledb.port</p>
+				<p class="diffprop">kvs.exampledb.timeout</p>
+				<p class="diffprop">kvs.exampledb.maxTotal</p>
+				<p class="diffprop">kvs.exampledb.maxIdle</p>
+				<p class="diffprop">kvs.exampledb.minIdle</p>
+			</td>
+			<td class="keylistcell">
 				<p class="diffprop">mail.address.support</p>
+				<p class="diffprop">kvs.examplekvs.host</p>
+				<p class="diffprop">kvs.examplekvs.port</p>
+				<p class="diffprop">kvs.examplekvs.timeout</p>
+				<p class="diffprop">kvs.examplekvs.maxTotal</p>
+				<p class="diffprop">kvs.examplekvs.maxIdle</p>
+				<p class="diffprop">kvs.examplekvs.minIdle</p>
 			</td>
 		</tr>
 	</tbody>
@@ -253,7 +279,7 @@ table.child, table.child td, table.child th {
 			<td class="filecell"><strong>../src/main/resources/nonrdb_config.properties</strong></td>
 			<td class="envtypecell">-</td>
 			<td class="langtypecell">-</td>
-			<td class="sizecell">6</td>
+			<td class="sizecell">19</td>
 			<td class="extendsfilecell">../src/main/resources/nonrdb_env.properties</td>
 			<td>&nbsp;</td>
 			<td class="markcell">-</td>
@@ -960,6 +986,210 @@ table.child, table.child td, table.child th {
 	</tr>
 	<tr>
 		<td class="rownumcell">19</td>
+		<td class="keycell">solr.example.url</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">http://localhost:8983/solr/example</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">-------</td>
+				</tr>
+				<tr>
+					<td class="envtypecell">integration</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">http://localhost:8983/solr/example</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">-------</td>
+				</tr>
+				<tr>
+					<td class="envtypecell">production</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">http://localhost:8983/solr/example</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">-------</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">20</td>
+		<td class="keycell">kvs.mock</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">true</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Whether&nbsp;to&nbsp;use&nbsp;mock&nbsp;for&nbsp;KVS</td>
+				</tr>
+				<tr>
+					<td class="envtypecell">integration</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">true</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Whether&nbsp;to&nbsp;use&nbsp;mock&nbsp;for&nbsp;KVS</td>
+				</tr>
+				<tr>
+					<td class="envtypecell">production</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">true</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Whether&nbsp;to&nbsp;use&nbsp;mock&nbsp;for&nbsp;KVS</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">21</td>
+		<td class="keycell">kvs.examplekvs.host</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">localhost</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Hostname</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">22</td>
+		<td class="keycell">kvs.examplekvs.port</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">6379</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Port</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">23</td>
+		<td class="keycell">kvs.examplekvs.timeout</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">2000</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Timeout&nbsp;for&nbsp;connection</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">24</td>
+		<td class="keycell">kvs.examplekvs.maxTotal</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">15</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Max&nbsp;number&nbsp;of&nbsp;pooled&nbsp;connections</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">25</td>
+		<td class="keycell">kvs.examplekvs.maxIdle</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">15</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Max&nbsp;number&nbsp;of&nbsp;idle&nbsp;connections</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">26</td>
+		<td class="keycell">kvs.examplekvs.minIdle</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">15</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Min&nbsp;number&nbsp;of&nbsp;idle&nbsp;connections</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">27</td>
 		<td class="keycell">server.domain</td>
 		<td>
 			<table class="child">
@@ -990,6 +1220,180 @@ table.child, table.child td, table.child th {
 					<td class="valuecell">docksidestage.org</td>
 					<td class="uniquenocell">2</td>
 					<td class="commentcell">domain&nbsp;to&nbsp;access&nbsp;this&nbsp;application&nbsp;from&nbsp;internet,&nbsp;e.g.&nbsp;for&nbsp;registration&nbsp;mail</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">28</td>
+		<td class="keycell">kvs.exampledb.host</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">integration</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">localhost</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Hostname</td>
+				</tr>
+				<tr>
+					<td class="envtypecell">production</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">localhost</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Hostname</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">29</td>
+		<td class="keycell">kvs.exampledb.port</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">integration</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">6379</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Port</td>
+				</tr>
+				<tr>
+					<td class="envtypecell">production</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">6379</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Port</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">30</td>
+		<td class="keycell">kvs.exampledb.timeout</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">integration</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">2000</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Timeout&nbsp;for&nbsp;connection</td>
+				</tr>
+				<tr>
+					<td class="envtypecell">production</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">2000</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Timeout&nbsp;for&nbsp;connection</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">31</td>
+		<td class="keycell">kvs.exampledb.maxTotal</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">integration</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">15</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Max&nbsp;number&nbsp;of&nbsp;pooled&nbsp;connections</td>
+				</tr>
+				<tr>
+					<td class="envtypecell">production</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">15</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Max&nbsp;number&nbsp;of&nbsp;pooled&nbsp;connections</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">32</td>
+		<td class="keycell">kvs.exampledb.maxIdle</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">integration</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">15</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Max&nbsp;number&nbsp;of&nbsp;idle&nbsp;connections</td>
+				</tr>
+				<tr>
+					<td class="envtypecell">production</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">15</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Max&nbsp;number&nbsp;of&nbsp;idle&nbsp;connections</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">33</td>
+		<td class="keycell">kvs.exampledb.minIdle</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">integration</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">15</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Min&nbsp;number&nbsp;of&nbsp;idle&nbsp;connections</td>
+				</tr>
+				<tr>
+					<td class="envtypecell">production</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">15</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Min&nbsp;number&nbsp;of&nbsp;idle&nbsp;connections</td>
 				</tr>
 			</table>
 		</td>
@@ -1053,6 +1457,292 @@ table.child, table.child td, table.child th {
 	</tr>
 	<tr>
 		<td class="rownumcell">3</td>
+		<td class="keycell">solr.connectionTimeout</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">10000</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Solr&nbsp;connection&nbsp;timeout</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">4</td>
+		<td class="keycell">solr.socketTimeout</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">10000</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Solr&nbsp;socket&nbsp;timeout</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">5</td>
+		<td class="keycell">solr.defaultMaxConnectionsPerHost</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">32</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Solr&nbsp;default&nbsp;max&nbsp;connections&nbsp;per&nbsp;host</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">6</td>
+		<td class="keycell">solr.maxTotalConnections</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">128</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Solr&nbsp;max&nbsp;total&nbsp;connections</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">7</td>
+		<td class="keycell">solr.aliveCheckInterval</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">60000</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Solr&nbsp;interval&nbsp;for&nbsp;checking&nbsp;aliveness</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">8</td>
+		<td class="keycell">kvs.examplekvs.maxWaitMillis</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">-1</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Max&nbsp;latency&nbsp;to&nbsp;get&nbsp;connection&nbsp;to&nbsp;kvs&nbsp;(milliseconds)</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">9</td>
+		<td class="keycell">kvs.examplekvs.minEvictableIdleTimeMillis</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">60000</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">TTL&nbsp;for&nbsp;idle&nbsp;connection&nbsp;(milliseconds)</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">10</td>
+		<td class="keycell">kvs.examplekvs.softMinEvictableIdleTimeMillis</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">30000</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Soft&nbsp;TTL&nbsp;for&nbsp;idle&nbsp;connection&nbsp;(milliseconds)</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">11</td>
+		<td class="keycell">kvs.examplekvs.numTestsPerEvictionRun</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">10</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Max&nbsp;number&nbsp;of&nbsp;idle&nbsp;connections&nbsp;per&nbsp;monitoring&nbsp;process</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">12</td>
+		<td class="keycell">kvs.examplekvs.testOnBorrow</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">true</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Should&nbsp;check&nbsp;if&nbsp;connection&nbsp;is&nbsp;available&nbsp;before&nbsp;getting&nbsp;connection</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">13</td>
+		<td class="keycell">kvs.examplekvs.testOnReturn</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">false</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Should&nbsp;check&nbsp;if&nbsp;connection&nbsp;is&nbsp;available&nbsp;before&nbsp;returning&nbsp;connection</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">14</td>
+		<td class="keycell">kvs.examplekvs.testWhileIdle</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">true</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Should&nbsp;check&nbsp;if&nbsp;idle&nbsp;connections&nbsp;are&nbsp;available</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">15</td>
+		<td class="keycell">kvs.examplekvs.timeBetweenEvictionRunsMillis</td>
+		<td>
+			<table class="child">
+				<tr>
+					<th>Env</th>
+					<th>Lang</th>
+					<th>Property</th>
+					<th><span title="Unique No (same value, same No)">uq</span></th>
+					<th>Comment</th>
+				</tr>
+				<tr>
+					<td class="envtypecell">-</td>
+					<td class="langtypecell">-</td>
+					<td class="valuecell">30000</td>
+					<td class="uniquenocell">1</td>
+					<td class="commentcell">Monitoring&nbsp;interval&nbsp;for&nbsp;idle&nbsp;connections&nbsp;in&nbsp;connection&nbsp;pool&nbsp;(milliseconds)</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="rownumcell">16</td>
 		<td class="keycell">cookie.default.path</td>
 		<td>
 			<table class="child">
@@ -1074,7 +1764,7 @@ table.child, table.child td, table.child th {
 		</td>
 	</tr>
 	<tr>
-		<td class="rownumcell">4</td>
+		<td class="rownumcell">17</td>
 		<td class="keycell">cookie.default.expire</td>
 		<td>
 			<table class="child">
@@ -1096,7 +1786,7 @@ table.child, table.child td, table.child th {
 		</td>
 	</tr>
 	<tr>
-		<td class="rownumcell">5</td>
+		<td class="rownumcell">18</td>
 		<td class="keycell">cookie.eternal.expire</td>
 		<td>
 			<table class="child">
@@ -1118,7 +1808,7 @@ table.child, table.child td, table.child th {
 		</td>
 	</tr>
 	<tr>
-		<td class="rownumcell">6</td>
+		<td class="rownumcell">19</td>
 		<td class="keycell">cookie.remember.me.nonrdb.key</td>
 		<td>
 			<table class="child">
@@ -1132,7 +1822,7 @@ table.child, table.child td, table.child th {
 				<tr>
 					<td class="envtypecell">-</td>
 					<td class="langtypecell">-</td>
-					<td class="valuecell">HRB</td>
+					<td class="valuecell">NRB</td>
 					<td class="uniquenocell">1</td>
 					<td class="commentcell">The&nbsp;cookie&nbsp;key&nbsp;of&nbsp;remember-me&nbsp;for&nbsp;Nonrdb&nbsp;#change_it_first</td>
 				</tr>

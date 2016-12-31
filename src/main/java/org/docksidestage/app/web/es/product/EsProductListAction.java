@@ -93,7 +93,7 @@ public class EsProductListAction extends NonrdbBaseAction {
             if (form.productStatus != null) {
                 cb.query().setProductStatusCode_Equal(form.productStatus);
             }
-            cb.query().addOrderBy_ProductName_Asc(); // TODO multifield support
+            cb.query().addOrderBy_ProductName_raw_Asc();
             cb.query().addOrderBy_Id_Asc();
             cb.paging(4, pageNumber);
         });

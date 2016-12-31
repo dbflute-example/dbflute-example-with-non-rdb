@@ -26,20 +26,21 @@ h1 {
     letter-spacing: 0.2em;
 }
 h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    padding: 3px 0;
+    background-color: #9e4873;
+    color: #F9FCEB;
+    text-indent: 2em;
+    letter-spacing: 0.2em;
+}
+h3 {
     margin: 2em 0 0.5em 0;
     font-size: 1.8em;
     border-left: 0.5em solid #882255;
     background-color: #CFA7BB;
     text-indent: 0.3em;
     line-height: 1.5em;
-}
-h3 {
-    padding: 0 0 0 10px;
-    margin: 1em 10% 0 0;
-    border-top: double 3px #882255;
-    border-bottom: solid 1px #333333;
-    font-size: 1.5em;
-    color: #333333;
 }
 h4 {
     padding: 0 0 0 10px;
@@ -55,37 +56,37 @@ h4 {
     text-align: right;
 }
 .sisterlink {
-	margin-top: 0.6em;
-	font-size: 120%;
+    margin-top: 0.6em;
+    font-size: 120%;
 }
 .sistersublink {
-	margin-top: 0.6em;
-	font-size: 85%;
+    margin-top: 0.6em;
+    font-size: 85%;
 }
 .sisterneighborlink {
-	margin-top: 0.6em;
-	font-size: 100%;
+    margin-top: 0.6em;
+    font-size: 100%;
 }
-.actiontitle {
+.doctitle {
     font-size: 1.2em;
     color: #889977;
 }
-.actionsubtitle {
+.docsubtitle {
     font-size: 1.0em;
     color: #889977;
 }
-.actionmainvalue {
+.docmainvalue {
     font-size: 1.3em;
     color: #221188;
 }
-.actionsubvalue {
+.docsubvalue {
     font-size: 1.1em;
     color: #221188;
 }
-p.actionsubitem {
+p.docsubitem {
     padding: 0.2em 0 0 1.5em;
 }
-.actionannotations {
+.docannotations {
     color: #666666;
 }
 
@@ -124,13 +125,13 @@ td {
     font-size: 0.9em;
     color: #666666;
 }
-.rownumcell {
-    text-align: center;
+.rowcell {
+    white-space: nowrap;
+}
+.rowcellnum {
+    text-align: right;
     font-size: 0.4em;
     color: #444;
-}
-.aliascell {
-    white-space: nowrap;
 }
 
 /* inner table */
@@ -164,8 +165,15 @@ table.child, table.child td, table.child th {
 |
 to nonrdb
 </p>
+
+<p class="sisterneighborlink">
+        <a href="#lastadoc_action">to action(24)</a>
+            | <a href="#lastadoc_mail">to mail(1)</a>
+                | <a href="#lastadoc_appcls">to appcls(1)</a>
+        </p>
 </div>
 
+<h2 id="lastadoc_action">action</h2>
 / :: RootAction<br>
 /nonrdb/base/ :: NonrdbBaseAction<br>
 /es/product/add/ :: EsProductAddAction<br>
@@ -190,5 +198,135 @@ to nonrdb
 /signout/ :: SignoutAction<br>
 /signup/ :: SignupAction<br>
 /withdrawal/ :: WithdrawalAction<br>
+
+<h2 id="lastadoc_mail">mail</h2>
+<table>
+    <thead>
+    <tr>
+        <th>No.</th>
+        <th>file</th>
+        <th>class</th>
+        <th>title</th>
+        <th>parameter count</th>
+    </tr>
+    </thead>
+    <tbody id="table-list-body">
+    <tr>
+        <td class="rowcellnum">1</td>
+        <td class="rowcell"><a href="#member/welcome_member.dfmail">member/welcome_member.dfmail</a></td>
+        <td class="rowcell"><span title="org.docksidestage.mylasta.mail.WelcomeMemberPostcard">WelcomeMemberPostcard</span></td>
+        <td class="rowcell">New&nbsp;Member's&nbsp;Registration</td>
+        <td class="rowcellnum">4</td>
+    </tr>
+    </tbody>
+</table>
+
+<h3 id="member/welcome_member.dfmail">
+member/welcome_member.dfmail
+</h3>
+<h4>
+New&nbsp;Member's&nbsp;Registration
+</h4>
+<p>
+<span class="doctitle">Class:</span> <span class="docmainvalue">org.docksidestage.mylasta.mail.WelcomeMemberPostcard</span>
+</p>
+<p class="docsubitem">
+<span class="docsubtitle">hasOptionPlusHtml:</span>
+<span class="docannotations docsubvalue">false</span>
+</p>
+
+<p class="tablecomment" style="white-space:pre-wrap;"><br>&nbsp;[New&nbsp;Member's&nbsp;Registration]<br>&nbsp;The&nbsp;member&nbsp;will&nbsp;be&nbsp;formalized&nbsp;after&nbsp;click.<br></p>
+
+<table>
+    <thead>
+    <tr>
+        <th class="rownumhead">No.</th>
+        <th>name</th>
+        <th>type</th>
+    </tr>
+    </thead>
+    <tr>
+        <td class="rowcellnum">1</td>
+        <td>memberName</td>
+        <td>String</td>
+    </tr>
+    <tr>
+        <td class="rowcellnum">2</td>
+        <td>domain</td>
+        <td>String</td>
+    </tr>
+    <tr>
+        <td class="rowcellnum">3</td>
+        <td>account</td>
+        <td>String</td>
+    </tr>
+    <tr>
+        <td class="rowcellnum">4</td>
+        <td>token</td>
+        <td>String</td>
+    </tr>
+</table>
+
+
+
+<h2 id="lastadoc_appcls">appcls</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Classification</th>
+        <th>Type</th>
+        <th>Top Comment</th>
+        <th>Definition</th>
+    </tr>
+    </thead>
+    <tbody id="table-list-body">
+    <tr>
+        <td>SearchMemberStatus</td>
+        <td class="clstypecell"> implicit</td>
+        <td>MemberStatus&nbsp;for&nbsp;search&nbsp;condition</td>
+        <td>
+            <table class="child">
+            <tr>
+                <th id="SearchMemberStatusCls">Code</th>
+                <th>Name</th>
+                <th>Comment</th>
+                <th><span class="clsgroup" title="means member that can use services :: [Formalized, Provisional]">serviceAvailable</span></th>
+                <th><span class="clsgroup" title="Members are not formalized yet :: [Provisional]">shortOfFormalized</span></th>
+            </tr>
+            <tr>
+                <td>FML</td>
+                <td>Formalized</td>
+                <td class="commentcell">as&nbsp;formal&nbsp;member,&nbsp;allowed&nbsp;to&nbsp;use&nbsp;all&nbsp;service</td>
+                <td class="flgcell">o</td>
+                <td class="flgcell"> &nbsp;</td>
+            </tr>
+            <tr>
+                <td>WDL</td>
+                <td>Withdrawal</td>
+                <td class="commentcell">withdrawal&nbsp;is&nbsp;fixed,&nbsp;not&nbsp;allowed&nbsp;to&nbsp;use&nbsp;service</td>
+                <td class="flgcell"> &nbsp;</td>
+                <td class="flgcell"> &nbsp;</td>
+            </tr>
+            <tr>
+                <td>PRV</td>
+                <td>Provisional</td>
+                <td class="commentcell">first&nbsp;status&nbsp;after&nbsp;entry,&nbsp;allowed&nbsp;to&nbsp;use&nbsp;only&nbsp;part&nbsp;of&nbsp;service</td>
+                <td class="flgcell">o</td>
+                <td class="flgcell">o</td>
+            </tr>
+            <tr>
+                <td>ALL</td>
+                <td>All</td>
+                <td class="commentcell">without&nbsp;status&nbsp;filter</td>
+                <td class="flgcell"> &nbsp;</td>
+                <td class="flgcell"> &nbsp;</td>
+            </tr>
+            </table>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+
 </body>
 </html>

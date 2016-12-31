@@ -16,6 +16,8 @@
 package org.docksidestage.esflute.maihama.cbean.cq.bs;
 
 import java.time.*;
+import java.util.ArrayList;
+
 import java.util.Collection;
 
 import org.docksidestage.esflute.maihama.allcommon.EsAbstractConditionQuery;
@@ -23,7 +25,7 @@ import org.docksidestage.esflute.maihama.cbean.cq.MemberCQ;
 import org.dbflute.cbean.ckey.ConditionKey;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
-import org.dbflute.exception.IllegalConditionBeanOperationException;
+import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder.FilterFunctionBuilder;
 
 /**
  * @author ESFlute (using FreeGen)
@@ -52,14 +54,15 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
             final ConditionOptionCall<FunctionScoreQueryBuilder> opLambda) {
         MemberCQ cq = new MemberCQ();
         queryLambda.callback(cq);
-        final FunctionScoreQueryBuilder builder = regFunctionScoreQ(cq.getQuery());
+        final Collection<FilterFunctionBuilder> list = new ArrayList<>();
         if (functionsLambda != null) {
             functionsLambda.callback((cqLambda, scoreFunctionBuilder) -> {
                 MemberCQ cf = new MemberCQ();
                 cqLambda.callback(cf);
-                builder.add(cf.getQuery(), scoreFunctionBuilder);
+                list.add(new FilterFunctionBuilder(cf.getQuery(), scoreFunctionBuilder));
             });
         }
+        final FunctionScoreQueryBuilder builder = regFunctionScoreQ(cq.getQuery(), list);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -238,8 +241,8 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
         setAccount_MatchPhrase(account, null);
     }
 
-    public void setAccount_MatchPhrase(String account, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhraseQ("account", account);
+    public void setAccount_MatchPhrase(String account, ConditionOptionCall<MatchPhraseQueryBuilder> opLambda) {
+        MatchPhraseQueryBuilder builder = regMatchPhraseQ("account", account);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -249,8 +252,8 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
         setAccount_MatchPhrasePrefix(account, null);
     }
 
-    public void setAccount_MatchPhrasePrefix(String account, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhrasePrefixQ("account", account);
+    public void setAccount_MatchPhrasePrefix(String account, ConditionOptionCall<MatchPhrasePrefixQueryBuilder> opLambda) {
+        MatchPhrasePrefixQueryBuilder builder = regMatchPhrasePrefixQ("account", account);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -260,8 +263,8 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
         setAccount_Fuzzy(account, null);
     }
 
-    public void setAccount_Fuzzy(String account, ConditionOptionCall<FuzzyQueryBuilder> opLambda) {
-        FuzzyQueryBuilder builder = regFuzzyQ("account", account);
+    public void setAccount_Fuzzy(String account, ConditionOptionCall<MatchQueryBuilder> opLambda) {
+        MatchQueryBuilder builder = regFuzzyQ("account", account);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -315,7 +318,8 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
     }
 
     public void setAccount_GreaterThan(String account, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("account", ConditionKey.CK_GREATER_THAN, account);
+        final Object _value = account;
+        RangeQueryBuilder builder = regRangeQ("account", ConditionKey.CK_GREATER_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -326,7 +330,8 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
     }
 
     public void setAccount_LessThan(String account, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("account", ConditionKey.CK_LESS_THAN, account);
+        final Object _value = account;
+        RangeQueryBuilder builder = regRangeQ("account", ConditionKey.CK_LESS_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -337,7 +342,8 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
     }
 
     public void setAccount_GreaterEqual(String account, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("account", ConditionKey.CK_GREATER_EQUAL, account);
+        final Object _value = account;
+        RangeQueryBuilder builder = regRangeQ("account", ConditionKey.CK_GREATER_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -348,7 +354,8 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
     }
 
     public void setAccount_LessEqual(String account, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("account", ConditionKey.CK_LESS_EQUAL, account);
+        final Object _value = account;
+        RangeQueryBuilder builder = regRangeQ("account", ConditionKey.CK_LESS_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -385,6 +392,7 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
         regOBD("account");
         return this;
     }
+
 
     public void setName_Equal(String name) {
         setName_Term(name, null);
@@ -455,8 +463,8 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
         setName_MatchPhrase(name, null);
     }
 
-    public void setName_MatchPhrase(String name, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhraseQ("name", name);
+    public void setName_MatchPhrase(String name, ConditionOptionCall<MatchPhraseQueryBuilder> opLambda) {
+        MatchPhraseQueryBuilder builder = regMatchPhraseQ("name", name);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -466,8 +474,8 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
         setName_MatchPhrasePrefix(name, null);
     }
 
-    public void setName_MatchPhrasePrefix(String name, ConditionOptionCall<MatchQueryBuilder> opLambda) {
-        MatchQueryBuilder builder = regMatchPhrasePrefixQ("name", name);
+    public void setName_MatchPhrasePrefix(String name, ConditionOptionCall<MatchPhrasePrefixQueryBuilder> opLambda) {
+        MatchPhrasePrefixQueryBuilder builder = regMatchPhrasePrefixQ("name", name);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -477,8 +485,8 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
         setName_Fuzzy(name, null);
     }
 
-    public void setName_Fuzzy(String name, ConditionOptionCall<FuzzyQueryBuilder> opLambda) {
-        FuzzyQueryBuilder builder = regFuzzyQ("name", name);
+    public void setName_Fuzzy(String name, ConditionOptionCall<MatchQueryBuilder> opLambda) {
+        MatchQueryBuilder builder = regFuzzyQ("name", name);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -532,7 +540,8 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
     }
 
     public void setName_GreaterThan(String name, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("name", ConditionKey.CK_GREATER_THAN, name);
+        final Object _value = name;
+        RangeQueryBuilder builder = regRangeQ("name", ConditionKey.CK_GREATER_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -543,7 +552,8 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
     }
 
     public void setName_LessThan(String name, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("name", ConditionKey.CK_LESS_THAN, name);
+        final Object _value = name;
+        RangeQueryBuilder builder = regRangeQ("name", ConditionKey.CK_LESS_THAN, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -554,7 +564,8 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
     }
 
     public void setName_GreaterEqual(String name, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("name", ConditionKey.CK_GREATER_EQUAL, name);
+        final Object _value = name;
+        RangeQueryBuilder builder = regRangeQ("name", ConditionKey.CK_GREATER_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -565,7 +576,8 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
     }
 
     public void setName_LessEqual(String name, ConditionOptionCall<RangeQueryBuilder> opLambda) {
-        RangeQueryBuilder builder = regRangeQ("name", ConditionKey.CK_LESS_EQUAL, name);
+        final Object _value = name;
+        RangeQueryBuilder builder = regRangeQ("name", ConditionKey.CK_LESS_EQUAL, _value);
         if (opLambda != null) {
             opLambda.callback(builder);
         }
@@ -593,13 +605,14 @@ public abstract class BsMemberCQ extends EsAbstractConditionQuery {
         }
     }
 
-    public BsMemberCQ addOrderBy_Name_Asc() {
-        regOBA("name");
+
+    public BsMemberCQ addOrderBy_Name_raw_Asc() {
+        regOBA("name.raw");
         return this;
     }
 
-    public BsMemberCQ addOrderBy_Name_Desc() {
-        regOBD("name");
+    public BsMemberCQ addOrderBy_Name_raw_Desc() {
+        regOBD("name.raw");
         return this;
     }
 
