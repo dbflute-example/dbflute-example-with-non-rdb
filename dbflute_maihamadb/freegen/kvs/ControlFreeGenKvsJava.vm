@@ -48,6 +48,10 @@ $manager.makeDirectory($request.generateDirPath)
       #set ($path = "org/dbflute/kvs/core/exception/KvsException.java")
       #mkdir($path)
       #generate("./kvs/allcommon/core/exception/KvsException.vm", $path)
+
+      #set ($path = "org/dbflute/kvs/core/assertion/KvsAssertion.java")
+      #mkdir($path)
+      #generate("./kvs/allcommon/core/assertion/KvsAssertion.vm", $path)
     #end
   #end
 
