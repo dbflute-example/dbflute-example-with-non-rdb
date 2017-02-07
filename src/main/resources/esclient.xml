@@ -3,7 +3,12 @@
 	"http://dbflute.org/meta/lastadi10.dtd">
 <components namespace="esclient">
 	<component name="client" instance="singleton">
-		org.elasticsearch.client.transport.TransportClient.builder().build().addTransportAddress(new org.elasticsearch.common.transport.InetSocketTransportAddress(java.net.InetAddress.getByName("localhost"), 9300))
+		new org.elasticsearch.transport.client.PreBuiltTransportClient(
+			org.elasticsearch.common.settings.Settings.builder()
+				.put("cluster.name", "elasticsearch").build())
+				.addTransportAddress(
+					new org.elasticsearch.common.transport.InetSocketTransportAddress(
+						java.net.InetAddress.getByName("localhost"), 9300))
 		<preDestroy name="close" />
 	</component>
 </components>

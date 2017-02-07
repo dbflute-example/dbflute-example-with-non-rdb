@@ -272,7 +272,7 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
     }
 
     protected IndexRequestBuilder createInsertRequest(final EsAbstractEntity esEntity) {
-        final IndexRequestBuilder builder = client.prepareIndex(asEsIndex(), asEsIndexType()).setSource(esEntity.toSource());
+        final IndexRequestBuilder builder = client.prepareIndex(asEsIndex(), asEsIndexType()).setSource(toSource(esEntity));
         final String id = esEntity.asDocMeta().id();
         if (id != null) {
             builder.setId(id);
@@ -299,7 +299,7 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
 
     protected IndexRequestBuilder createUpdateRequest(final EsAbstractEntity esEntity) {
         final IndexRequestBuilder builder =
-                client.prepareIndex(asEsIndex(), asEsIndexType(), esEntity.asDocMeta().id()).setSource(esEntity.toSource());
+                client.prepareIndex(asEsIndex(), asEsIndexType(), esEntity.asDocMeta().id()).setSource(toSource(esEntity));
         final RequestOptionCall<IndexRequestBuilder> indexOption = esEntity.asDocMeta().indexOption();
         if (indexOption != null) {
             indexOption.callback(builder);
@@ -309,6 +309,10 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
             builder.setVersion(version);
         }
         return builder;
+    }
+
+    protected Map<String, Object> toSource(final EsAbstractEntity esEntity) {
+        return esEntity.toSource();
     }
 
     @Override
