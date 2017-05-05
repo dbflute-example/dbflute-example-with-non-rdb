@@ -98,45 +98,49 @@ public class BsProduct extends EsAbstractEntity {
     public Map<String, Object> toSource() {
         Map<String, Object> sourceMap = new HashMap<>();
         if (latestPurchaseDate != null) {
-            sourceMap.put("latest_purchase_date", latestPurchaseDate);
+            addFieldToSource(sourceMap, "latest_purchase_date", latestPurchaseDate);
         }
         if (productCategory != null) {
-            sourceMap.put("product_category", productCategory);
+            addFieldToSource(sourceMap, "product_category", productCategory);
         }
         if (productCategoryCode != null) {
-            sourceMap.put("product_category_code", productCategoryCode);
+            addFieldToSource(sourceMap, "product_category_code", productCategoryCode);
         }
         if (productDescription != null) {
-            sourceMap.put("product_description", productDescription);
+            addFieldToSource(sourceMap, "product_description", productDescription);
         }
         if (productHandleCode != null) {
-            sourceMap.put("product_handle_code", productHandleCode);
+            addFieldToSource(sourceMap, "product_handle_code", productHandleCode);
         }
         if (productName != null) {
-            sourceMap.put("product_name", productName);
+            addFieldToSource(sourceMap, "product_name", productName);
         }
         if (productStatus != null) {
-            sourceMap.put("product_status", productStatus);
+            addFieldToSource(sourceMap, "product_status", productStatus);
         }
         if (productStatusCode != null) {
-            sourceMap.put("product_status_code", productStatusCode);
+            addFieldToSource(sourceMap, "product_status_code", productStatusCode);
         }
         if (registerDatetime != null) {
-            sourceMap.put("register_datetime", registerDatetime);
+            addFieldToSource(sourceMap, "register_datetime", registerDatetime);
         }
         if (registerUser != null) {
-            sourceMap.put("register_user", registerUser);
+            addFieldToSource(sourceMap, "register_user", registerUser);
         }
         if (regularPrice != null) {
-            sourceMap.put("regular_price", regularPrice);
+            addFieldToSource(sourceMap, "regular_price", regularPrice);
         }
         if (updateDatetime != null) {
-            sourceMap.put("update_datetime", updateDatetime);
+            addFieldToSource(sourceMap, "update_datetime", updateDatetime);
         }
         if (updateUser != null) {
-            sourceMap.put("update_user", updateUser);
+            addFieldToSource(sourceMap, "update_user", updateUser);
         }
         return sourceMap;
+    }
+
+    protected void addFieldToSource(Map<String, Object> sourceMap, String field, Object value) {
+        sourceMap.put(field, value);
     }
 
     // ===================================================================================

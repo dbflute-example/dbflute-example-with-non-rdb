@@ -15,8 +15,10 @@
  */
 package org.docksidestage.esflute.maihama.allcommon;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -499,7 +501,7 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
     // ===================================================================================
     //                                                                        Assist Logic
     //                                                                        ============
-    public static String[] toStringArray(final Object value) {
+    protected String[] toStringArray(final Object value) {
         if (value instanceof String[]) {
             return (String[]) value;
         } else if (value instanceof List) {
@@ -510,6 +512,14 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
             return null;
         }
         return new String[] { str };
+    }
+
+    protected LocalDateTime toLocalDateTime(Object value) {
+        return DfTypeUtil.toLocalDateTime(value);
+    }
+
+    protected Date toDate(Object value) {
+        return DfTypeUtil.toDate(value);
     }
 
     public static class BulkList<E, B> implements List<E> {

@@ -76,11 +76,15 @@ public abstract class BsMemberBhv extends EsAbstractBehavior<Member, MemberCB> {
             final RESULT result = entityType.newInstance();
             result.setAccount(DfTypeUtil.toString(source.get("account")));
             result.setName(DfTypeUtil.toString(source.get("name")));
-            return result;
+            return updateEntity(source, result);
         } catch (InstantiationException | IllegalAccessException e) {
             final String msg = "Cannot create a new instance: " + entityType.getName();
             throw new IllegalBehaviorStateException(msg, e);
         }
+    }
+
+    protected <RESULT extends Member> RESULT updateEntity(Map<String, Object> source, RESULT result) {
+        return result;
     }
 
     // ===================================================================================

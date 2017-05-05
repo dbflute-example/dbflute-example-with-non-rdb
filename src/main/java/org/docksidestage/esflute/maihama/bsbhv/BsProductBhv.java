@@ -74,7 +74,7 @@ public abstract class BsProductBhv extends EsAbstractBehavior<Product, ProductCB
     protected <RESULT extends Product> RESULT createEntity(Map<String, Object> source, Class<? extends RESULT> entityType) {
         try {
             final RESULT result = entityType.newInstance();
-            result.setLatestPurchaseDate(DfTypeUtil.toLocalDateTime(source.get("latest_purchase_date")));
+            result.setLatestPurchaseDate(toLocalDateTime(source.get("latest_purchase_date")));
             result.setProductCategory(DfTypeUtil.toString(source.get("product_category")));
             result.setProductCategoryCode(DfTypeUtil.toString(source.get("product_category_code")));
             result.setProductDescription(DfTypeUtil.toString(source.get("product_description")));
@@ -82,16 +82,20 @@ public abstract class BsProductBhv extends EsAbstractBehavior<Product, ProductCB
             result.setProductName(DfTypeUtil.toString(source.get("product_name")));
             result.setProductStatus(DfTypeUtil.toString(source.get("product_status")));
             result.setProductStatusCode(DfTypeUtil.toString(source.get("product_status_code")));
-            result.setRegisterDatetime(DfTypeUtil.toLocalDateTime(source.get("register_datetime")));
+            result.setRegisterDatetime(toLocalDateTime(source.get("register_datetime")));
             result.setRegisterUser(DfTypeUtil.toString(source.get("register_user")));
             result.setRegularPrice(DfTypeUtil.toInteger(source.get("regular_price")));
-            result.setUpdateDatetime(DfTypeUtil.toLocalDateTime(source.get("update_datetime")));
+            result.setUpdateDatetime(toLocalDateTime(source.get("update_datetime")));
             result.setUpdateUser(DfTypeUtil.toString(source.get("update_user")));
-            return result;
+            return updateEntity(source, result);
         } catch (InstantiationException | IllegalAccessException e) {
             final String msg = "Cannot create a new instance: " + entityType.getName();
             throw new IllegalBehaviorStateException(msg, e);
         }
+    }
+
+    protected <RESULT extends Product> RESULT updateEntity(Map<String, Object> source, RESULT result) {
+        return result;
     }
 
     // ===================================================================================
