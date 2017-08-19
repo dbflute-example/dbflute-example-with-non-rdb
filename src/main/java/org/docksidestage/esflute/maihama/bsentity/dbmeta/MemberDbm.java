@@ -106,8 +106,8 @@ public class MemberDbm extends AbstractDBMeta {
     // ===================================================================================
     //                                                                         Column Info
     //                                                                         ===========
-    protected final ColumnInfo _columnAccount = cci("account", "account", null, null, String.class, "account", null, false, false, false, "keyword", 0, 0, null, false, null, null, null, null, null, false);
-    protected final ColumnInfo _columnName = cci("name", "name", null, null, String.class, "name", null, false, false, false, "text", 0, 0, null, false, null, null, null, null, null, false);
+    protected final ColumnInfo _columnAccount = cci("account", "account", null, null, String.class, "account", null, false, false, false, "keyword", 0, 0, null, null, false, null, null, null, null, null, false);
+    protected final ColumnInfo _columnName = cci("name", "name", null, null, String.class, "name", null, false, false, false, "text", 0, 0, null, null, false, null, null, null, null, null, false);
 
     public ColumnInfo columnAccount() { return _columnAccount; }
     public ColumnInfo columnName() { return _columnName; }

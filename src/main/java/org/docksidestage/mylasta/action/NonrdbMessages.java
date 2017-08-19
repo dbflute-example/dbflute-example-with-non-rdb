@@ -203,13 +203,13 @@ public class NonrdbMessages extends NonrdbLabels {
      * message: numeric value out of bounds (&lt;{integer} digits&gt;.&lt;{fraction} digits&gt; expected)
      * </pre>
      * @param property The property name for the message. (NotNull)
-     * @param integer The parameter integer for message. (NotNull)
      * @param fraction The parameter fraction for message. (NotNull)
+     * @param integer The parameter integer for message. (NotNull)
      * @return this. (NotNull)
      */
-    public NonrdbMessages addConstraintsDigitsMessage(String property, String integer, String fraction) {
+    public NonrdbMessages addConstraintsDigitsMessage(String property, String fraction, String integer) {
         assertPropertyNotNull(property);
-        add(property, new UserMessage(CONSTRAINTS_Digits_MESSAGE, integer, fraction));
+        add(property, new UserMessage(CONSTRAINTS_Digits_MESSAGE, fraction, integer));
         return this;
     }
 
@@ -441,13 +441,13 @@ public class NonrdbMessages extends NonrdbLabels {
      * message: The check digit for ${value} is invalid, ${modType} checksum failed
      * </pre>
      * @param property The property name for the message. (NotNull)
-     * @param value The parameter value for message. (NotNull)
      * @param modType The parameter modType for message. (NotNull)
+     * @param value The parameter value for message. (NotNull)
      * @return this. (NotNull)
      */
-    public NonrdbMessages addConstraintsModCheckMessage(String property, String value, String modType) {
+    public NonrdbMessages addConstraintsModCheckMessage(String property, String modType, String value) {
         assertPropertyNotNull(property);
-        add(property, new UserMessage(CONSTRAINTS_ModCheck_MESSAGE, value, modType));
+        add(property, new UserMessage(CONSTRAINTS_ModCheck_MESSAGE, modType, value));
         return this;
     }
 

@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.docksidestage.esflute.maihama.allcommon.EsAbstractBehavior;
-import org.docksidestage.esflute.maihama.allcommon.EsAbstractEntity;
 import org.docksidestage.esflute.maihama.allcommon.EsAbstractEntity.RequestOptionCall;
 import org.docksidestage.esflute.maihama.bsentity.dbmeta.ProductDbm;
 import org.docksidestage.esflute.maihama.cbean.ProductCB;

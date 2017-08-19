@@ -58,7 +58,7 @@ public abstract class EsAbstractConditionAggregation {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected List<AbstractAggregationBuilder> aggregationAggregationBuilderList;
+    protected List<AbstractAggregationBuilder<?>> aggregationAggregationBuilderList;
 
     // ===================================================================================
     //                                                                             Control
@@ -68,14 +68,14 @@ public abstract class EsAbstractConditionAggregation {
         return aggregationAggregationBuilderList != null && !aggregationAggregationBuilderList.isEmpty();
     }
 
-    public List<AbstractAggregationBuilder> getAggregationBuilderList() {
+    public List<AbstractAggregationBuilder<?>> getAggregationBuilderList() {
         return aggregationAggregationBuilderList != null ? aggregationAggregationBuilderList : Collections.emptyList();
     }
 
     // ===================================================================================
     //                                                                         Aggregation
-    //                                                                               =====
-    public void addAggregation(AbstractAggregationBuilder aggregationAggregationBuilder) {
+    //                                                                         ===========
+    public void addAggregation(AbstractAggregationBuilder<?> aggregationAggregationBuilder) {
         assertObjectNotNull("aggregationAggregationBuilder", aggregationAggregationBuilder);
         regA(aggregationAggregationBuilder);
     }
@@ -223,7 +223,7 @@ public abstract class EsAbstractConditionAggregation {
         return builder;
     }
 
-    protected void regA(AbstractAggregationBuilder builder) {
+    protected void regA(AbstractAggregationBuilder<?> builder) {
         assertObjectNotNull("builder", builder);
         if (aggregationAggregationBuilderList == null) {
             aggregationAggregationBuilderList = new ArrayList<>();
@@ -267,7 +267,7 @@ public abstract class EsAbstractConditionAggregation {
     //                                                                        ============
 
     @FunctionalInterface
-    public interface ConditionOptionCall<OP extends AbstractAggregationBuilder> {
+    public interface ConditionOptionCall<OP extends AbstractAggregationBuilder<?>> {
 
         /**
          * @param op The option of condition to be set up. (NotNull)

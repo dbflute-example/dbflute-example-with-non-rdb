@@ -29,7 +29,6 @@ import org.docksidestage.esflute.maihama.cbean.ca.bs.BsProductCA;
 import org.dbflute.cbean.ConditionQuery;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 
 /**
  * @author ESFlute (using FreeGen)
