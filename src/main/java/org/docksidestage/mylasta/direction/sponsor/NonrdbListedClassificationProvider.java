@@ -19,8 +19,6 @@ import java.util.function.Function;
 
 import org.dbflute.jdbc.ClassificationMeta;
 import org.dbflute.optional.OptionalThing;
-import org.docksidestage.dbflute.allcommon.CDef;
-import org.docksidestage.dbflute.allcommon.DBCurrent;
 import org.docksidestage.mylasta.appcls.AppCDef;
 import org.lastaflute.db.dbflute.classification.TypicalListedClassificationProvider;
 import org.lastaflute.db.dbflute.exception.ProvidedClassificationNotFoundException;
@@ -33,11 +31,7 @@ public class NonrdbListedClassificationProvider extends TypicalListedClassificat
     @Override
     protected Function<String, ClassificationMeta> chooseClassificationFinder(String projectName)
             throws ProvidedClassificationNotFoundException {
-        if (DBCurrent.getInstance().projectName().equals(projectName)) {
-            return clsName -> onMainSchema(clsName).orElse(null); // null means not found
-        } else {
-            throw new ProvidedClassificationNotFoundException("Unknown DBFlute project name: " + projectName);
-        }
+        throw new ProvidedClassificationNotFoundException("Unknown DBFlute project name: " + projectName);
     }
 
     @Override
@@ -50,7 +44,7 @@ public class NonrdbListedClassificationProvider extends TypicalListedClassificat
     }
 
     protected OptionalThing<ClassificationMeta> onMainSchema(String clsName) {
-        return findMeta(CDef.DefMeta.class, clsName);
+        return OptionalThing.empty();
     }
 
     protected OptionalThing<ClassificationMeta> onAppCls(String clsName) {

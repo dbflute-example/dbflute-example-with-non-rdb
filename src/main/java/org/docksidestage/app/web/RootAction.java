@@ -16,19 +16,11 @@
 package org.docksidestage.app.web;
 
 import org.docksidestage.app.web.base.NonrdbBaseAction;
-import org.docksidestage.app.web.mypage.MypageAction;
-import org.lastaflute.web.Execute;
 import org.lastaflute.web.login.AllowAnyoneAccess;
-import org.lastaflute.web.response.HtmlResponse;
 
 /**
  * @author jflute
  */
 @AllowAnyoneAccess
 public class RootAction extends NonrdbBaseAction {
-
-    @Execute
-    public HtmlResponse index() {
-        return redirect(MypageAction.class);
-    }
 }

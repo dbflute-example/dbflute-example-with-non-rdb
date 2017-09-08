@@ -19,14 +19,12 @@ import javax.annotation.Resource;
 
 import org.dbflute.optional.OptionalThing;
 import org.docksidestage.app.logic.context.AccessContextLogic;
-import org.docksidestage.app.web.base.login.NonrdbLoginAssist;
-import org.docksidestage.app.web.base.view.HeaderBean;
 import org.docksidestage.mylasta.action.NonrdbHtmlPath;
 import org.docksidestage.mylasta.action.NonrdbMessages;
-import org.docksidestage.mylasta.action.NonrdbUserBean;
 import org.lastaflute.db.dbflute.accesscontext.AccessContextArranger;
 import org.lastaflute.web.TypicalAction;
 import org.lastaflute.web.login.LoginManager;
+import org.lastaflute.web.login.UserBean;
 import org.lastaflute.web.response.ActionResponse;
 import org.lastaflute.web.ruts.process.ActionRuntime;
 import org.lastaflute.web.token.DoubleSubmitManager;
@@ -45,9 +43,6 @@ public abstract class NonrdbBaseAction extends TypicalAction // has several inte
     /** The application type for NonRdB, e.g. used by access context. */
     protected static final String APP_TYPE = "NRB"; // #change_it_first
 
-    /** The user type for Member, e.g. used by access context. */
-    protected static final String USER_TYPE = "M"; // #change_it_first (can delete if no login)
-
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -55,8 +50,6 @@ public abstract class NonrdbBaseAction extends TypicalAction // has several inte
     private DoubleSubmitManager doubleSubmitManager;
     @Resource
     private AccessContextLogic accessContextLogic;
-    @Resource
-    private NonrdbLoginAssist loginAssist;
 
     // ===================================================================================
     //                                                                               Hook
@@ -85,11 +78,6 @@ public abstract class NonrdbBaseAction extends TypicalAction // has several inte
 
     @Override
     public void hookFinally(ActionRuntime runtime) { // application may override
-        if (runtime.isForwardToHtml()) { // #delete_ifapi
-            runtime.registerData("headerBean", getUserBean().map(userBean -> {
-                return new HeaderBean(userBean);
-            }).orElse(HeaderBean.empty()));
-        }
         super.hookFinally(runtime);
     }
 
@@ -121,18 +109,18 @@ public abstract class NonrdbBaseAction extends TypicalAction // has several inte
     //                                            ----------
     // #app_customize return empty if login is unused
     @Override
-    protected OptionalThing<NonrdbUserBean> getUserBean() { // application may call, overriding for co-variant
-        return loginAssist.getSavedUserBean();
+    protected OptionalThing<? extends UserBean<?>> getUserBean() { // application may call, overriding for co-variant
+        return OptionalThing.empty();
     }
 
     @Override
     protected OptionalThing<String> myUserType() { // for framework
-        return OptionalThing.of(USER_TYPE);
+        return OptionalThing.empty();
     }
 
     @Override
     protected OptionalThing<LoginManager> myLoginManager() { // for framework
-        return OptionalThing.of(loginAssist);
+        return OptionalThing.empty();
     }
 
     // ===================================================================================

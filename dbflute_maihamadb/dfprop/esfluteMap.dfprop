@@ -18,22 +18,22 @@
 # *The line that starts with '#' means comment-out.
 #
 map:{
-    # base package of generated classes
-    ; basePackage = org.docksidestage.esflute
-
-    # base path to JSON resource, URL or relative path
-    ; basePath = ./playes/index
-
-    # settings for indexes
-    ; indexMap = map:{
-        ; maihama = map:{
-            ; package = maihama
-            #; esclientDiFile = elasticsearch_client.xml
-            #; esfluteDiFile = esflute_maihama.xml
-        }
-    }
-
-    # version for elasticsearch's jar file (no version means latest)
-    ; elasticsearchVersion = 2.3.0
+    ## base package of generated classes
+    #; basePackage = org.docksidestage.esflute
+    #
+    ## base path to JSON resource, URL or relative path
+    #; basePath = ./playes/index
+    #
+    ## settings for indexes
+    #; indexMap = map:{
+    #    ; maihama = map:{
+    #        ; package = maihama
+    #        #; esclientDiFile = elasticsearch_client.xml
+    #        #; esfluteDiFile = esflute_maihama.xml
+    #    }
+    #}
+    #
+    ## version for elasticsearch's jar file (no version means latest)
+    #; elasticsearchVersion = 2.3.0
 }
 # ----------------/
