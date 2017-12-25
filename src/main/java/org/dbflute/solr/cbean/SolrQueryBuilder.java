@@ -767,7 +767,7 @@ public class SolrQueryBuilder {
      * @return　Solr向けのUTC形式でDate型の検索文字列フォーマットにした日時文字列
      */
     public static String formatYMDHmsForSolrByJST(Date date) {
-        // TODO -9ベタでいいか確認。
+        // XXX p1us2er0 -9ベタでいいか確認。 (2015/05/26)
         return formatYMDHmsForSolr(date, -9);
     }
 
@@ -803,7 +803,7 @@ public class SolrQueryBuilder {
         }
     }
 
-    // TODO org.apache.commons.lang3.StringUtilsのコピー。時間があるときに最適化。
+    // XXX p1us2er0 org.apache.commons.lang3.StringUtilsのコピー。時間があるときに最適化。 (2016/09/25)
     /**
      * <p>Left pad a String with a specified String.</p>
      *

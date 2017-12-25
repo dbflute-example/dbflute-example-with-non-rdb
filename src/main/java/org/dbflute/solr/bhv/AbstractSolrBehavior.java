@@ -104,7 +104,7 @@ public abstract class AbstractSolrBehavior<ENTITY extends SolrEntity, INDEX exte
         }
     }
 
-    /** 
+    /**
      * Retrieve entities by paging-search.
      * @param cbLambda ConditionBean callback function (NotNull)
      * @return List of the result entities (NotNull)
@@ -356,7 +356,7 @@ public abstract class AbstractSolrBehavior<ENTITY extends SolrEntity, INDEX exte
     }
 
     /**
-     * Adjust max total connections and default max connections per host of HTTP client 
+     * Adjust max total connections and default max connections per host of HTTP client
      * @param httpClient HTTP client
      */
     protected void adjustHttpClient(HttpClient httpClient) {

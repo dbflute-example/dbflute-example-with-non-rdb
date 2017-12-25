@@ -15,11 +15,13 @@
  */
 package org.dbflute.kvs.cache.facade;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -60,16 +62,23 @@ public abstract class AbstractKvsCacheFacade implements KvsCacheFacade {
     //                                                                                ====
     @Override
     public <ENTITY extends Entity> OptionalEntity<ENTITY> findEntity(List<Object> searchKeyList, ConditionBean cb) {
-        return kvsCacheBusinessAssist.findEntity(mySelector(), cb.asDBMeta().getProjectName(), searchKeyList, cb, cacheTtl());
+        return findEntity(searchKeyList, cb, entity -> calcExpireDateTime(cacheTtl()));
     }
 
     @Override
-    public <ENTITY extends Entity> List<ENTITY> findList(List<Object> searchKeyList, ConditionBean cb) {
-        return kvsCacheBusinessAssist.findList(mySelector(), cb.asDBMeta().getProjectName(), searchKeyList, cb, cacheTtl());
+    public <ENTITY extends Entity> OptionalEntity<ENTITY> findEntity(List<Object> searchKeyList, ConditionBean cb,
+            Function<ENTITY, LocalDateTime> expireDateTimeLambda) {
+        return kvsCacheBusinessAssist.findEntity(mySelector(), cb.asDBMeta().getProjectName(), searchKeyList, cb, expireDateTimeLambda);
     }
 
     @Override
     public <ENTITY extends Entity> OptionalEntity<ENTITY> findEntityById(Object id, DBMeta dbmeta, Set<ColumnInfo> specifiedColumnInfoSet) {
+        return findEntityById(id, dbmeta, specifiedColumnInfoSet, entity -> calcExpireDateTime(cacheTtl()));
+    }
+
+    @Override
+    public <ENTITY extends Entity> OptionalEntity<ENTITY> findEntityById(Object id, DBMeta dbmeta, Set<ColumnInfo> specifiedColumnInfoSet,
+            Function<ENTITY, LocalDateTime> expireDateTimeLambda) {
         final List<Object> searchKeyList = new ArrayList<Object>(1);
         searchKeyList.add(id);
         final BehaviorReadable readable = behaviorSelector.byName(dbmeta.getTableDbName());
@@ -79,8 +88,19 @@ public abstract class AbstractKvsCacheFacade implements KvsCacheFacade {
         final Map<String, Object> primaryKeyMap = new HashMap<String, Object>(1);
         primaryKeyMap.put(primaryInfo.getFirstColumn().getColumnDbName(), id);
         cb.acceptPrimaryKeyMap(primaryKeyMap);
-        return kvsCacheBusinessAssist.findEntity(mySelector(), cb.asDBMeta().getProjectName(), searchKeyList, cb, cacheTtl(),
-                specifiedColumnInfoSet);
+        return kvsCacheBusinessAssist.findEntity(mySelector(), cb.asDBMeta().getProjectName(), searchKeyList, cb,
+                entity -> calcExpireDateTime(cacheTtl()), specifiedColumnInfoSet);
+    }
+
+    @Override
+    public <ENTITY extends Entity> List<ENTITY> findList(List<Object> searchKeyList, ConditionBean cb) {
+        return findList(searchKeyList, cb, entity -> calcExpireDateTime(cacheTtl()));
+    }
+
+    @Override
+    public <ENTITY extends Entity> List<ENTITY> findList(List<Object> searchKeyList, ConditionBean cb,
+            Function<List<ENTITY>, LocalDateTime> expireDateTimeLambda) {
+        return kvsCacheBusinessAssist.findList(mySelector(), cb.asDBMeta().getProjectName(), searchKeyList, cb, expireDateTimeLambda);
     }
 
     @Override
@@ -139,6 +159,15 @@ public abstract class AbstractKvsCacheFacade implements KvsCacheFacade {
     //                                                                               Other
     //                                                                               =====
     @Override
+    public OptionalEntity<Long> ttl(List<Object> searchKeyList, ConditionBean cb) {
+        String key = kvsCacheBusinessAssist.generateKey(cb.asDBMeta().getProjectName(), cb.asTableDbName(), searchKeyList);
+        Long ttl = kvsCacheManager.ttl(key);
+        return OptionalEntity.ofNullable(ttl, () -> {
+            throw new IllegalArgumentException("Not found the entity by the condition. (might be deleted?)");
+        });
+    }
+
+    @Override
     public int getNumActive() {
         return kvsCacheManager.getNumActive();
     }
@@ -150,8 +179,8 @@ public abstract class AbstractKvsCacheFacade implements KvsCacheFacade {
         return this.behaviorSelector;
     }
 
-    protected Integer cacheTtl() {
-        return this.cacheTtl;
+    public Long cacheTtl() {
+        return this.cacheTtl == null ? null : this.cacheTtl.longValue();
     }
 
     // ===================================================================================
@@ -169,5 +198,10 @@ public abstract class AbstractKvsCacheFacade implements KvsCacheFacade {
             throw new KvsException("This method is not available with concatenated primary key: " + primaryInfo);
         }
         return primaryInfo;
+    }
+
+    @Override
+    public LocalDateTime calcExpireDateTime(Long ttl) {
+        return kvsCacheBusinessAssist.calcExpireDateTime(ttl);
     }
 }

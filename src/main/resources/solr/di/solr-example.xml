@@ -4,5 +4,5 @@
 <components namespace="solr-example">
     <include path="lastaflute_assist.xml"/>
 
-    <component name="solrExampleBhv" class="jp.unext.laxample.solr.exbhv.SolrExampleBhv" />
+    <component name="solrExampleBhv" class="org.docksidestage.solr.exbhv.SolrExampleBhv" />
 </components>

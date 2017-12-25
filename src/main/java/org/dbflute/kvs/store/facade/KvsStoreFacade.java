@@ -76,11 +76,11 @@ public interface KvsStoreFacade {
      * @param kvsStoreDBMeta Metadata of KVS store (NotNull)
      * @param searchKeyList A list containing keys for search (NotNull)
      * @param entity Entity to insert/update (NotNull)
-     * @param availableDateTime Time To Live (NullAllowed: use server-config if null is set)
+     * @param expireDateTime Time To Live (NullAllowed: use server-config if null is set)
      * @param <ENTITY> Entity of DBFlute
      */
     <ENTITY extends KvsStoreEntity> void insertOrUpdate(KvsStoreDBMeta kvsStoreDBMeta, List<Object> searchKeyList, ENTITY entity,
-            LocalDateTime availableDateTime);
+            LocalDateTime expireDateTime);
 
     /**
      * Insert/Update the assigned entities into(in) KVS.
@@ -96,11 +96,11 @@ public interface KvsStoreFacade {
      * @param kvsStoreDBMeta Metadata of KVS store (NotNull)
      * @param searchKeyList A list containing keys for search (NotNull)
      * @param entity Entity to insert/update (NotNull)
-     * @param availableDateTime Time To Live (NullAllowed: use server-config if null is set)
+     * @param expireDateTime Time To Live (NullAllowed: use server-config if null is set)
      * @param <ENTITY> Entity of DBFlute
      */
     <ENTITY extends KvsStoreEntity> void insertOrUpdate(KvsStoreDBMeta kvsStoreDBMeta, List<Object> searchKeyList, List<ENTITY> entityList,
-            LocalDateTime availableDateTime);
+            LocalDateTime expireDateTime);
 
     // ===================================================================================
     //                                                                              Delete

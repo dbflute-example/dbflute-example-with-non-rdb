@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2016 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -89,8 +89,8 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     }
 
     @Override
-    public void registerString(String key, String value, LocalDateTime availableDateTime) {
-        kvsStoreDelegator.registerString(key, value, availableDateTime);
+    public void registerString(String key, String value, LocalDateTime expireDateTime) {
+        kvsStoreDelegator.registerString(key, value, expireDateTime);
     }
 
     @Override
@@ -99,8 +99,8 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     }
 
     @Override
-    public void registerMultiString(Map<String, String> keyValueMap, LocalDateTime availableDateTime) {
-        kvsStoreDelegator.registerMultiString(keyValueMap, availableDateTime);
+    public void registerMultiString(Map<String, String> keyValueMap, LocalDateTime expireDateTime) {
+        kvsStoreDelegator.registerMultiString(keyValueMap, expireDateTime);
     }
 
     // -----------------------------------------------------
@@ -112,8 +112,8 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     }
 
     @Override
-    public void registerList(String key, List<String> value, LocalDateTime availableDateTime) {
-        kvsStoreDelegator.registerList(key, value, availableDateTime);
+    public void registerList(String key, List<String> value, LocalDateTime expireDateTime) {
+        kvsStoreDelegator.registerList(key, value, expireDateTime);
     }
 
     @Override
@@ -122,8 +122,8 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     }
 
     @Override
-    public void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime availableDateTime) {
-        kvsStoreDelegator.registerMultiList(keyValueMap, availableDateTime);
+    public void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime expireDateTime) {
+        kvsStoreDelegator.registerMultiList(keyValueMap, expireDateTime);
     }
 
     // -----------------------------------------------------
@@ -135,8 +135,8 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     }
 
     @Override
-    public void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime availableDateTime) {
-        kvsStoreDelegator.registerHash(key, fieldValueMap, availableDateTime);
+    public void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime expireDateTime) {
+        kvsStoreDelegator.registerHash(key, fieldValueMap, expireDateTime);
     }
 
     @Override
@@ -145,8 +145,8 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     }
 
     @Override
-    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime availableDateTime) {
-        kvsStoreDelegator.registerMultiHash(keyValueMap, availableDateTime);
+    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime expireDateTime) {
+        kvsStoreDelegator.registerMultiHash(keyValueMap, expireDateTime);
     }
 
     // ===================================================================================

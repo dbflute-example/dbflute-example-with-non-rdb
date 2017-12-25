@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2016 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -86,10 +86,8 @@ public class Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm extends Abstr
 #elseif ($column.isRefColumn)
 #set ($javaNative = ${column.camelizedName})
 #end
-#if ($javaNative == 'boolean')
-        ${table.uncapCamelName}.set${column.capCamelName}(Boolean.valueOf((String) map.get("${column.uncapCamelName}")));
-#elseif ($javaNative == 'Integer' || $javaNative == 'Long')
-        ${table.uncapCamelName}.set${column.capCamelName}(org.dbflute.util.DfTypeUtil.to${javaNative}(map.get("${column.uncapCamelName}")));
+#if ($javaNative == 'Boolean' || $javaNative == 'Integer' || $javaNative == 'Long' || $javaNative == 'java.math.BigDecimal')
+        ${table.uncapCamelName}.set${column.capCamelName}(org.dbflute.util.DfTypeUtil.to${javaNative.replaceAll('.*\.', '')}(map.get("${column.uncapCamelName}")));
 #elseif ($javaNative == 'java.time.LocalDate' || $javaNative == 'java.time.LocalDateTime')
         ${table.uncapCamelName}.set${column.capCamelName}(parse${javaNative.replaceAll('.*\.', '')}((String) map.get("${column.uncapCamelName}")));
 #elseif ($javaNative == 'String')
@@ -104,7 +102,7 @@ public class Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm extends Abstr
 #if ($genericsType == 'java.time.LocalDate' || $genericsType == 'java.time.LocalDateTime')
             return parse${genericsType.replaceAll('.*\.', '')}(value == null ? null : value.toString());
 #else
-            return org.dbflute.util.DfTypeUtil.to${genericsType}(value);
+            return org.dbflute.util.DfTypeUtil.to${genericsType.replaceAll('.*\.', '')}(value);
 #end
         }).collect(java.util.stream.Collectors.toList()));
 #elseif ($javaNative.matches('java\.util\.Map\<([^<]*), ([^<]*)\>'))
@@ -113,18 +111,18 @@ public class Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm extends Abstr
 #if ($genericsTypeKey == 'java.time.LocalDate' || $genericsTypeKey == 'java.time.LocalDateTime')
             return parse${genericsTypeKey.replaceAll('.*\.', '')}(value == null ? null : value.toString());
 #else
-            return org.dbflute.util.DfTypeUtil.to${genericsTypeKey}(key);
+            return org.dbflute.util.DfTypeUtil.to${genericsTypeKey.replaceAll('.*\.', '')}(key);
 #end
         } , value -> {
 #set($genericsTypeValue = ${javaNative.replaceAll('java\.util\.List\<(.*)\>', '$2')})
 #if ($genericsTypeValue == 'java.time.LocalDate' || $genericsTypeValue == 'java.time.LocalDateTime')
             return parse${genericsTypeValue.replaceAll('.*\.', '')}(value);
 #else
-            return org.dbflute.util.DfTypeUtil.to${genericsTypeValue}(key);
+            return org.dbflute.util.DfTypeUtil.to${genericsTypeValue.replaceAll('.*\.', '')}(key);
 #end
         })));
 #else
-        ${table.uncapCamelName}.set${column.capCamelName}((${javaNative}) map.get("${column.uncapCamelName}"));
+        ${table.uncapCamelName}.set${column.capCamelName}(toAnalyzedTypeValue(entity.getClass(), "_${column.uncapCamelName}", map.get("${column.uncapCamelName}")));
 #end
 #end
     }

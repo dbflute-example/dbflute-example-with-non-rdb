@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2016 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -81,9 +81,9 @@ public interface KvsStoreManager {
      * 有効期限を設定して指定したkeyで値をKVSに保存する。
      * @param key KVSへの登録キー (NotNull)
      * @param value 指定されたkeyでKVS上に保存される値 (NotNull)
-     * @param availableDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     * @param expireDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
      */
-    void registerString(String key, String value, LocalDateTime availableDateTime);
+    void registerString(String key, String value, LocalDateTime expireDateTime);
 
     /**
      * 指定したKeyで値をKVSに保存する。
@@ -94,9 +94,9 @@ public interface KvsStoreManager {
     /**
      * 有効期限を設定して指定したKeyで値をKVSに保存する。
      * @param keyValueMap KVSへの登録キー、値のMAP (NotNull)
-     * @param availableDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     * @param expireDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
      */
-    void registerMultiString(Map<String, String> keyValueMap, LocalDateTime availableDateTime);
+    void registerMultiString(Map<String, String> keyValueMap, LocalDateTime expireDateTime);
 
     // -----------------------------------------------------
     //                                                  List
@@ -112,9 +112,9 @@ public interface KvsStoreManager {
      * 有効期限を設定して指定したKeyで値をKVSに保存する。
      * @param key KVSへの登録キー (NotNull)
      * @param value 指定されたkeyでKVS上に保存される値 (NotNull)
-     * @param availableDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     * @param expireDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
      */
-    void registerList(String key, List<String> value, LocalDateTime availableDateTime);
+    void registerList(String key, List<String> value, LocalDateTime expireDateTime);
 
     /**
      * 指定したKeyで文字列リストをKVSに保存する。
@@ -125,20 +125,20 @@ public interface KvsStoreManager {
     /**
      * 有効期限を設定して指定したKeyで文字列リストをKVSに保存する。
      * @param keyValueMap KVSへの登録キー、値のMAP (NotNull)
-     * @param availableDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     * @param expireDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
      */
-    void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime availableDateTime);
+    void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime expireDateTime);
 
     // -----------------------------------------------------
     //                                                  Hash
     //                                                  ----
     void registerHash(String key, Map<String, String> fieldValueMap);
 
-    void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime availableDateTime);
+    void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime expireDateTime);
 
     void registerMultiHash(Map<String, Map<String, String>> keyValueMap);
 
-    void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime availableDateTime);
+    void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime expireDateTime);
 
     // ===================================================================================
     //                                                                              Delete

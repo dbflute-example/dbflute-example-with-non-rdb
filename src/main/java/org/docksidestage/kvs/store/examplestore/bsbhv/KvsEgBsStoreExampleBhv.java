@@ -15,6 +15,7 @@
  */
 package org.docksidestage.kvs.store.examplestore.bsbhv;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -132,6 +133,32 @@ public abstract class KvsEgBsStoreExampleBhv {
         KvsEgStoreExampleDbm storeExampleDbm = asDBMeta();
         storeExampleDbm.validateAllColumn(storeExample);
         examplestoreKvsStoreFacade.insertOrUpdate(storeExampleDbm, storeExampleDbm.extractKeyList(storeExample), storeExample);
+        return storeExample;
+    }
+
+    /**
+     * Insert or update the entity with TTL.
+     * <pre>
+     * <span style="color: #0000C0">kvsCalcEvaluationBhv</span>.<span style="color: #CC4747">insertOrUpdate</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     KvsCalcEvaluation evaluation = <span style="color: #70226C">new</span> KvsCalcEvaluation();
+     *     <span style="color: #3F7E5E">// Setting KVS-key(s) is required</span>
+     *     evaluation.setSakuhinPublicCode(<span style="color: #553000">sakuhinCode</span>);
+     *     evaluation.setPlatformPublicCode(<span style="color: #553000">platformCode</span>);
+     *     <span style="color: #3F7E5E">// Set other column value(s) for insert/update</span>
+     *     evaluation.set...;
+     *     ...
+     *     <span style="color: #70226C">return</span> evaluation;
+     * }, LocalDateTime.now().plus(<span style="color: #553000">86400000</span>, ChronoUnit.MILLIS));
+     * </pre>
+     * @param entityLambda The handler of entity row of KvsEgStoreExample (NotNull)
+     * @param expireDateTime
+     * @return The Entity used to insert/update with automatically-set column value (NotNull)
+     */
+    public KvsEgStoreExample insertOrUpdate(Supplier<KvsEgStoreExample> entityLambda, LocalDateTime expireDateTime) {
+        KvsEgStoreExample storeExample = entityLambda.get();
+        KvsEgStoreExampleDbm storeExampleDbm = asDBMeta();
+        storeExampleDbm.validateAllColumn(storeExample);
+        examplestoreKvsStoreFacade.insertOrUpdate(storeExampleDbm, storeExampleDbm.extractKeyList(storeExample), storeExample, expireDateTime);
 
         return storeExample;
     }

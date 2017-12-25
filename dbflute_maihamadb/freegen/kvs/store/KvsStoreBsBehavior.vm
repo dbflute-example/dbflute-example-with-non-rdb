@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2016 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -21,6 +21,10 @@
 #end
 ${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.bsbhv;
 
+import java.time.LocalDateTime;
+#if ($table.ttl && $table.ttl > 0)
+import java.time.temporal.ChronoUnit;
+#end
 #if ($kvsKeyCount == 1)
 import java.util.List;
 import java.util.function.Consumer;
@@ -30,6 +34,11 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import org.dbflute.optional.OptionalEntity;
+#if ($table.ttl && $table.ttl > 0)
+#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+import org.dbflute.saflute.core.time.TimeManager;
+#end
+#end
 import org.dbflute.util.DfCollectionUtil;
 #else
 import java.util.function.Consumer;
@@ -37,7 +46,17 @@ import java.util.function.Supplier;
 
 import javax.annotation.Resource;
 
+#if ($table.ttl && $table.ttl > 0)
+#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+import org.dbflute.saflute.core.time.TimeManager;
+#end
+#end
 import org.dbflute.optional.OptionalEntity;
+#end
+#if ($table.ttl && $table.ttl > 0)
+#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+import org.lastaflute.core.time.TimeManager;
+#end
 #end
 
 import ${request.package}.${tableMap.schema}.bsentity.dbmeta.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm;
@@ -51,10 +70,21 @@ import ${request.package}.${tableMap.schema}.facade.${manager.initCap($tableMap.
  */
 public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv {
 
+#if ($table.ttl && $table.ttl > 0)
+    /** TimeManager. */
+    @Resource
+    private TimeManager timeManager;
+
+#end
     /** ${manager.initCap($tableMap.schema)}KvsStoreFacade. */
     @Resource
     private ${manager.initCap($tableMap.schema)}KvsStoreFacade ${tableMap.schema}KvsStoreFacade;
 
+#if ($table.ttl && $table.ttl > 0)
+    /** TTL (sec) */
+    private final long TTL = ${table.ttl};
+
+#end
     /**
      * Handle the meta as DBMeta, that has all info of the table.
      * @return DBMeta instance (NotNull)
@@ -155,7 +185,38 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv {
         Kvs$!{tableMap.schemaPrefix}${table.camelizedName} ${table.uncapCamelName} = entityLambda.get();
         Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm ${table.uncapCamelName}Dbm = asDBMeta();
         ${table.uncapCamelName}Dbm.validateAllColumn(${table.uncapCamelName});
+#if ($table.ttl && $table.ttl > 0)
+        LocalDateTime expireDateTime = timeManager.currentDateTime().plus(TTL, ChronoUnit.SECONDS);
+        ${tableMap.schema}KvsStoreFacade.insertOrUpdate(${table.uncapCamelName}Dbm, ${table.uncapCamelName}Dbm.extractKeyList(${table.uncapCamelName}), ${table.uncapCamelName}, expireDateTime);
+#else
         ${tableMap.schema}KvsStoreFacade.insertOrUpdate(${table.uncapCamelName}Dbm, ${table.uncapCamelName}Dbm.extractKeyList(${table.uncapCamelName}), ${table.uncapCamelName});
+#end
+        return ${table.uncapCamelName};
+    }
+
+    /**
+     * Insert or update the entity with TTL.
+     * <pre>
+     * <span style="color: #0000C0">kvsCalcEvaluationBhv</span>.<span style="color: #CC4747">insertOrUpdate</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     KvsCalcEvaluation evaluation = <span style="color: #70226C">new</span> KvsCalcEvaluation();
+     *     <span style="color: #3F7E5E">// Setting KVS-key(s) is required</span>
+     *     evaluation.setSakuhinPublicCode(<span style="color: #553000">sakuhinCode</span>);
+     *     evaluation.setPlatformPublicCode(<span style="color: #553000">platformCode</span>);
+     *     <span style="color: #3F7E5E">// Set other column value(s) for insert/update</span>
+     *     evaluation.set...;
+     *     ...
+     *     <span style="color: #70226C">return</span> evaluation;
+     * }, LocalDateTime.now().plus(<span style="color: #553000">86400000</span>, ChronoUnit.MILLIS));
+     * </pre>
+     * @param entityLambda The handler of entity row of Kvs$!{tableMap.schemaPrefix}${table.camelizedName} (NotNull)
+     * @param expireDateTime
+     * @return The Entity used to insert/update with automatically-set column value (NotNull)
+     */
+    public Kvs$!{tableMap.schemaPrefix}${table.camelizedName} insertOrUpdate(Supplier<Kvs$!{tableMap.schemaPrefix}${table.camelizedName}> entityLambda, LocalDateTime expireDateTime) {
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName} ${table.uncapCamelName} = entityLambda.get();
+        Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm ${table.uncapCamelName}Dbm = asDBMeta();
+        ${table.uncapCamelName}Dbm.validateAllColumn(${table.uncapCamelName});
+        ${tableMap.schema}KvsStoreFacade.insertOrUpdate(${table.uncapCamelName}Dbm, ${table.uncapCamelName}Dbm.extractKeyList(${table.uncapCamelName}), ${table.uncapCamelName}, expireDateTime);
 
         return ${table.uncapCamelName};
     }

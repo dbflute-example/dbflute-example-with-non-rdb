@@ -15,10 +15,12 @@
  */
 package org.docksidestage.kvs.cache.maihamadb.bsbhv;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -48,7 +50,7 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
     //                                                                          ==========
     /** MaihamadbKvsCacheFacade. */
     @Resource
-    private MaihamadbKvsCacheFacade maihamadbKvsCacheFacade;
+    protected MaihamadbKvsCacheFacade maihamadbKvsCacheFacade;
 
     /**
      * Handle the meta as DBMeta, that has all info of the table.
@@ -85,7 +87,8 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
         KvsProductCB kvsCB = createCB(cbLambda);
         ProductCB cb = adjustKvsConditionBeanOfProductId(kvsCB);
 
-        OptionalEntity<Product> optEntity = maihamadbKvsCacheFacade.findEntity(createKvsKeyListOfProductId(kvsCB), cb);
+        OptionalEntity<Product> optEntity =
+                maihamadbKvsCacheFacade.findEntity(createKvsKeyListOfProductId(kvsCB), cb, expireDateTimeLambdaOfProductId());
 
         return Stream.of(optEntity)
                 .filter(OptionalEntity::isPresent)
@@ -93,7 +96,7 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
                 .filter(kvsCB.query().getWherePredicate())
                 .findFirst()
                 .map(OptionalEntity::of)
-                .orElse(OptionalEntity.empty());
+                .orElseGet(() -> OptionalEntity.empty());
     }
 
     // KVS CB から ProductId 用の ProductCB を作成して返します。
@@ -106,7 +109,13 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
 
     // ProductId で DB に使う条件のみを kvsCB から取り出し cb に設定します。
     protected void addKvsConditionOfProductId(KvsProductCB kvsCB, ProductCB cb) {
+        addDefaultSpecifyColumnOfProductId(kvsCB, cb);
         addDefaultWhereOfProductId(kvsCB, cb);
+    }
+
+    // ProductId 用の select 句の列挙されるカラムを CB に設定します。
+    protected void addDefaultSpecifyColumnOfProductId(KvsProductCB kvsCB, ProductCB cb) {
+        cb.specify().everyColumn();
     }
 
     // ProductId 用の キー条件を CB に設定します。
@@ -118,6 +127,37 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
             throw new IllegalStateException("'setProductId_Equal()' has not been called.");
         }
         cb.query().invokeQueryEqual("productId", productId);
+    }
+
+    protected Function<Product, LocalDateTime> expireDateTimeLambdaOfProductId() {
+        String expireDateTimeColumnFlexibleName = null;
+        return expireDateTimeLambda(maihamadbKvsCacheFacade, expireDateTimeColumnFlexibleName);
+    }
+
+    /**
+     * Select the ttl by the condition-bean.<br>
+     * It returns non-null Optional entity, so you should...
+     * <ul>
+     *   <li>use alwaysPresent() if the data is always present as your business rule</li>
+     *   <li>use ifPresent() and orElse() if it might be empty</li>
+     * </ul>
+     * <pre>
+     * <span style="color: #0000C0">kvsProductBhv</span>.<span style="color: #CC4747">ttlByProductId</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #3F7E5E">// Setting query condition to the key column is required</span>
+     *     <span style="color: #553000">cb</span>.query().setProductId_Equal(1);
+     *     <span style="color: #3F7E5E">// Condition for other column(s) can be set if necessary</span>
+     *     <span style="color: #553000">cb</span>.query().set...
+     * }).<span style="color: #CC4747">alwaysPresent</span>(<span style="color: #553000">ttl</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ...
+     * });
+     * </pre>
+     * @param cbLambda The callback for condition-bean of KvsProduct (NotNull)
+     * @return The optional ttl selected by the condition (NotNull: if no data, empty ttl)
+     */
+    public OptionalEntity<Long> selectTtlByProductId(Consumer<KvsProductCB> cbLambda) {
+        KvsProductCB kvsCB = createCB(cbLambda);
+        ProductCB cb = adjustKvsConditionBeanOfProductId(kvsCB);
+        return maihamadbKvsCacheFacade.ttl(createKvsKeyListOfProductId(kvsCB), cb);
     }
 
     /**
@@ -208,7 +248,8 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
         KvsProductCB kvsCB = createCB(cbLambda);
         ProductCB cb = adjustKvsConditionBeanOfCategoryCode(kvsCB);
 
-        List<Product> list = maihamadbKvsCacheFacade.findList(createKvsKeyListOfCategoryCode(kvsCB), cb);
+        List<Product> list =
+                maihamadbKvsCacheFacade.findList(createKvsKeyListOfCategoryCode(kvsCB), cb, expireDateTimeLambdaOfCategoryCode());
 
         Predicate<Product> filter = kvsCB.query().getWherePredicate();
         Comparator<Product> sorted = kvsCB.query().getOrderByComparator();
@@ -236,12 +277,18 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
 
     // CategoryCode で DB に使う条件のみを kvsCB から取り出し cb に設定します。
     protected void addKvsConditionOfCategoryCode(KvsProductCB kvsCB, ProductCB cb) {
+        addDefaultSpecifyColumnOfCategoryCode(kvsCB, cb);
         addDefaultWhereOfCategoryCode(kvsCB, cb);
         addDefaultOrderByOfCategoryCode(cb);
         kvsCB.xgetFetchFirst().ifPresent(fetchSize -> cb.fetchFirst(fetchSize));
     }
 
-    // CategoryCode 用の キー条件を CB に設定します。
+    // CategoryCode 用の select 句の列挙されるカラムを CB に設定します。
+    protected void addDefaultSpecifyColumnOfCategoryCode(KvsProductCB kvsCB, ProductCB cb) {
+        cb.specify().everyColumn();
+    }
+
+    // CategoryCode 用のキー条件を CB に設定します。
     protected void addDefaultWhereOfCategoryCode(KvsProductCB kvsCB, ProductCB cb) {
         Map<ColumnInfo, Object> columnEqualValue = kvsCB.query().xdfgetColumnEqualValue();
 
@@ -258,6 +305,11 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
         cb.query().addOrderBy_ProductId_Asc();
     }
 
+    protected Function<List<Product>, LocalDateTime> expireDateTimeLambdaOfCategoryCode() {
+        String expireDateTimeColumnFlexibleName = null;
+        return expireDateTimeOfMinInListLambda(maihamadbKvsCacheFacade, expireDateTimeColumnFlexibleName);
+    }
+
     /**
      * CategoryCode 用のデフォルトソート順を Comparator で取得します。
      */
@@ -265,6 +317,32 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
         Comparator<Product> comparator = Comparator.comparing(Product::getRegularPrice, Comparator.naturalOrder());
         comparator.thenComparing(Product::getProductId, Comparator.naturalOrder());
         return comparator;
+    }
+
+    /**
+     * Select the ttl by the condition-bean.<br>
+     * It returns non-null Optional entity, so you should...
+     * <ul>
+     *   <li>use alwaysPresent() if the data is always present as your business rule</li>
+     *   <li>use ifPresent() and orElse() if it might be empty</li>
+     * </ul>
+     * <pre>
+     * <span style="color: #0000C0">kvsProductBhv</span>.<span style="color: #CC4747">ttlByCategoryCode</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #3F7E5E">// Setting query condition to the key column is required</span>
+     *     <span style="color: #553000">cb</span>.query().setCategoryCode_Equal(1);
+     *     <span style="color: #3F7E5E">// Condition for other column(s) can be set if necessary</span>
+     *     <span style="color: #553000">cb</span>.query().set...
+     * }).<span style="color: #CC4747">alwaysPresent</span>(<span style="color: #553000">ttl</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ...
+     * });
+     * </pre>
+     * @param cbLambda The callback for condition-bean of KvsProduct (NotNull)
+     * @return The optional ttl selected by the condition (NotNull: if no data, empty ttl)
+     */
+    public OptionalEntity<Long> selectTtlByCategoryCode(Consumer<KvsProductCB> cbLambda) {
+        KvsProductCB kvsCB = createCB(cbLambda);
+        ProductCB cb = adjustKvsConditionBeanOfCategoryCode(kvsCB);
+        return maihamadbKvsCacheFacade.ttl(createKvsKeyListOfCategoryCode(kvsCB), cb);
     }
 
     /**

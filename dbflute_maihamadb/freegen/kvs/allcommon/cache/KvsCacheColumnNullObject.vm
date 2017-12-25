@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2016 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -75,17 +75,11 @@ public class KvsCacheColumnNullObject {
             return null;
         }
         final DBMeta dbMeta = entity.asDBMeta();
-        final Set<ColumnInfo> specifiedColumnInfoSet = dbMeta.getColumnInfoList()
-                .stream()
-                .filter(columnInfo -> columnInfo.getPropertyName().equalsIgnoreCase(columnName))
-                .limit(1)
-                .collect(Collectors.toSet());
-        if (specifiedColumnInfoSet.isEmpty()) {
-            specifiedColumnInfoSet.addAll(dbMeta.getColumnInfoList());
-        }
-
-        logger.debug("specifiedColumnInfoSet={}", specifiedColumnInfoSet);
-
+        // TODO p1us2er0 どちらがいいか検討。 (2017/12/19)
+        //final Set<ColumnInfo> specifiedColumnInfoSet = entity.myspecifiedProperties().stream().map(property -> {
+        //    return dbMeta.findColumnInfo(columnName);
+        //}).collect(Collectors.toSet());
+        final Set<ColumnInfo> specifiedColumnInfoSet = DfCollectionUtil.newLinkedHashSet(dbMeta.findColumnInfo(columnName));
         final OptionalEntity<Entity> optCached = getKvsCacheFacade(dbMeta).findEntityById(primaryKey, dbMeta, specifiedColumnInfoSet);
 
         if (!optCached.isPresent()) {

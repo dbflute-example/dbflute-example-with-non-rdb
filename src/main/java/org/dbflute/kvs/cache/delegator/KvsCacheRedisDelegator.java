@@ -127,11 +127,11 @@ public class KvsCacheRedisDelegator extends AbstractKvsRedisDelegator {
     }
 
     @Override
-    public void registerString(String key, String value, LocalDateTime availableDateTime) {
+    public void registerString(String key, String value, LocalDateTime expireDateTime) {
         try {
-            super.registerString(key, value, availableDateTime);
+            super.registerString(key, value, expireDateTime);
         } catch (Exception e) {
-            LOG.warn("kvs access error. key={}, value={}, availableDateTime={}", key, value, availableDateTime, e);
+            LOG.warn("kvs access error. key={}, value={}, expireDateTime={}", key, value, expireDateTime, e);
             return;
         }
     }
@@ -147,11 +147,11 @@ public class KvsCacheRedisDelegator extends AbstractKvsRedisDelegator {
     }
 
     @Override
-    public void registerMultiString(Map<String, String> keyValueMap, LocalDateTime availableDateTime) {
+    public void registerMultiString(Map<String, String> keyValueMap, LocalDateTime expireDateTime) {
         try {
-            super.registerMultiString(keyValueMap, availableDateTime);
+            super.registerMultiString(keyValueMap, expireDateTime);
         } catch (Exception e) {
-            LOG.warn("kvs access error. keyValueMap={}, availableDateTime={}", keyValueMap, availableDateTime, e);
+            LOG.warn("kvs access error. keyValueMap={}, expireDateTime={}", keyValueMap, expireDateTime, e);
             return;
         }
     }
@@ -170,11 +170,11 @@ public class KvsCacheRedisDelegator extends AbstractKvsRedisDelegator {
     }
 
     @Override
-    public void registerList(String key, List<String> value, LocalDateTime availableDateTime) {
+    public void registerList(String key, List<String> value, LocalDateTime expireDateTime) {
         try {
-            super.registerList(key, value, availableDateTime);
+            super.registerList(key, value, expireDateTime);
         } catch (Exception e) {
-            LOG.warn("kvs access error. key={}, value={}, availableDateTime={}", key, value, availableDateTime, e);
+            LOG.warn("kvs access error. key={}, value={}, expireDateTime={}", key, value, expireDateTime, e);
             return;
         }
     }
@@ -190,11 +190,11 @@ public class KvsCacheRedisDelegator extends AbstractKvsRedisDelegator {
     }
 
     @Override
-    public void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime availableDateTime) {
+    public void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime expireDateTime) {
         try {
-            super.registerMultiList(keyValueMap, availableDateTime);
+            super.registerMultiList(keyValueMap, expireDateTime);
         } catch (Exception e) {
-            LOG.warn("kvs access error. keyValueMap={}, availableDateTime={}", keyValueMap, availableDateTime, e);
+            LOG.warn("kvs access error. keyValueMap={}, expireDateTime={}", keyValueMap, expireDateTime, e);
             return;
         }
     }
@@ -213,11 +213,11 @@ public class KvsCacheRedisDelegator extends AbstractKvsRedisDelegator {
     }
 
     @Override
-    public void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime availableDateTime) {
+    public void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime expireDateTime) {
         try {
-            super.registerHash(key, fieldValueMap, availableDateTime);
+            super.registerHash(key, fieldValueMap, expireDateTime);
         } catch (Exception e) {
-            LOG.warn("kvs access error. key={}, fieldValueMap={}, availableDateTime={}", key, fieldValueMap, availableDateTime, e);
+            LOG.warn("kvs access error. key={}, fieldValueMap={}, expireDateTime={}", key, fieldValueMap, expireDateTime, e);
             return;
         }
     }
@@ -233,11 +233,11 @@ public class KvsCacheRedisDelegator extends AbstractKvsRedisDelegator {
     }
 
     @Override
-    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime availableDateTime) {
+    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime expireDateTime) {
         try {
-            super.registerMultiHash(keyValueMap, availableDateTime);
+            super.registerMultiHash(keyValueMap, expireDateTime);
         } catch (Exception e) {
-            LOG.warn("kvs access error. keyValueMap={}, availableDateTime={}", keyValueMap, availableDateTime, e);
+            LOG.warn("kvs access error. keyValueMap={}, expireDateTime={}", keyValueMap, expireDateTime, e);
             return;
         }
     }

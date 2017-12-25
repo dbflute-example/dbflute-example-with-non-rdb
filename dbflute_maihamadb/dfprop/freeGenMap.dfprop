@@ -6,7 +6,7 @@
         ; resourceMap = map:{
             ; baseDir = ../src/main
             ; resourceType = SOLR
-            ; resourceFile = playsolr/schema/example_schema.xml
+            ; resourceFile = $$baseDir$$/resources/solr/schema/example_schema.xml
         }
         ; outputMap = map:{
             ; templateFile = unused
@@ -28,7 +28,7 @@
         ; resourceMap = map:{
             ; baseDir = ../src/main
             ; resourceType = JSON_SCHEMA
-            ; resourceFile = playkvs/schema/kvs-pool.json
+            ; resourceFile = $$baseDir$$/resources/kvs/schema/kvs-pool.json
         }
         ; outputMap = map:{
             ; templateFile = unused
@@ -47,7 +47,7 @@
         ; resourceMap = map:{
             ; baseDir = ../src/main
             ; resourceType = JSON_SCHEMA
-            ; resourceFile = playkvs/schema/kvs-store-schema-examplestore.json
+            ; resourceFile = $$baseDir$$/resources/kvs/schema/kvs-store-schema-examplestore.json
         }
         ; outputMap = map:{
             ; templateFile = unused
@@ -69,7 +69,7 @@
         ; resourceMap = map:{
             ; baseDir = ../src/main
             ; resourceType = JSON_SCHEMA
-            ; resourceFile = playkvs/schema/kvs-cache-schema-maihamadb.json
+            ; resourceFile = $$baseDir$$/resources/kvs/schema/kvs-cache-schema-maihamadb.json
         }
         ; outputMap = map:{
             ; templateFile = unused

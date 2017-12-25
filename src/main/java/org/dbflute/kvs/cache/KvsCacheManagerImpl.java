@@ -89,8 +89,8 @@ public class KvsCacheManagerImpl implements KvsCacheManager {
     }
 
     @Override
-    public void registerString(String key, String value, LocalDateTime availableDateTime) {
-        kvsCacheDelegator.registerString(key, value, availableDateTime);
+    public void registerString(String key, String value, LocalDateTime expireDateTime) {
+        kvsCacheDelegator.registerString(key, value, expireDateTime);
     }
 
     @Override
@@ -99,8 +99,8 @@ public class KvsCacheManagerImpl implements KvsCacheManager {
     }
 
     @Override
-    public void registerMultiString(Map<String, String> keyValueMap, LocalDateTime availableDateTime) {
-        kvsCacheDelegator.registerMultiString(keyValueMap, availableDateTime);
+    public void registerMultiString(Map<String, String> keyValueMap, LocalDateTime expireDateTime) {
+        kvsCacheDelegator.registerMultiString(keyValueMap, expireDateTime);
     }
 
     // -----------------------------------------------------
@@ -112,8 +112,8 @@ public class KvsCacheManagerImpl implements KvsCacheManager {
     }
 
     @Override
-    public void registerList(String key, List<String> value, LocalDateTime availableDateTime) {
-        kvsCacheDelegator.registerList(key, value, availableDateTime);
+    public void registerList(String key, List<String> value, LocalDateTime expireDateTime) {
+        kvsCacheDelegator.registerList(key, value, expireDateTime);
     }
 
     @Override
@@ -123,8 +123,8 @@ public class KvsCacheManagerImpl implements KvsCacheManager {
     }
 
     @Override
-    public void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime availableDateTime) {
-        kvsCacheDelegator.registerMultiList(keyValueMap, availableDateTime);
+    public void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime expireDateTime) {
+        kvsCacheDelegator.registerMultiList(keyValueMap, expireDateTime);
     }
 
     // -----------------------------------------------------
@@ -136,8 +136,8 @@ public class KvsCacheManagerImpl implements KvsCacheManager {
     }
 
     @Override
-    public void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime availableDateTime) {
-        kvsCacheDelegator.registerHash(key, fieldValueMap, availableDateTime);
+    public void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime expireDateTime) {
+        kvsCacheDelegator.registerHash(key, fieldValueMap, expireDateTime);
     }
 
     @Override
@@ -146,8 +146,8 @@ public class KvsCacheManagerImpl implements KvsCacheManager {
     }
 
     @Override
-    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime availableDateTime) {
-        kvsCacheDelegator.registerMultiHash(keyValueMap, availableDateTime);
+    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime expireDateTime) {
+        kvsCacheDelegator.registerMultiHash(keyValueMap, expireDateTime);
     }
 
     // ===================================================================================
@@ -166,6 +166,11 @@ public class KvsCacheManagerImpl implements KvsCacheManager {
     // ===================================================================================
     //                                                                               Other
     //                                                                               =====
+    @Override
+    public Long ttl(String key) {
+        return kvsCacheDelegator.ttl(key);
+    }
+
     @Override
     public int getNumActive() {
         return kvsCacheDelegator.getNumActive();

@@ -110,9 +110,9 @@ public abstract class AbstractKvsStoreFacade implements KvsStoreFacade {
 
     @Override
     public <ENTITY extends KvsStoreEntity> void insertOrUpdate(KvsStoreDBMeta kvsStoreDBMeta, List<Object> searchKeyList, ENTITY entity,
-            LocalDateTime availableDateTime) {
+            LocalDateTime expireDateTime) {
         String key = generateKey(kvsStoreDBMeta.getProjectName(), kvsStoreDBMeta.getTableName(), searchKeyList);
-        kvsStoreManager.registerString(key, kvsStoreConverterHandler.toMapString(entity), availableDateTime);
+        kvsStoreManager.registerString(key, kvsStoreConverterHandler.toMapString(entity), expireDateTime);
     }
 
     @Override
@@ -123,9 +123,9 @@ public abstract class AbstractKvsStoreFacade implements KvsStoreFacade {
 
     @Override
     public <ENTITY extends KvsStoreEntity> void insertOrUpdate(KvsStoreDBMeta kvsStoreDBMeta, List<Object> searchKeyList,
-            List<ENTITY> entityList, LocalDateTime availableDateTime) {
+            List<ENTITY> entityList, LocalDateTime expireDateTime) {
         String key = generateKey(kvsStoreDBMeta.getProjectName(), kvsStoreDBMeta.getTableName(), searchKeyList);
-        kvsStoreManager.registerList(key, kvsStoreConverterHandler.toMapStringList(entityList), availableDateTime);
+        kvsStoreManager.registerList(key, kvsStoreConverterHandler.toMapStringList(entityList), expireDateTime);
     }
 
     // ===================================================================================

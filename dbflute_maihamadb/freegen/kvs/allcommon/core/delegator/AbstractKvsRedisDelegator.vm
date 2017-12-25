@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2016 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -137,15 +137,15 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
     }
 
     @Override
-    public void registerString(String key, String value, LocalDateTime availableDateTime) {
-        if (availableDateTime == null) {
+    public void registerString(String key, String value, LocalDateTime expireDateTime) {
+        if (expireDateTime == null) {
             try (Jedis jedis = kvsRedisPool.getResource()) {
                 jedis.set(key, value);
             }
         } else {
             try (Jedis jedis = kvsRedisPool.getResource(); Pipeline pipeline = jedis.pipelined()) {
                 pipeline.set(key, value);
-                expireAt(pipeline, key, availableDateTime);
+                expireAt(pipeline, key, expireDateTime);
                 pipeline.sync();
             } catch (IOException e) {
                 throw new KvsException("kvs error.", e);
@@ -159,7 +159,7 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
     }
 
     @Override
-    public void registerMultiString(Map<String, String> keyValueMap, LocalDateTime availableDateTime) {
+    public void registerMultiString(Map<String, String> keyValueMap, LocalDateTime expireDateTime) {
         if (keyValueMap.isEmpty()) {
             return;
         }
@@ -171,14 +171,14 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
             return list.stream();
         }).toArray(size -> new String[size]);
 
-        if (availableDateTime == null) {
+        if (expireDateTime == null) {
             try (Jedis jedis = kvsRedisPool.getResource()) {
                 jedis.mset(keysValues);
             }
         } else {
             try (Jedis jedis = kvsRedisPool.getResource(); Pipeline pipeline = jedis.pipelined()) {
                 pipeline.mset(keysValues);
-                keyValueMap.keySet().stream().forEach(key -> expireAt(pipeline, key, availableDateTime));
+                keyValueMap.keySet().stream().forEach(key -> expireAt(pipeline, key, expireDateTime));
                 pipeline.sync();
             } catch (IOException e) {
                 throw new KvsException("kvs error.", e);
@@ -195,7 +195,7 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
     }
 
     @Override
-    public void registerList(String key, List<String> value, LocalDateTime availableDateTime) {
+    public void registerList(String key, List<String> value, LocalDateTime expireDateTime) {
         if (value.isEmpty()) {
             delete(key);
             return;
@@ -203,8 +203,8 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
         try (Jedis jedis = kvsRedisPool.getResource(); Pipeline pipeline = jedis.pipelined()) {
             pipeline.del(key);
             pipeline.rpush(key, value.stream().distinct().toArray(size -> new String[size]));
-            if (availableDateTime != null) {
-                expireAt(pipeline, key, availableDateTime);
+            if (expireDateTime != null) {
+                expireAt(pipeline, key, expireDateTime);
             }
             pipeline.sync();
         } catch (IOException e) {
@@ -218,7 +218,7 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
     }
 
     @Override
-    public void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime availableDateTime) {
+    public void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime expireDateTime) {
         try (Jedis jedis = kvsRedisPool.getResource(); Pipeline pipeline = jedis.pipelined()) {
             keyValueMap.forEach((key, value) -> {
                 pipeline.del(key);
@@ -226,8 +226,8 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
                     return;
                 }
                 pipeline.rpush(key, value.stream().distinct().toArray(size -> new String[size]));
-                if (availableDateTime != null) {
-                    expireAt(pipeline, key, availableDateTime);
+                if (expireDateTime != null) {
+                    expireAt(pipeline, key, expireDateTime);
                 }
             });
             pipeline.sync();
@@ -246,12 +246,12 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
     }
 
     @Override
-    public void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime availableDateTime) {
+    public void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime expireDateTime) {
         try (Jedis jedis = kvsRedisPool.getResource(); Pipeline pipeline = jedis.pipelined()) {
             pipeline.hmset(key, fieldValueMap.entrySet().stream().collect(
                     Collectors.toMap(fieldValue -> fieldValue.getKey(), fieldValue -> Objects.toString(fieldValue.getValue(), ""))));
-            if (availableDateTime != null) {
-                expireAt(pipeline, key, availableDateTime);
+            if (expireDateTime != null) {
+                expireAt(pipeline, key, expireDateTime);
             }
             pipeline.sync();
         } catch (IOException e) {
@@ -266,13 +266,13 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
     }
 
     @Override
-    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime availableDateTime) {
+    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime expireDateTime) {
         try (Jedis jedis = kvsRedisPool.getResource(); Pipeline pipeline = jedis.pipelined()) {
             keyValueMap.forEach((key, fieldValueMap) -> {
                 pipeline.hmset(key, fieldValueMap.entrySet().stream().collect(
                         Collectors.toMap(fieldValue -> fieldValue.getKey(), fieldValue -> Objects.toString(fieldValue.getValue(), ""))));
-                if (availableDateTime != null) {
-                    expireAt(pipeline, key, availableDateTime);
+                if (expireDateTime != null) {
+                    expireAt(pipeline, key, expireDateTime);
                 }
             });
             pipeline.sync();
@@ -285,11 +285,11 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
      * Set Time To Live to a value in KVS that is specified by the assigned key.
      * @param pipeline Pipeline (NotNull)
      * @param key Key for a value in KVS (NotNull)
-     * @param availableDateTime Time To Live (NullAllowed: do not set ttl if null)
+     * @param expireDateTime Time To Live (NullAllowed: do not set ttl if null)
      */
-    protected void expireAt(Pipeline pipeline, String key, LocalDateTime availableDateTime) {
-        if (availableDateTime != null) {
-            pipeline.expireAt(key, TimeUnit.MILLISECONDS.toSeconds(new HandyDate(availableDateTime).getDate().getTime()));
+    protected void expireAt(Pipeline pipeline, String key, LocalDateTime expireDateTime) {
+        if (expireDateTime != null) {
+            pipeline.expireAt(key, TimeUnit.MILLISECONDS.toSeconds(new HandyDate(expireDateTime).getDate().getTime()));
         }
     }
 
@@ -316,6 +316,14 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
     // ===================================================================================
     //                                                                               Other
     //                                                                               =====
+    @Override
+    public Long ttl(String key) {
+        try (Jedis jedis = kvsRedisPool.getResource()) {
+            return jedis.ttl(key);
+        }
+    }
+
+    @Override
     public int getNumActive() {
         return kvsRedisPool.getNumActive();
     }

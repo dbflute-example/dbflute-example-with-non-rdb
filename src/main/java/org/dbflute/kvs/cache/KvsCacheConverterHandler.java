@@ -53,7 +53,7 @@ public class KvsCacheConverterHandler {
         return createMapListString().buildMapString(entity.asDBMeta().extractAllColumnMap(entity));
     }
 
-    /** 
+    /**
      * Convert Entity objects in the assigned list to MapString values in KVS represented by String.
      * @param entityList A list of Entity objects (NotNull)
      * @param <ENTITY> Entity class of DBFlute

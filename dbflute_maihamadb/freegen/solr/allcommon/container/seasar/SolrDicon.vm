@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2016 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -20,5 +20,5 @@
     <include path="saflute_assist.dicon"/>
     <include path="saflute_core.dicon"/>
 
-    <component name="solr${tableMap.schema}Bhv" class="jp.unext.laxample.solr.exbhv.Solr${tableMap.schema}Bhv" />
+    <component name="solr${tableMap.schema}Bhv" class="${request.package}.exbhv.Solr${tableMap.schema}Bhv" />
 </components>

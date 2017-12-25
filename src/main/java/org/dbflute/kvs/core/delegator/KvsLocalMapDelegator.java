@@ -38,7 +38,7 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     //                                                                          Definition
     //                                                                          ==========
     private static final Map<String, Object> KEY_VALUE_MAP = new ConcurrentHashMap<String, Object>();
-    private static final Map<String, LocalDateTime> KEY_AVAILABLEDATETIME_MAP = new ConcurrentHashMap<String, LocalDateTime>();
+    private static final Map<String, LocalDateTime> KEY_EXPIRE_DATE_TIME_MAP = new ConcurrentHashMap<String, LocalDateTime>();
 
     // ===================================================================================
     //                                                                                Set
@@ -56,7 +56,7 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     //                                                ------
     @Override
     public String findString(String key) {
-        Object value = getInAvailableDateTime(key);
+        Object value = getInExpireDateTime(key);
         if (value == null) {
             return null;
         }
@@ -78,7 +78,7 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     //                                                  ----
     @Override
     public List<String> findList(String key) {
-        Object value = getInAvailableDateTime(key);
+        Object value = getInExpireDateTime(key);
         if (value == null) {
             return Collections.emptyList();
         }
@@ -102,7 +102,7 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     //                                                  ----
     @Override
     public List<String> findHash(String key, Set<String> fieldList) {
-        Object value = getInAvailableDateTime(key);
+        Object value = getInExpireDateTime(key);
         if (value == null) {
             value = DfCollectionUtil.newLinkedHashMap();
         }
@@ -133,8 +133,8 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     }
 
     @Override
-    public void registerString(String key, String value, LocalDateTime availableDateTime) {
-        registerMultiString(DfCollectionUtil.newLinkedHashMap(key, value), availableDateTime);
+    public void registerString(String key, String value, LocalDateTime expireDateTime) {
+        registerMultiString(DfCollectionUtil.newLinkedHashMap(key, value), expireDateTime);
     }
 
     @Override
@@ -143,11 +143,11 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     }
 
     @Override
-    public void registerMultiString(Map<String, String> keyValueMap, LocalDateTime availableDateTime) {
+    public void registerMultiString(Map<String, String> keyValueMap, LocalDateTime expireDateTime) {
         keyValueMap.entrySet().forEach(keyValue -> {
             KEY_VALUE_MAP.put(keyValue.getKey(), keyValue.getValue());
-            if (availableDateTime != null) {
-                KEY_AVAILABLEDATETIME_MAP.put(keyValue.getKey(), availableDateTime);
+            if (expireDateTime != null) {
+                KEY_EXPIRE_DATE_TIME_MAP.put(keyValue.getKey(), expireDateTime);
             }
         });
     }
@@ -161,8 +161,8 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     }
 
     @Override
-    public void registerList(String key, List<String> value, LocalDateTime availableDateTime) {
-        registerMultiList(DfCollectionUtil.newLinkedHashMap(key, value), availableDateTime);
+    public void registerList(String key, List<String> value, LocalDateTime expireDateTime) {
+        registerMultiList(DfCollectionUtil.newLinkedHashMap(key, value), expireDateTime);
     }
 
     @Override
@@ -171,11 +171,11 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     }
 
     @Override
-    public void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime availableDateTime) {
+    public void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime expireDateTime) {
         keyValueMap.forEach((key, value) -> {
             KEY_VALUE_MAP.put(key, value);
-            if (availableDateTime != null) {
-                KEY_AVAILABLEDATETIME_MAP.put(key, availableDateTime);
+            if (expireDateTime != null) {
+                KEY_EXPIRE_DATE_TIME_MAP.put(key, expireDateTime);
             }
         });
     }
@@ -189,8 +189,8 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     }
 
     @Override
-    public void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime availableDateTime) {
-        registerMultiHash(DfCollectionUtil.newLinkedHashMap(key, fieldValueMap), availableDateTime);
+    public void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime expireDateTime) {
+        registerMultiHash(DfCollectionUtil.newLinkedHashMap(key, fieldValueMap), expireDateTime);
     }
 
     @Override
@@ -199,13 +199,13 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     }
 
     @Override
-    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime availableDateTime) {
+    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime expireDateTime) {
         keyValueMap.forEach((key, fieldValueMap) -> {
-            Object value = getInAvailableDateTime(key);
+            Object value = getInExpireDateTime(key);
             if (value == null) {
                 KEY_VALUE_MAP.put(key, fieldValueMap);
-                if (availableDateTime != null) {
-                    KEY_AVAILABLEDATETIME_MAP.put(key, availableDateTime);
+                if (expireDateTime != null) {
+                    KEY_EXPIRE_DATE_TIME_MAP.put(key, expireDateTime);
                 }
                 return;
             }
@@ -213,8 +213,8 @@ public class KvsLocalMapDelegator implements KvsDelegator {
                 @SuppressWarnings("all")
                 Map<String, String> map = (Map<String, String>) value;
                 map.putAll(fieldValueMap);
-                if (availableDateTime != null) {
-                    KEY_AVAILABLEDATETIME_MAP.put(key, availableDateTime);
+                if (expireDateTime != null) {
+                    KEY_EXPIRE_DATE_TIME_MAP.put(key, expireDateTime);
                 }
             }
         });
@@ -226,20 +226,25 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     @Override
     public void delete(String key) {
         KEY_VALUE_MAP.remove(key);
-        KEY_AVAILABLEDATETIME_MAP.remove(key);
+        KEY_EXPIRE_DATE_TIME_MAP.remove(key);
     }
 
     @Override
     public void delete(String... keys) {
         Arrays.stream(keys).forEach(key -> {
             KEY_VALUE_MAP.remove(key);
-            KEY_AVAILABLEDATETIME_MAP.remove(key);
+            KEY_EXPIRE_DATE_TIME_MAP.remove(key);
         });
     }
 
     // ===================================================================================
     //                                                                               Other
     //                                                                               =====
+    @Override
+    public Long ttl(String key) {
+        return 1L;
+    }
+
     @Override
     public int getNumActive() {
         return 1;
@@ -248,14 +253,14 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     // ===================================================================================
     //                                                                        Small Helper
     //                                                                        ============
-    protected Object getInAvailableDateTime(String key) {
-        LocalDateTime availableDateTime = KEY_AVAILABLEDATETIME_MAP.get(key);
+    protected Object getInExpireDateTime(String key) {
+        LocalDateTime expireDateTime = KEY_EXPIRE_DATE_TIME_MAP.get(key);
         LocalDateTime currentDateTime = getTimeManager().currentDateTime();
-        if (availableDateTime == null || availableDateTime.compareTo(currentDateTime) >= 0) {
+        if (expireDateTime == null || expireDateTime.compareTo(currentDateTime) >= 0) {
             return KEY_VALUE_MAP.get(key);
         }
         KEY_VALUE_MAP.remove(key);
-        KEY_AVAILABLEDATETIME_MAP.remove(key);
+        KEY_EXPIRE_DATE_TIME_MAP.remove(key);
         return null;
     }
 

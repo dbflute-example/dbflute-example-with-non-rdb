@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2016 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -109,9 +109,9 @@ public interface KvsDelegator {
      * 指定されたキーに対して、有効期限を明示して文字列を登録する。
      * @param key キー (NotNull)
      * @param value 文字列 (NotNull)
-     * @param availableDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     * @param expireDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
      */
-    void registerString(String key, String value, LocalDateTime availableDateTime);
+    void registerString(String key, String value, LocalDateTime expireDateTime);
 
     /**
      * 指定されたすべてのキーに対して、文字列を登録する。
@@ -122,9 +122,9 @@ public interface KvsDelegator {
     /**
      * 指定されたすべてのキーに対して、有効期限を明示して文字列を登録する。
      * @param keyValueMap キー、文字列MAP (NotNull)
-     * @param availableDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     * @param expireDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
      */
-    void registerMultiString(Map<String, String> keyValueMap, LocalDateTime availableDateTime);
+    void registerMultiString(Map<String, String> keyValueMap, LocalDateTime expireDateTime);
 
     // -----------------------------------------------------
     //                                                  List
@@ -140,9 +140,9 @@ public interface KvsDelegator {
      * 指定されたキーに対して、有効期限を明示して文字列リストを登録する。
      * @param key キー (NotNull)
      * @param value 文字列リスト (NotNull)
-     * @param availableDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     * @param expireDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
      */
-    void registerList(String key, List<String> value, LocalDateTime availableDateTime);
+    void registerList(String key, List<String> value, LocalDateTime expireDateTime);
 
     /**
      * 指定されたすべてのキーに対して、文字列リストを登録する。
@@ -153,9 +153,9 @@ public interface KvsDelegator {
     /**
      * 指定されたすべてのキーに対して、有効期限を明示して文字列リストを登録する。
      * @param keyValueMap キー、文字列リストMAP (NotNull)
-     * @param availableDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     * @param expireDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
      */
-    void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime availableDateTime);
+    void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime expireDateTime);
 
     // -----------------------------------------------------
     //                                                  Hash
@@ -171,9 +171,9 @@ public interface KvsDelegator {
      * 指定されたキーに対して、有効期限を明示してハッシュを登録する。
      * @param key キー (NotNull)
      * @param fieldValueMap フィールド、文字列Map (NotNull)
-     * @param availableDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     * @param expireDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
      */
-    void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime availableDateTime);
+    void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime expireDateTime);
 
     /**
      * 指定されたすべてのキーに対して、ハッシュを登録する。
@@ -184,9 +184,9 @@ public interface KvsDelegator {
     /**
      * 指定されたすべてのキーに対して、有効期限を明示してハッシュを登録する。
      * @param keyValueMap キー、フィールド、文字列Map (NotNull)
-     * @param availableDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     * @param expireDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
      */
-    void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime availableDateTime);
+    void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime expireDateTime);
 
     // ===================================================================================
     //                                                                              Delete
@@ -206,6 +206,12 @@ public interface KvsDelegator {
     // ===================================================================================
     //                                                                               Other
     //                                                                               =====
+    /**
+     * Return the ttl.
+     * @return The ttl
+     */
+    Long ttl(String key);
+
     /**
      * Get the number of active connections in connection pool.
      * @return The number of active connections in connection pool

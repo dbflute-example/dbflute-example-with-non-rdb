@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2016 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ import org.dbflute.util.DfCollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ${tableMap.dbflutePackage}.bsentity.dbmeta.${table.capCamelName}Dbm;
-import ${tableMap.dbflutePackage}.exentity.${table.capCamelName};
+import ${tableMap.dbflutePackage}.bsentity.dbmeta.$!{tableMap.schemaPrefix}${table.capCamelName}Dbm;
+import ${tableMap.dbflutePackage}.exentity.$!{tableMap.schemaPrefix}${table.capCamelName};
 
 /**
  * The base condition-query of (${table.comment})${table.capCamelName}.
@@ -43,8 +43,8 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected ${table.camelizedName}Dbm dbMeta = ${table.camelizedName}Dbm.getInstance();
-    protected Comparator<${table.camelizedName}> orderBy;
+    protected $!{tableMap.schemaPrefix}${table.camelizedName}Dbm dbMeta = $!{tableMap.schemaPrefix}${table.camelizedName}Dbm.getInstance();
+    protected Comparator<$!{tableMap.schemaPrefix}${table.camelizedName}> orderBy;
     protected Map<ColumnInfo, Object> columnEqualValue = DfCollectionUtil.newHashMap();
     protected Map<ColumnInfo, Boolean> columnOrderBy = DfCollectionUtil.newHashMap();
 
@@ -65,27 +65,27 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ {
         columnOrderBy.put(dbMeta.column${initCapName}(), true);
 
         orderBy = (orderBy == null) ? //
-                Comparator.comparing(${table.capCamelName}::get${initCapName}, Comparator.naturalOrder())
-                : orderBy.thenComparing(${table.capCamelName}::get${initCapName}, Comparator.naturalOrder());
+                Comparator.comparing($!{tableMap.schemaPrefix}${table.capCamelName}::get${initCapName}, Comparator.naturalOrder())
+                : orderBy.thenComparing($!{tableMap.schemaPrefix}${table.capCamelName}::get${initCapName}, Comparator.naturalOrder());
     }
 
     public void addOrderBy_${initCapName}_Desc() {
         columnOrderBy.put(dbMeta.column${initCapName}(), false);
 
         orderBy = (orderBy == null) ? //
-                Comparator.comparing(${table.capCamelName}::get${initCapName}, Comparator.reverseOrder())
-                : orderBy.thenComparing(${table.capCamelName}::get${initCapName}, Comparator.reverseOrder());
+                Comparator.comparing($!{tableMap.schemaPrefix}${table.capCamelName}::get${initCapName}, Comparator.reverseOrder())
+                : orderBy.thenComparing($!{tableMap.schemaPrefix}${table.capCamelName}::get${initCapName}, Comparator.reverseOrder());
     }
 
 #end
     // ===================================================================================
     //                                                                        Assist Logic
     //                                                                        ============
-    public Comparator<${table.camelizedName}> getOrderByComparator() {
+    public Comparator<$!{tableMap.schemaPrefix}${table.camelizedName}> getOrderByComparator() {
         return orderBy;
     }
 
-    public Predicate<${table.camelizedName}> getWherePredicate() {
+    public Predicate<$!{tableMap.schemaPrefix}${table.camelizedName}> getWherePredicate() {
         return entity -> {
             for (Entry<ColumnInfo, Object> entry : columnEqualValue.entrySet()) {
                 Object value = entry.getKey().read(entity);

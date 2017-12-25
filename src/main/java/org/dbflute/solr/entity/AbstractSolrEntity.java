@@ -90,7 +90,7 @@ public abstract class AbstractSolrEntity implements SolrEntity {
         }
     }
 
-    // TODO 例外メッセージを整理する。
+    // XXX p1us2er0 例外メッセージを整理する。 (2015/05/31)
     protected static void throwNonSpecifiedColumnAccessException(SolrEntity entity, String propertyName,
             EntityModifiedProperties specifiedProperties) {
         final ExceptionMessageBuilder br = new ExceptionMessageBuilder();

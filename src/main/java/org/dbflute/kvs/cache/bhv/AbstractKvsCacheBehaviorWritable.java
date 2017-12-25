@@ -15,11 +15,17 @@
  */
 package org.dbflute.kvs.cache.bhv;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.dbflute.Entity;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.kvs.cache.cbean.KvsCacheConditionBean;
+import org.dbflute.kvs.cache.facade.KvsCacheFacade;
+import org.dbflute.util.DfStringUtil;
 
 public abstract class AbstractKvsCacheBehaviorWritable<ENTITY extends Entity, CB extends ConditionBean, KVS_CB extends KvsCacheConditionBean> {
 
@@ -31,6 +37,44 @@ public abstract class AbstractKvsCacheBehaviorWritable<ENTITY extends Entity, CB
     }
 
     public abstract KVS_CB newConditionBean();
+
+    // -----------------------------------------------------
+    //                                        expireDateTime
+    //                                        --------------
+    protected Function<ENTITY, LocalDateTime> expireDateTimeLambda(KvsCacheFacade kvsCacheFacade, String expireDateTimeColumnFlexibleName) {
+        return entity -> {
+            if (entity == null || DfStringUtil.is_Null_or_Empty(expireDateTimeColumnFlexibleName)) {
+                return kvsCacheFacade.calcExpireDateTime(kvsCacheFacade.cacheTtl());
+            }
+            return entity.asDBMeta().findColumnInfo(expireDateTimeColumnFlexibleName).read(entity);
+        };
+    }
+
+    protected Function<List<ENTITY>, LocalDateTime> expireDateTimeOfMaxInListLambda(KvsCacheFacade kvsCacheFacade,
+            String expireDateTimeColumnFlexibleName) {
+        return entityList -> {
+            if (DfStringUtil.is_Null_or_Empty(expireDateTimeColumnFlexibleName)) {
+                return kvsCacheFacade.calcExpireDateTime(kvsCacheFacade.cacheTtl());
+            }
+            return entityList.stream()
+                    .map(entity -> (LocalDateTime) entity.asDBMeta().findColumnInfo(expireDateTimeColumnFlexibleName).read(entity))
+                    .max(Comparator.comparing(dateTime -> dateTime))
+                    .orElseGet(() -> kvsCacheFacade.calcExpireDateTime(kvsCacheFacade.cacheTtl()));
+        };
+    }
+
+    protected Function<List<ENTITY>, LocalDateTime> expireDateTimeOfMinInListLambda(KvsCacheFacade kvsCacheFacade,
+            String expireDateTimeColumnFlexibleName) {
+        return entityList -> {
+            if (DfStringUtil.is_Null_or_Empty(expireDateTimeColumnFlexibleName)) {
+                return kvsCacheFacade.calcExpireDateTime(kvsCacheFacade.cacheTtl());
+            }
+            return entityList.stream()
+                    .map(entity -> (LocalDateTime) entity.asDBMeta().findColumnInfo(expireDateTimeColumnFlexibleName).read(entity))
+                    .min(Comparator.comparing(dateTime -> dateTime))
+                    .orElseGet(() -> kvsCacheFacade.calcExpireDateTime(kvsCacheFacade.cacheTtl()));
+        };
+    }
 
     // -----------------------------------------------------
     //                                                Assert

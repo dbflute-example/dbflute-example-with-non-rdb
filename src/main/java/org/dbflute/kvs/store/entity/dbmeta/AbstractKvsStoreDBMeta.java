@@ -15,9 +15,14 @@
  */
 package org.dbflute.kvs.store.entity.dbmeta;
 
+import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
+
+import org.dbflute.util.DfReflectionUtil;
+import org.dbflute.util.DfCollectionUtil;
 
 /**
  * @author FreeGen
@@ -46,5 +51,20 @@ public abstract class AbstractKvsStoreDBMeta implements KvsStoreDBMeta {
 
     protected String formatLocalDateTime(LocalDateTime localDateTime) {
         return localDateTime == null ? null : DATE_TIME_FORMATTER.format(localDateTime);
+    }
+
+    protected <T extends Object> T toAnalyzedTypeValue(Class<?> targetClass, String fieldName, Object value) {
+        Class<?> type = DfReflectionUtil.getAccessibleField(targetClass, fieldName).getType();
+        if (org.dbflute.jdbc.Classification.class.isAssignableFrom(type)) {
+            Method ofMethod = DfReflectionUtil.getPublicMethod(type, "codeOf", new Class<?>[] { Object.class });
+            @SuppressWarnings("unchecked")
+            T t = (T) DfReflectionUtil.invokeStatic(ofMethod, new Object[] { value });
+            return t;
+        }
+        Map<String, Object> logInfoMap = DfCollectionUtil.newLinkedHashMap();
+        logInfoMap.put("targetClass", targetClass);
+        logInfoMap.put("fieldName", fieldName);
+        logInfoMap.put("value", value);
+        throw new IllegalArgumentException("couldn't analyze. " + logInfoMap);
     }
 }

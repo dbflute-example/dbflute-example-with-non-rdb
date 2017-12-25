@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2016 the original author or authors.
+## Copyright 2014-2017 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ public interface KvsCacheManager {
     //                                                  Hash
     //                                                  ----
     /**
-     * Retrieve a hashmap corresponding to the assigned key and return it as List<String>. 
+     * Retrieve a hashmap corresponding to the assigned key and return it as List<String>.
      * @param key Key (NotNull)
      * @param fieldList A set of field(s)  (NotNull)
      * @return A hashmap represented by List of String associated with the assigned key (NullAllowed)
@@ -94,7 +94,7 @@ public interface KvsCacheManager {
     //                                                String
     //                                                ------
     /**
-     * Register a String value into KVS. 
+     * Register a String value into KVS.
      * @param key Key for the value to register (NotNull)
      * @param value String value to register (NotNull)
      */
@@ -104,9 +104,9 @@ public interface KvsCacheManager {
      * Register a String value into KVS with ttl
      * @param key Key for the value to register (NotNull)
      * @param value String value to register (NotNull)
-     * @param availableDateTime Time To Live (NullAllowed: use server-config if null is set)
+     * @param expireDateTime Time To Live (NullAllowed: use server-config if null is set)
      */
-    void registerString(String key, String value, LocalDateTime availableDateTime);
+    void registerString(String key, String value, LocalDateTime expireDateTime);
 
     /**
      * Register all key-value pairs contained in the assigned Map.
@@ -117,9 +117,9 @@ public interface KvsCacheManager {
     /**
      * Register all key-value pairs contained in the assigned Map with ttl.
      * @param keyValueMap Map of key-value pairs (NotNull)
-     * @param availableDateTime Time To Live (NullAllowed: use server-config if null is set)
+     * @param expireDateTime Time To Live (NullAllowed: use server-config if null is set)
      */
-    void registerMultiString(Map<String, String> keyValueMap, LocalDateTime availableDateTime);
+    void registerMultiString(Map<String, String> keyValueMap, LocalDateTime expireDateTime);
 
     // -----------------------------------------------------
     //                                                  List
@@ -135,9 +135,9 @@ public interface KvsCacheManager {
      * Register a list of String values into KVS with ttl.
      * @param key Key for the list of String values to register (NotNull)
      * @param value A list of String values to register as a value (NotNull)
-     * @param availableDateTime Time To Live (NullAllowed: use server-config if null is set)
+     * @param expireDateTime Time To Live (NullAllowed: use server-config if null is set)
      */
-    void registerList(String key, List<String> value, LocalDateTime availableDateTime);
+    void registerList(String key, List<String> value, LocalDateTime expireDateTime);
 
     /**
      * Register all key-value pairs contained in the assigned Map.
@@ -148,9 +148,9 @@ public interface KvsCacheManager {
     /**
      * Register all key-value pairs contained in the assigned Map with ttl.
      * @param keyValueMap A Map containing pairs of the key and associated List (NotNull)
-     * @param availableDateTime Time To Live (NullAllowed: use server-config if null is set)
+     * @param expireDateTime Time To Live (NullAllowed: use server-config if null is set)
      */
-    void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime availableDateTime);
+    void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime expireDateTime);
 
     // -----------------------------------------------------
     //                                                  Hash
@@ -166,9 +166,9 @@ public interface KvsCacheManager {
      * Register a hashmap into KVS with ttl.
      * @param key A key for the hashmap to register (NotNull)
      * @param fieldValueMap A Map to register (NotNull)
-     * @param availableDateTime Time To Live (NullAllowed: use server-config if null is set)
+     * @param expireDateTime Time To Live (NullAllowed: use server-config if null is set)
      */
-    void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime availableDateTime);
+    void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime expireDateTime);
 
     /**
      * Register all key-value pairs contained in the assigned Map.
@@ -179,9 +179,9 @@ public interface KvsCacheManager {
     /**
      * Register all key-value pairs contained in the assigned Map with ttl.
      * @param keyValueMap A Map containing pairs of the key and associated Map (NotNull)
-     * @param availableDateTime Time To Live (NullAllowed: use server-config if null is set)
+     * @param expireDateTime Time To Live (NullAllowed: use server-config if null is set)
      */
-    void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime availableDateTime);
+    void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime expireDateTime);
 
     // ===================================================================================
     //                                                                              Delete
@@ -201,6 +201,12 @@ public interface KvsCacheManager {
     // ===================================================================================
     //                                                                               Other
     //                                                                               =====
+    /**
+     * Return the ttl.
+     * @return The ttl
+     */
+    Long ttl(String key);
+
     /**
      * Return the number of active connections in connection pool.
      * @return The number of active connections
