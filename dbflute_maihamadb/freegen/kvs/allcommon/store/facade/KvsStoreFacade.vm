@@ -86,7 +86,7 @@ public interface KvsStoreFacade {
      * Insert/Update the assigned entities into(in) KVS.
      * @param kvsStoreDBMeta Metadata of KVS store (NotNull)
      * @param searchKeyList A list containing keys for search (NotNull)
-     * @param entity Entity to insert/update (NotNull)
+     * @param entityList Entity list to insert/update (NotNull)
      * @param <ENTITY> Entity of DBFlute
      */
     <ENTITY extends KvsStoreEntity> void insertOrUpdate(KvsStoreDBMeta kvsStoreDBMeta, List<Object> searchKeyList, List<ENTITY> entityList);
@@ -95,7 +95,7 @@ public interface KvsStoreFacade {
      * Insert/Update the assingned entities into(in) KVS with ttl.
      * @param kvsStoreDBMeta Metadata of KVS store (NotNull)
      * @param searchKeyList A list containing keys for search (NotNull)
-     * @param entity Entity to insert/update (NotNull)
+     * @param entityList Entity list to insert/update (NotNull)
      * @param expireDateTime Time To Live (NullAllowed: use server-config if null is set)
      * @param <ENTITY> Entity of DBFlute
      */

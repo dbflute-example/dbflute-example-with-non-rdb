@@ -151,7 +151,7 @@ public abstract class KvsEgBsStoreExampleBhv {
      * }, LocalDateTime.now().plus(<span style="color: #553000">86400000</span>, ChronoUnit.MILLIS));
      * </pre>
      * @param entityLambda The handler of entity row of KvsEgStoreExample (NotNull)
-     * @param expireDateTime
+     * @param expireDateTime expire date time
      * @return The Entity used to insert/update with automatically-set column value (NotNull)
      */
     public KvsEgStoreExample insertOrUpdate(Supplier<KvsEgStoreExample> entityLambda, LocalDateTime expireDateTime) {

@@ -231,7 +231,7 @@ public class KvsCacheBusinessAssist {
      * The type of the value stored into KVS will be List of MapString.
      * @param selector Selector corresponding to the DB to connect to (NotNull）
      * @param dbName The name of DB to connect to (NotNull)
-     * @param searchKeyList Key info. specified in KVS (equal to the search condition spedified by CB) (NotNull)
+     * @param searchKeyListList Key info. specified in KVS (equal to the search condition spedified by CB) (NotNull)
      * @param dbmeta Matadata for target DB (NotNull)
      * @param cbLamda Condition lambda expresion (NotNull)
      * @param ttl Time To Live (NullAllowed: use server-config if null is set)

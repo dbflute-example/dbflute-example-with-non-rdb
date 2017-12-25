@@ -167,6 +167,8 @@ public interface KvsCacheFacade {
     //                                                                               =====
     /**
      * Get the ttl associated with the assigned search key-list.
+     * @param searchKeyList A list containing keys for search (NotNull)
+     * @param cb CB that specifies query condition (NotNull)
      * @return The ttl associated with the assigned search key-list (NotNull)
      */
     OptionalEntity<Long> ttl(List<Object> searchKeyList, ConditionBean cb);

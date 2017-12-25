@@ -209,7 +209,7 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv {
      * }, LocalDateTime.now().plus(<span style="color: #553000">86400000</span>, ChronoUnit.MILLIS));
      * </pre>
      * @param entityLambda The handler of entity row of Kvs$!{tableMap.schemaPrefix}${table.camelizedName} (NotNull)
-     * @param expireDateTime
+     * @param expireDateTime expire date time
      * @return The Entity used to insert/update with automatically-set column value (NotNull)
      */
     public Kvs$!{tableMap.schemaPrefix}${table.camelizedName} insertOrUpdate(Supplier<Kvs$!{tableMap.schemaPrefix}${table.camelizedName}> entityLambda, LocalDateTime expireDateTime) {

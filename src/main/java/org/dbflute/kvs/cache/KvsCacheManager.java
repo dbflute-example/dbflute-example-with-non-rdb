@@ -203,6 +203,7 @@ public interface KvsCacheManager {
     //                                                                               =====
     /**
      * Return the ttl.
+     * @param key Key (NotNull)
      * @return The ttl
      */
     Long ttl(String key);

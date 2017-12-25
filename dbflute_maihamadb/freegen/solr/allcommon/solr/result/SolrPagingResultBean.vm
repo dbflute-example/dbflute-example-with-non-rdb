@@ -20,7 +20,7 @@ import org.dbflute.cbean.result.PagingResultBean;
 /**
  * Solrの戻り用クラス
  * @author FreeGen
- * @param <ENTITY>
+ * @param <ENTITY> entity
  */
 public class SolrPagingResultBean<ENTITY> extends PagingResultBean<ENTITY> implements SolrResultBean {
 

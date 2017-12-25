@@ -52,21 +52,15 @@ public class SolrQueryBuilder {
 
     private static final int PAD_LIMIT = 8192;
 
-    /**
-     * セット範囲検索のワイルドカード
-     *
-     */
+    /** セット範囲検索のワイルドカード */
     private static final String SET_RANGE_SEARCH_RIGHT_WILDCARD = "?????";
 
-    /**
-     * セット範囲検索のワイルドカード
-     *
-     */
+    /** セット範囲検索のワイルドカード */
     private static final String SET_RANGE_SEARCH_LEFT_WILDCARD = "\\*";
 
     /**
      * グループにラップする。
-     * @param query クエリ文字列
+     * @param query query
      * @return グループ化したクエリ文字列
      */
     public static String wrapGroupQuery(String query) {
@@ -75,7 +69,7 @@ public class SolrQueryBuilder {
 
     /**
      * 否定グループにラップする。
-     * @param query クエリ文字列
+     * @param query query
      * @param asterisk アスタリクスを条件に入れる場合、<code>true</code>
      * @return グループ化したクエリ文字列
      */
@@ -88,7 +82,7 @@ public class SolrQueryBuilder {
 
     /**
      * クエリリストをANDでつなげる。
-     * @param queryList クエリリスト
+     * @param queryList query list
      * @return クエリリストをANDでつなげたクエリ文字列
      */
     public static String concatEachCondition(List<String> queryList) {
@@ -97,8 +91,8 @@ public class SolrQueryBuilder {
 
     /**
      * クエリリストを論理演算でつなげる。
-     * @param queryList クエリリスト
-     * @param operator 論理演算
+     * @param queryList query list
+     * @param operator operator
      * @return クエリリストを論理演算でつなげたクエリ文字列
      */
     public static String concatEachCondition(List<String> queryList, SolrQueryLogicalOperator operator) {
@@ -140,7 +134,7 @@ public class SolrQueryBuilder {
     }
 
     /**
-     * フリーワードのスプリットした文字列を返す。。
+     * フリーワードのスプリットした文字列を返す。
      * @param freewordSet フリーワードセット文字列
      * @return フリーワードのスプリットした配列
      */
@@ -166,9 +160,9 @@ public class SolrQueryBuilder {
 
     /**
      * 論理演算子してのEqual検索用
-     * @param solrFieldName
-     * @param query
-     * @return クエリ文字列
+     * @param solrFieldName solr field name
+     * @param query query
+     * @return query
      */
     public static String queryBuilderForEqual(String solrFieldName, String query) {
         StringBuilder queryBuilder = new StringBuilder();
@@ -218,8 +212,8 @@ public class SolrQueryBuilder {
 
     /**
      * フィールドに値が存在するかどうか判定するクエリーを作成します
-     * @param solrFieldName
-     * @return クエリ文字列
+     * @param solrFieldName solr field name
+     * @return query
      */
     public static String queryBuilderForExists(String solrFieldName) {
         if (solrFieldName == null) {
@@ -236,10 +230,10 @@ public class SolrQueryBuilder {
     /**
      * 範囲検索クエリ構築
      *
-     * @param solrFieldName
-     * @param from
-     * @param to
-     * @return クエリ文字列
+     * @param solrFieldName solr field name
+     * @param from from
+     * @param to to
+     * @return query
      */
     public static String queryBuilderForRangeSearch(String solrFieldName, Date from, Date to) {
         String toStr = null;
@@ -272,10 +266,10 @@ public class SolrQueryBuilder {
 
     /**
      * 範囲検索クエリ構築
-     * @param solrFieldName
-     * @param from
-     * @param to
-     * @return クエリ文字列
+     * @param solrFieldName solr field name
+     * @param from from
+     * @param to to
+     * @return query
      */
     public static String queryBuilderForRangeSearch(String solrFieldName, BigDecimal from, BigDecimal to) {
         String toStr = null;
@@ -296,10 +290,10 @@ public class SolrQueryBuilder {
 
     /**
      * 範囲検索クエリ構築
-     * @param solrFieldName
-     * @param from
-     * @param to
-     * @return クエリ文字列
+     * @param solrFieldName solr field name
+     * @param from from
+     * @param to to
+     * @return query
      */
     public static String queryBuilderForRangeSearch(String solrFieldName, Long from, Long to) {
         String toStr = null;
@@ -321,10 +315,10 @@ public class SolrQueryBuilder {
     /**
      * 範囲検索クエリ構築
      *
-     * @param solrFieldName
-     * @param from
-     * @param to
-     * @return クエリ文字列
+     * @param solrFieldName solr field name
+     * @param from from
+     * @param to to
+     * @return query
      */
     public static String queryBuilderForRangeSearch(String solrFieldName, Integer from, Integer to) {
         String toStr = null;
@@ -346,10 +340,10 @@ public class SolrQueryBuilder {
     /**
      * 範囲検索クエリ構築
      *
-     * @param solrFieldName
-     * @param from
-     * @param to
-     * @return クエリ文字列
+     * @param solrFieldName solr field name
+     * @param from from
+     * @param to to
+     * @return query
      */
     public static String queryBuilderForRangeSearch(String solrFieldName, String from, String to) {
         if (DfStringUtil.is_Null_or_Empty(from)) {
@@ -363,13 +357,13 @@ public class SolrQueryBuilder {
 
     /**
      * セット範囲検索
-     * @param solrFieldName
+     * @param solrFieldName solr field name
      * @param cd
-     * @param from
-     * @param to
+     * @param from from
+     * @param to to
      * @param paddingLength
      * @param paddingStr
-     * @return クエリ文字列
+     * @return query
      */
     public static String queryBuilderForSetRangeSearch(String solrFieldName, String cd, String from, String to, int paddingLength,
             String paddingStr) {
@@ -395,11 +389,11 @@ public class SolrQueryBuilder {
 
     /**
      * セット範囲検索 InScope
-     * @param solrFieldName
+     * @param solrFieldName solr field name
      * @param beanList
      * @param paddingLength
      * @param paddingStr
-     * @return クエリ文字列
+     * @return query
      */
     public static String queryBuilderForSetRangeSearchInScope(String solrFieldName, Collection<SolrSetRangeSearchBean> beanList,
             int paddingLength, String paddingStr) {
@@ -450,10 +444,10 @@ public class SolrQueryBuilder {
     /**
      * フリーワード検索クエリ構築
      * ダブルコーテーションによるフレーズ検索対応
-     * @param solrFieldName
+     * @param solrFieldName solr field name
      * @param queryStrs
-     * @param operator
-     * @return クエリ文字列
+     * @param operator operator
+     * @return query
      */
     public static String queryBuilderForFreewordSearch(String solrFieldName, String queryStrs, SolrQueryLogicalOperator operator) {
         if (DfStringUtil.is_NotNull_and_NotTrimmedEmpty(queryStrs)) {
@@ -491,10 +485,10 @@ public class SolrQueryBuilder {
 
     /**
      * 検索ワードリストクエリ構築
-     * @param solrFieldName
-     * @param queryList
-     * @param operator
-     * @return クエリ文字列
+     * @param solrFieldName solr field name
+     * @param queryList query list
+     * @param operator operator
+     * @return query
      */
     public static String queryBuilderForSearchBigDecimalList(String solrFieldName, Collection<BigDecimal> queryList,
             SolrQueryLogicalOperator operator) {
@@ -509,10 +503,10 @@ public class SolrQueryBuilder {
 
     /**
      * 検索ワードリストクエリ構築
-     * @param solrFieldName
-     * @param queryList
-     * @param operator
-     * @return クエリ文字列
+     * @param solrFieldName solr field name
+     * @param queryList query list
+     * @param operator operator
+     * @return query
      */
     public static String queryBuilderForSearchLongList(String solrFieldName, Collection<Long> queryList,
             SolrQueryLogicalOperator operator) {
@@ -527,10 +521,10 @@ public class SolrQueryBuilder {
 
     /**
      * 検索ワードリストクエリ構築
-     * @param solrFieldName
-     * @param queryList
-     * @param operator
-     * @return クエリ文字列
+     * @param solrFieldName solr field name
+     * @param queryList query list
+     * @param operator operator
+     * @return query
      */
     public static String queryBuilderForSearchIntegerList(String solrFieldName, Collection<Integer> queryList,
             SolrQueryLogicalOperator operator) {
@@ -548,10 +542,10 @@ public class SolrQueryBuilder {
      * 例 NOT： candidate_id: Not (1000 OR 10002 OR 10004)
      * 例 OR： candidate_id: (1000 OR 10002 OR 10004)
      * 例 AND： candidate_id: (1000 AND 10002 AND 10004)
-     * @param solrFieldName
-     * @param queryList
-     * @param operator
-     * @return クエリ文字列
+     * @param solrFieldName solr field name
+     * @param queryList query list
+     * @param operator operator
+     * @return query
      */
     public static String queryBuilderForSearchWordList(String solrFieldName, Collection<String> queryList,
             SolrQueryLogicalOperator operator) {
@@ -586,9 +580,9 @@ public class SolrQueryBuilder {
     /**
      * 検索Word Listクエリの構築
      * 例：(1000 OR 10002 OR 10004)
-     * @param queryList
-     * @param operator
-     * @return クエリ文字列
+     * @param queryList query list
+     * @param operator operator
+     * @return query
      */
     private static String queryBuilderForSearchWordListPart(Collection<String> queryList, SolrQueryLogicalOperator operator) {
         StringBuilder queryBuilder = new StringBuilder();
@@ -631,8 +625,8 @@ public class SolrQueryBuilder {
      * 検索窓に入れたワードを検索フレーズ、単語単位のリストにします
      * フレーズ検索（""ダブルコーテーション）にも対応しています
      * "fund manager" ゴールドマンサックス ⇒ "fund manager", "ゴールドマンサックス"
-     * @param str
-     * @return クエリ文字列
+     * @param str 文字列
+     * @return query
      */
     public static List<String> createSearchWordList(final String str) {
         if (DfStringUtil.is_Null_or_TrimmedEmpty(str)) {
@@ -657,8 +651,8 @@ public class SolrQueryBuilder {
      * 例：求職者が、企業1をブロックしいているラベル
      *    BLK_CMP_1
      * </pre>
-     * @param args
-     * @return クエリ文字列
+     * @param args arguments
+     * @return query
      */
     public static String createCombinationQueryValue(Object... args) {
         if (args == null || args.length == 0) {
@@ -677,7 +671,7 @@ public class SolrQueryBuilder {
      * @param value2 後方値
      * @param lpadLength lpadの桁数
      * @param lpadChar lpad実行で挿入する文字列
-     * @return クエリ文字列
+     * @return query
      */
     public static String createDoubleQueryValue(String value1, String value2, int lpadLength, Character lpadChar) {
         if (value1 == null || value2 == null) {
@@ -690,8 +684,8 @@ public class SolrQueryBuilder {
 
     /**
      * フレーズ以外の部分をリスト化して取得します
-     * @param str
-     * @return クエリ文字列
+     * @param str 文字列
+     * @return query
      */
     public static List<String> getExcludedPhraseList(String str) {
         Matcher phrasePartMatcher = BOOLEAN_PHRASE_PART.matcher(str);
@@ -708,8 +702,8 @@ public class SolrQueryBuilder {
 
     /**
      * フレーズ部分をリスト化して取得します
-     * @param str
-     * @return クエリ文字列
+     * @param str 文字列
+     * @return query
      */
     public static List<String> getPhraseList(String str) {
         Matcher phrasePartMatcher = BOOLEAN_PHRASE_PART.matcher(str);
@@ -723,7 +717,7 @@ public class SolrQueryBuilder {
 
     /**
      * 厳しいListのチェック
-     * @param collection
+     * @param collection collection
      * @return 空でない場合、{@code true}
      */
     private static <E> boolean isNotEmptyStrict(Collection<E> collection) {
@@ -732,7 +726,7 @@ public class SolrQueryBuilder {
 
     /**
      * 厳しいListのチェック
-     * @param collection
+     * @param collection collection
      * @return 空の場合、{@code true}
      */
     private static <E> boolean isEmptyStrict(Collection<E> collection) {
@@ -763,7 +757,7 @@ public class SolrQueryBuilder {
 
     /**
      * Solr向けDate型の検索文字列フォーマットに変換します。DateがJSTの場合に使います
-     * @param date
+     * @param date 日付
      * @return　Solr向けのUTC形式でDate型の検索文字列フォーマットにした日時文字列
      */
     public static String formatYMDHmsForSolrByJST(Date date) {
