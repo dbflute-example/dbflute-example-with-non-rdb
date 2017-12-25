@@ -6,13 +6,11 @@
         ; resourceMap = map:{
             ; baseDir = ../src/main
             ; resourceType = SOLR
-            ; resourceFile = $$baseDir$$/resources/solr/schema/example_schema.xml
+            ; resourceFile = $$baseDir$$/resources/solr/schema/solr_schema_example.xml
         }
         ; outputMap = map:{
-            ; templateFile = unused
             ; outputDirectory = ../src/main/java
             ; package = org.docksidestage.solr
-            ; className = unused
         }
         ; tableMap = map:{
             ; tablePath = map
@@ -28,13 +26,11 @@
         ; resourceMap = map:{
             ; baseDir = ../src/main
             ; resourceType = JSON_SCHEMA
-            ; resourceFile = $$baseDir$$/resources/kvs/schema/kvs-pool.json
+            ; resourceFile = $$baseDir$$/resources/kvs/schema/kvs_pool.json
         }
         ; outputMap = map:{
-            ; templateFile = unused
             ; outputDirectory = $$baseDir$$/java
             ; package = org.docksidestage.kvs.pool
-            ; className = unused
         }
         ; tableMap = map:{
             ; tablePath = map
@@ -47,13 +43,11 @@
         ; resourceMap = map:{
             ; baseDir = ../src/main
             ; resourceType = JSON_SCHEMA
-            ; resourceFile = $$baseDir$$/resources/kvs/schema/kvs-store-schema-examplestore.json
+            ; resourceFile = $$baseDir$$/resources/kvs/schema/kvs_store_schema_examplestore.json
         }
         ; outputMap = map:{
-            ; templateFile = unused
             ; outputDirectory = $$baseDir$$/java
             ; package = org.docksidestage.kvs.store
-            ; className = unused
         }
         ; tableMap = map:{
             ; tablePath = map
@@ -69,13 +63,11 @@
         ; resourceMap = map:{
             ; baseDir = ../src/main
             ; resourceType = JSON_SCHEMA
-            ; resourceFile = $$baseDir$$/resources/kvs/schema/kvs-cache-schema-maihamadb.json
+            ; resourceFile = $$baseDir$$/resources/kvs/schema/kvs_cache_schema_maihamadb.json
         }
         ; outputMap = map:{
-            ; templateFile = unused
             ; outputDirectory = $$baseDir$$/java
             ; package = org.docksidestage.kvs.cache
-            ; className = unused
         }
         ; tableMap = map:{
             ; tablePath = map
@@ -89,6 +81,23 @@
                     ; schemaDir = ./schema
                 }
             }
+        }
+    }
+    # ==========================================================================
+    #                                                       Remote Api(Petstore)
+    #                                                       ====================
+    ; RemoteApiPetstore = map:{
+        ; resourceMap = map:{
+            ; baseDir = ../src/main
+            ; resourceType = SWAGGER
+            ; resourceFile = $$baseDir$$/resources/remoteapi/schema/remoteapi_schema_petstore.json
+        }
+        ; outputMap = map:{
+            ; outputDirectory = ../src/main/java
+            ; package = org.docksidestage.remote
+        }
+        ; tableMap = map:{
+            ; ruleJsPath = ../src/main/resources/remoteapi/schema/remoteapi_schema_petstore_rule.js
         }
     }
 }
