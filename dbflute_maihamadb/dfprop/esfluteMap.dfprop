@@ -22,14 +22,14 @@ map:{
     ; basePackage = org.docksidestage.esflute
 
     # base path to JSON resource, URL or relative path
-    ; basePath = ../src/main/resources/elasticsearch/schema
+    ; basePath = ../src/main/resources/es/schema
 
     # settings for indexes
     ; indexMap = map:{
         ; maihama = map:{
             ; package = maihama
-            ; esclientDiFile = elasticsearch/di/elasticsearch_client.xml
-            ; esfluteDiFile = elasticsearch/di/esflute_maihama.xml
+            ; esclientDiFile = es/di/es_client.xml
+            ; esfluteDiFile = es/di/es_maihama.xml
         }
     }
 

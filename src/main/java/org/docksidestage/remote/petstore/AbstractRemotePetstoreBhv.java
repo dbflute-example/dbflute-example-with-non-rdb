@@ -15,7 +15,13 @@
  */
 package org.docksidestage.remote.petstore;
 
+import javax.annotation.Resource;
+
 import org.dbflute.remoteapi.FlutyRemoteApiRule;
+import org.docksidestage.mylasta.direction.NonrdbConfig;
+import org.lastaflute.core.json.JsonMappingOption;
+import org.lastaflute.remoteapi.receiver.LaJsonReceiver;
+import org.lastaflute.remoteapi.sender.body.LaJsonSender;
 import org.lastaflute.web.servlet.request.RequestManager;
 
 /**
@@ -27,6 +33,9 @@ import org.lastaflute.web.servlet.request.RequestManager;
  * @author FreeGen
  */
 public abstract class AbstractRemotePetstoreBhv extends org.lastaflute.remoteapi.LastaRemoteBehavior {
+
+    @Resource
+    private NonrdbConfig nonrdbConfig;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -43,13 +52,13 @@ public abstract class AbstractRemotePetstoreBhv extends org.lastaflute.remoteapi
     //                                                                          ==========
     @Override
     protected void yourDefaultRule(FlutyRemoteApiRule rule) {
-        // TODO you #change_it set your common default rule here
-        throw new IllegalStateException("set your common default rule here.");
+        JsonMappingOption mappingOption = new JsonMappingOption();
+        rule.sendBodyBy(new LaJsonSender(requestManager, mappingOption));
+        rule.receiveBodyBy(new LaJsonReceiver(requestManager, mappingOption));
     }
 
     @Override
     protected String getUrlBase() {
-        // TODO you #change_it set your base URL for the remote api here
-        throw new IllegalStateException("set your common default rule here.");
+        return nonrdbConfig.getRemoteApiPetstoreUrlBase();
     }
 }

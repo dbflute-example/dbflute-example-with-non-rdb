@@ -24,15 +24,15 @@ import org.docksidestage.app.web.base.login.NonrdbLoginAssist;
  * Use like this:
  * <pre>
  * YourTest extends {@link UnitNonrdbTestCase} {
- * 
+ *
  *     public void test_yourMethod() {
  *         <span style="color: #3F7E5E">// ## Arrange ##</span>
  *         YourAction action = new YourAction();
  *         <span style="color: #FD4747">inject</span>(action);
- * 
+ *
  *         <span style="color: #3F7E5E">// ## Act ##</span>
  *         action.submit();
- * 
+ *
  *         <span style="color: #3F7E5E">// ## Assert ##</span>
  *         assertTrue(action...);
  *     }
@@ -57,5 +57,20 @@ public abstract class UnitNonrdbTestCase extends WebContainerTestCase {
 
     protected int getMockLoginUserId() {
         return 1; // always exists in database as test data
+    }
+
+    // ===================================================================================
+    //                                                                               Mock
+    //                                                                              ======
+    protected String derivedResopnsePath(Class<?> responseClass) {
+        return derivedResopnsePath(responseClass, "", ".json");
+    }
+
+    protected String derivedResopnsePath(Class<?> responseClass, String pathPart) {
+        return derivedResopnsePath(responseClass, "_", pathPart);
+    }
+
+    protected String derivedResopnsePath(Class<?> responseClass, String separator, String pathPart) {
+        return responseClass.getName().replace(".", "/") + separator + pathPart;
     }
 }

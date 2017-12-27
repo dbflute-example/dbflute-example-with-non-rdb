@@ -104,6 +104,9 @@ public interface NonrdbEnv {
     /** The key of the configuration. e.g. localhost:8090/nonrdb */
     String SERVER_DOMAIN = "server.domain";
 
+    /** The key of the configuration. e.g. http://petstore.swagger.io/v2 */
+    String REMOTE_API_PETSTORE_URL_BASE = "remote.api.petstore.url.base";
+
     /**
      * Get the value of property as {@link String}.
      * @param propertyKey The key of the property. (NotNull)
@@ -432,6 +435,14 @@ public interface NonrdbEnv {
     String getServerDomain();
 
     /**
+     * Get the value for the key 'remote.api.petstore.url.base'. <br>
+     * The value is, e.g. http://petstore.swagger.io/v2 <br>
+     * comment: ----------
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getRemoteApiPetstoreUrlBase();
+
+    /**
      * The simple implementation for configuration.
      * @author FreeGen
      */
@@ -590,6 +601,10 @@ public interface NonrdbEnv {
 
         public String getServerDomain() {
             return get(NonrdbEnv.SERVER_DOMAIN);
+        }
+
+        public String getRemoteApiPetstoreUrlBase() {
+            return get(NonrdbEnv.REMOTE_API_PETSTORE_URL_BASE);
         }
     }
 }
