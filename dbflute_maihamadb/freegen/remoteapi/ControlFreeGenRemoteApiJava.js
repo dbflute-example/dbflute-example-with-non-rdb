@@ -147,11 +147,11 @@ function process(request) {
                     returnBean.array = array;
                 } else {
                     var definitionKey = responseSchema['$ref'].replace('#/definitions/', '');
-                    var returnProperties = definitionMap[definitionKey].properties;
+                    var returnProperties = definitionMap[scriptEngine.invokeMethod(rule, 'definitionKey', definitionKey)].properties;
                     if (!returnProperties.isEmpty()) {
                         for (returnPropertyKey in returnProperties) {
                             var returnPropertyValue = returnProperties[returnPropertyKey];
-                            var required = definitionMap[definitionKey].required;
+                            var required = definitionMap[scriptEngine.invokeMethod(rule, 'definitionKey', definitionKey)].required;
                             if (required) {
                                 returnPropertyValue.required = required.contains(returnPropertyKey);
                             }
@@ -204,8 +204,8 @@ function createRemoteApiBean(rule, beanPurposeType, api, properties) {
     remoteApiBean.api = api;
     remoteApiBean.package = package;
     remoteApiBean.className = scriptEngine.invokeMethod(rule, beanPurposeType + 'ClassName', api, false);
-    remoteApiBean.extendsClass = rule[beanPurposeType + 'ExtendsClass'];
-    remoteApiBean.implementsClasses = rule[beanPurposeType + 'ImplementsClasses'];
+    remoteApiBean.extendsClass = scriptEngine.invokeMethod(rule, beanPurposeType + 'ExtendsClass', api, properties);
+    remoteApiBean.implementsClasses = scriptEngine.invokeMethod(rule, beanPurposeType + 'ImplementsClasses', api, properties);
     remoteApiBean.properties = properties;
     remoteApiBean.beanPurposeType = beanPurposeType;
     remoteApiBean.remoteApiExp = api.httpMethod.toUpperCase() + ' ' + api.url;

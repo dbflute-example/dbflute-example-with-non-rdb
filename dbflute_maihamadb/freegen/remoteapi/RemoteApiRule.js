@@ -201,8 +201,25 @@ var baseRule = {
         return 'Remote' + manager.initCap(manager.camelize(namePart.replace(/\./g, '_'))) + (api.multipleHttpMethod ? manager.initCap(api.httpMethod) : '');
     },
 
-    paramExtendsClass : null,
-    paramImplementsClasses : null,
+    /**
+     * Return paramExtendsClass.
+     * @param {Api} api - API.
+     * @param {Object} properties - properties.
+     * @return {string} paramExtendsClass.
+     */
+    paramExtendsClass : function(api, properties) {
+        return null;
+    },
+
+    /**
+     * Return paramImplementsClasses.
+     * @param {Api} api - API.
+     * @param {Object} properties - properties.
+     * @return {string} paramImplementsClasses.
+     */
+    paramImplementsClasses : function(api, properties) {
+        return null;
+    },
 
     /**
      * Return paramClassName.
@@ -214,8 +231,25 @@ var baseRule = {
         return this.beanClassName(api, detail) + 'Param';
     },
 
-    returnExtendsClass : null,
-    returnImplementsClasses : null,
+    /**
+     * Return returnExtendsClass.
+     * @param {Api} api - API.
+     * @param {Object} properties - properties.
+     * @return {string} returnExtendsClass.
+     */
+    returnExtendsClass : function(api, properties) {
+        return null;
+    },
+
+    /**
+     * Return returnImplementsClasses.
+     * @param {Api} api - API.
+     * @param {Object} properties - properties.
+     * @return {string} returnImplementsClasses.
+     */
+    returnImplementsClasses : function(api, properties) {
+        return null;
+    },
 
     /**
      * Return returnClassName.
