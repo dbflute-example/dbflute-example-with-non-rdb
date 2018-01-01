@@ -83,8 +83,11 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
 
 
     protected abstract String asEsIndex();
+
     protected abstract String asEsIndexType();
+
     protected abstract String asEsSearchType();
+
     protected abstract <RESULT extends ENTITY> RESULT createEntity(Map<String, Object> source, Class<? extends RESULT> entityType);
 
     // ===================================================================================
@@ -146,7 +149,7 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
         final EsPagingResultBean<RESULT> list = new EsPagingResultBean<>(builder);
         final SearchHits searchHits = response.getHits();
         searchHits.forEach(hit -> {
-            final Map<String, Object> source = hit.getSource();
+            final Map<String, Object> source = hit.getSourceAsMap();
             final RESULT entity = createEntity(source, entityType);
             final DocMeta docMeta = ((EsAbstractEntity) entity).asDocMeta();
             docMeta.id(hit.getId());
@@ -158,7 +161,7 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
         list.setAllRecordCount((int) searchHits.getTotalHits());
         list.setCurrentPageNumber(cb.getFetchPageNumber());
 
-        list.setTook(response.getTookInMillis());
+        list.setTook(response.getTook().getMillis());
         list.setTotalShards(response.getTotalShards());
         list.setSuccessfulShards(response.getSuccessfulShards());
         list.setFailedShards(response.getFailedShards());
@@ -184,7 +187,7 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
                 if (handler.isBreakCursor()) {
                     return;
                 }
-                final Map<String, Object> source = hit.getSource();
+                final Map<String, Object> source = hit.getSourceAsMap();
                 final RESULT entity = createEntity(source, entityType);
                 final DocMeta docMeta = ((EsAbstractEntity) entity).asDocMeta();
                 docMeta.id(hit.getId());
@@ -205,7 +208,7 @@ public abstract class EsAbstractBehavior<ENTITY extends Entity, CB extends Condi
         delegateBulkRequest(cb, searchHits -> {
             List<RESULT> list = new ArrayList<>();
             searchHits.forEach(hit -> {
-                final Map<String, Object> source = hit.getSource();
+                final Map<String, Object> source = hit.getSourceAsMap();
                 final RESULT entity = createEntity(source, entityType);
                 final DocMeta docMeta = ((EsAbstractEntity) entity).asDocMeta();
                 docMeta.id(hit.getId());

@@ -1,5 +1,5 @@
 ##
-## Copyright 2017-2017 the original author or authors.
+## Copyright 2017-2018 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -62,10 +62,12 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
         return Lato.string(this);
     }
 }
-##################################################
+## _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 ## generate property.
-##################################################
-#macro(generateProperty, $class $propertyEntry)
+## @param class class (NotNull)
+## @param propertyEntry propertyEntry (NotNull)
+## _/_/_/_/_/_/_/_/_/_/
+#macro(generateProperty, $class, $propertyEntry)
 #set ($fieldName = $propertyEntry.key)
 #set ($property = $propertyEntry.value)
 ## TODO p1us2er0 temporary for beanPropertyManualMappingDescription. (2017/10/10)
@@ -116,9 +118,10 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
 #generateIndent($nestList.size())public ${fieldClass} ${scriptEngine.invokeMethod($rule, 'fieldName', $data.api, $fieldName)};
 #generateNestType($nestType)
 #end
-##################################################
+## _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 ## generate nest type.
-##################################################
+## @param type type (NotNull)
+## _/_/_/_/_/_/_/_/_/_/
 #macro(generateNestType, $type)
 #if ($type && $type != '' && !$nestList.contains($type) && !($nestTypeFullNameList.contains($type) || $nestTypeFullNameList.contains("$type.join('_', $nestList)_$type")))
 #adjustType($type)

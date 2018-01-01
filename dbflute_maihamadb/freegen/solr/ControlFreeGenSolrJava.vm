@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2017 the original author or authors.
+## Copyright 2014-2018 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 ## governing permissions and limitations under the License.
 ##
 $manager.info("requestList: ${requestList.size()}")
-#set ($genKvsCore = false)
+#set ($genSolrCore = false)
 
 #foreach ($request in $requestList)
 #set ($tableMap = $request.tableMap)
@@ -22,8 +22,8 @@ $request.enableOutputDirectory()
 $manager.makeDirectory($request.generateDirPath)
 
 #if ($request.isResourceTypeSolr() && ($manager.isTargetContainerSeasar() || $manager.isTargetContainerLastaDi() || $tableMap.targetContainer))
-  #if (!$genKvsCore)
-    #set ($genKvsCore = true)
+  #if (!$genSolrCore)
+    #set ($genSolrCore = true)
 
     #set ($path = "org/dbflute/solr/bhv/AbstractSolrBehavior.java")
     $manager.makeDirectory($path)
@@ -242,10 +242,16 @@ $manager.makeDirectory($request.generateDirPath)
     $request.info("parse('${path}')")
     $generator.parse("./solr/allcommon/container/lastadi/SolrDiXml.vm", $path, "", "")
   #end
+  #set ($scriptEngine = $manager.createJavaScriptEngine())
+  $scriptEngine.put('scriptEngine', $scriptEngine)
+  $scriptEngine.put('generator', $generator)
+  $scriptEngine.put('manager', $manager)
+  $scriptEngine.eval('load("./freegen/solr/ControlFreeGenSolrJava.js");')
+  $scriptEngine.invokeFunction('process', $request)
 #end
 #end
 
-#if ($genKvsCore)
+#if ($genSolrCore)
     #if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
       #set ($path = "../resources/solr/di/solr-all.dicon")
       $manager.makeDirectory($path)
