@@ -1,7 +1,7 @@
 // Based on ECMAScript5. Because Nashorn of java 8 is ECMAScript5.
-// ===================================================================================
-//                                                                          Definition
-//                                                                          ==========
+// =======================================================================================
+//                                                                              Definition
+//                                                                              ==========
 /**
  * Request Type.
  * @typedef {Object} Request
@@ -280,6 +280,11 @@ var baseRule = {
     fieldName : function(api, fieldName) {
         return manager.initUncap(manager.camelize(fieldName));
     },
+
+    // ===================================================================================
+    //                                                                                 Doc
+    //                                                                                 ===
+    docGeneration : true,
 
     // ===================================================================================
     //                                                                              Option

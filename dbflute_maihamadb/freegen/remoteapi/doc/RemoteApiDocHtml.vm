@@ -30,13 +30,39 @@
 #foreach($method in $exBehavior.bsBehavior.methodList)
     <tr>
         <td class="rowcellnum">${foreach.count}</td>
-        <td class="rowcell">$method.api.url</td>
+        <td class="rowcell"><a href="#$manager.htmlEscapeAsId($method.api.url)::$manager.htmlEscapeAsId($method.api.httpMethod)">$method.api.url</a></td>
         <td class="rowcell">$method.api.httpMethod</td>
 #set ($behaviorRequestMethodName = $scriptEngine.invokeMethod($rule, 'behaviorRequestMethodName', $method.api))
-        <td class="rowcell">${exBehavior.className}#$behaviorRequestMethodName</td>
+        <td class="rowcell">$manager.htmlEscape($exBehavior.className)#$manager.htmlEscape($behaviorRequestMethodName)()</td>
     </tr>
 #end
 #end
     </tbody>
 </table>
+
+#foreach($exBehavior in $data.exBehaviorMap.values())
+#foreach($method in $exBehavior.bsBehavior.methodList)
+<h3 id="$manager.htmlEscapeAsId($method.api.url)::$manager.htmlEscapeAsId($method.api.httpMethod)">
+$manager.htmlEscape($method.api.url) ($method.api.httpMethod)
+</h3>
+<p>
+#set ($behaviorRequestMethodName = $scriptEngine.invokeMethod($rule, 'behaviorRequestMethodName', $method.api))
+<span class="doctitle">Request Method:</span> <span class="docmainvalue">$manager.htmlEscape($exBehavior.className)#$manager.htmlEscape($behaviorRequestMethodName)()</span>
+</p>
+#if (!$method.pathVariables.isEmpty())
+<span class="doctitle">URL Parameter:</span>
+#set ($urlParameter = {})
+#set ($put = $urlParameter.put('properties', $method.pathVariables))
+$generator.parse("remoteapi/doc/RemoteApiDocHtmlBean.vm", null, "data", $urlParameter)
+#end
+#if ($method.paramBean.className)
+<span class="doctitle">Param as:</span> <span class="docsubvalue">$manager.htmlEscape($method.paramBean.className)</span>
+$generator.parse("remoteapi/doc/RemoteApiDocHtmlBean.vm", null, "data", $method.paramBean)
+#end
+#if ($method.returnBean.className)
+<span class="doctitle">Return as:</span> <span class="docsubvalue">$manager.htmlEscape($method.returnBean.className)</span>
+$generator.parse("remoteapi/doc/RemoteApiDocHtmlBean.vm", null, "data", $method.returnBean)
+#end
+#end
+#end
 #end

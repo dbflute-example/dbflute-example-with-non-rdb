@@ -3,6 +3,27 @@
  * @param {Request} request - request (NotNull)
  */
 function process(request) {
+    try {
+        processRemoteApi(request);
+    } catch (e) {
+        var message = '/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n';
+        message += 'Error in remote API generation.\n';
+        message += '\n';
+        message += '[Advice]\n';
+        message += '1. Upgrade version of dbflute engine to 1.1.6 or later.\n';
+        message += '2. If you can not upgrade the version, you may be able to avoid errors by chang setting.\n';
+        message += '3. Still if you do not improve it, there is a possibility of a bug.\n';
+        message += '_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/\n';
+        print(message);
+        throw e;
+    }
+}
+
+/**
+ * process remote api.
+ * @param {Request} request - request (NotNull)
+ */
+function processRemoteApi(request) {
     var optionMap = request.optionMap;
     request.enableOutputDirectory();
     manager.makeDirectory(request.generateDirPath);
@@ -172,25 +193,6 @@ function process(request) {
 }
 
 /**
- * generate file.
- * @param {string} src - src (NotNull)
- * @param {string} dest - dest (NotNull)
- * @param {map} data - data (NotNull)
- * @param {boolean} overwite - overwite (NotNull)
- */
-function generate(src, dest, data, overwite) {
-    if (dest === null) {
-        return generator.parse(src, dest, 'data', data);
-    }
-    if (!java.nio.file.Files.exists(java.nio.file.Paths.get(generator.outputPath, dest)) || overwite) {
-        manager.makeDirectory(dest);
-        print('generate("' + dest + '")');
-        return generator.parse(src, dest, 'data', data);
-    }
-    return '';
-}
-
-/**
  * Keep information of remote api bean.
  * @param {Rule} rule - rrule. (NotNull)
  * @param {string} beanPurposeType - The bean role type. e.g. param, return (NotNull)
@@ -341,6 +343,9 @@ function processRemoteApiBhv(rule, request, exBehaviorMap) {
  * @param {ExBehaviorMap} exBehaviorMap - The map of behavior information. (NotNull)
  */
 function processRemoteApiDoc(rule, request, exBehaviorMap) {
+    if (!rule['docGeneration']) {
+        return;
+    }
     var doc = new java.util.LinkedHashMap();
     doc.scheme = scriptEngine.invokeMethod(rule, 'scheme', request);
     doc.schemePackage = scriptEngine.invokeMethod(rule, 'schemePackage', doc.scheme);
@@ -362,4 +367,26 @@ function processRemoteApiDoc(rule, request, exBehaviorMap) {
         }
         java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, remoteApiDocHtml + '\n' + markBody).getBytes());
     }
+}
+
+// ===================================================================================
+//                                                                              Common
+//                                                                              ======
+/**
+ * generate file.
+ * @param {string} src - src (NotNull)
+ * @param {string} dest - dest (NotNull)
+ * @param {map} data - data (NotNull)
+ * @param {boolean} overwite - overwite (NotNull)
+ */
+function generate(src, dest, data, overwite) {
+    if (dest === null) {
+        return generator.parse(src, dest, 'data', data);
+    }
+    if (!java.nio.file.Files.exists(java.nio.file.Paths.get(generator.outputPath, dest)) || overwite) {
+        manager.makeDirectory(dest);
+        print('generate("' + dest + '")');
+        return generator.parse(src, dest, 'data', data);
+    }
+    return '';
 }
