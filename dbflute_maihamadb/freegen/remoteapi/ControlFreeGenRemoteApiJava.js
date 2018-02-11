@@ -168,19 +168,22 @@ function processRemoteApi(request) {
                     returnBean.array = array;
                 } else {
                     var definitionKey = responseSchema['$ref'].replace('#/definitions/', '');
-                    var returnProperties = definitionMap[scriptEngine.invokeMethod(rule, 'definitionKey', definitionKey)].properties;
-                    if (!returnProperties.isEmpty()) {
-                        for (returnPropertyKey in returnProperties) {
-                            var returnPropertyValue = returnProperties[returnPropertyKey];
-                            var required = definitionMap[scriptEngine.invokeMethod(rule, 'definitionKey', definitionKey)].required;
-                            if (required) {
-                                returnPropertyValue.required = required.contains(returnPropertyKey);
+                    var definition = definitionMap[scriptEngine.invokeMethod(rule, 'definitionKey', definitionKey)];
+                    if (definition) {
+                        var returnProperties = definition.properties;
+                        if (!returnProperties.isEmpty()) {
+                            for (returnPropertyKey in returnProperties) {
+                                var returnPropertyValue = returnProperties[returnPropertyKey];
+                                var required = definitionMap[scriptEngine.invokeMethod(rule, 'definitionKey', definitionKey)].required;
+                                if (required) {
+                                    returnPropertyValue.required = required.contains(returnPropertyKey);
+                                }
                             }
+                            var remoteApiBean = createRemoteApiBean(rule, 'return', api, returnProperties);
+                            remoteApiBean.array = array;
+                            returnBean = remoteApiBean;
+                            remoteApiBeanList.push(returnBean);
                         }
-                        var remoteApiBean = createRemoteApiBean(rule, 'return', api, returnProperties);
-                        remoteApiBean.array = array;
-                        returnBean = remoteApiBean;
-                        remoteApiBeanList.push(returnBean);
                     }
                 }
             }

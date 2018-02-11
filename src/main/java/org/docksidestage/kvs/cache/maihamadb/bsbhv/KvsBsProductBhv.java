@@ -50,7 +50,7 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
     //                                                                          ==========
     /** MaihamadbKvsCacheFacade. */
     @Resource
-    protected MaihamadbKvsCacheFacade maihamadbKvsCacheFacade;
+    private MaihamadbKvsCacheFacade maihamadbKvsCacheFacade;
 
     /**
      * Handle the meta as DBMeta, that has all info of the table.

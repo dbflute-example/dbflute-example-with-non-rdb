@@ -66,7 +66,7 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
     //                                                                          ==========
     /** ${manager.initCap($tableMap.schema)}KvsCacheFacade. */
     @Resource
-    protected ${manager.initCap($tableMap.schema)}KvsCacheFacade ${tableMap.schema}KvsCacheFacade;
+    private ${manager.initCap($tableMap.schema)}KvsCacheFacade ${tableMap.schema}KvsCacheFacade;
 
 #if ($tableMap.suppressBehaviorBasicMethodGen != 'true')
     /**
