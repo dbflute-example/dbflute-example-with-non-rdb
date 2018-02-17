@@ -73,6 +73,7 @@ public abstract class ${data.className} extends ${data.abstractBehavior.classNam
 #set ($moreUrl = '')
 #set ($returnBeanClassName = 'void')
 #foreach($pathVariableEntry in $method.pathVariables.entrySet())
+#set ($pathVariableName = $scriptEngine.invokeMethod($rule, 'fieldName', $data.api, {'in': 'path'}, $pathVariableEntry.key))
 #set ($pathVariable = $pathVariableEntry.value)
 #if ($pathVariable.type == 'array')
 #if ($scriptEngine.invokeMethod($rule, 'pathVariableManualMappingClass', $api, $pathVariable))
