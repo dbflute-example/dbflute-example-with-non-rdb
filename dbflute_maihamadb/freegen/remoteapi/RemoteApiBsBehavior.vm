@@ -65,7 +65,8 @@ public abstract class ${data.className} extends ${data.abstractBehavior.classNam
 #set ($behaviorRequestMethodName = $scriptEngine.invokeMethod($rule, 'behaviorRequestMethodName', $method.api))
 #set ($behaviorRuleMethodName = $scriptEngine.invokeMethod($rule, 'behaviorRuleMethodName', $method.api))
 #foreach($pathVariableEntry in $method.pathVariables.entrySet())
-#set ($behaviorRuleMethodName = "$behaviorRuleMethodName$manager.initCap($pathVariableEntry.key)")
+#set ($pathVariableName = $scriptEngine.invokeMethod($rule, 'fieldName', $data.api, {'in': 'path'}, $pathVariableEntry.key))
+#set ($behaviorRuleMethodName = "$behaviorRuleMethodName$manager.initCap($pathVariableName)")
 #end
 #set ($parameterList = [])
 #set ($parameterDefinition = '')
@@ -89,7 +90,7 @@ public abstract class ${data.className} extends ${data.abstractBehavior.classNam
 #set ($pathVariableClass = ${typeMap[$pathVariable.type]})
 #end
 ## TODO p1us2er0 temporary for beanPropertyManualMappingDescription. (2017/10/10)
-#set ($pathVariable.name = $pathVariableEntry.key)
+#set ($pathVariable.name = $pathVariableName)
 #set ($enumValueComment = '')
 #set ($nestType = '')
 #if ($pathVariable.enum)
@@ -98,14 +99,14 @@ public abstract class ${data.className} extends ${data.abstractBehavior.classNam
 #set ($enumValueComment = "(enumValue=$pathVariable.items.enum) ")
 #end
 #if ($scriptEngine.invokeMethod($rule, 'pathVariableManualMappingDescription', $api, $pathVariable))
-#set ($added = $parameterList.add({ "name": ${pathVariableEntry.key}, "class": ${pathVariableClass}, "description": "The value of path variable for ${pathVariableEntry.key}. ${enumValueComment}(${scriptEngine.invokeMethod($rule, 'pathVariableManualMappingDescription', $api, $pathVariable)}) (NotNull)"}))
+#set ($added = $parameterList.add({ 'name': ${pathVariableName}, 'class': ${pathVariableClass}, 'description': "The value of path variable for ${pathVariableName}. ${enumValueComment}(${scriptEngine.invokeMethod($rule, 'pathVariableManualMappingDescription', $api, $pathVariable)}) (NotNull)"}))
 #elseif ($pathVariable.description)
-#set ($added = $parameterList.add({ "name": ${pathVariableEntry.key}, "class": ${pathVariableClass}, "description": "The value of path variable for ${pathVariableEntry.key}. ${enumValueComment}(${pathVariable.description}) (NotNull)"}))
+#set ($added = $parameterList.add({ 'name': ${pathVariableName}, 'class': ${pathVariableClass}, 'description': "The value of path variable for ${pathVariableName}. ${enumValueComment}(${pathVariable.description}) (NotNull)"}))
 #else
-#set ($added = $parameterList.add({ "name": ${pathVariableEntry.key}, "class": ${pathVariableClass}, "description": "The value of path variable for ${pathVariableEntry.key}. ${enumValueComment}(NotNull)"}))
+#set ($added = $parameterList.add({ 'name': ${pathVariableName}, 'class': ${pathVariableClass}, 'description': "The value of path variable for ${pathVariableName}. ${enumValueComment}(NotNull)"}))
 #end
-#set ($parameterDefinition = "${parameterDefinition}${pathVariableClass} ${pathVariableEntry.key}, ")
-#set ($moreUrl = "${moreUrl}${pathVariableEntry.key}, ")
+#set ($parameterDefinition = "${parameterDefinition}${pathVariableClass} ${pathVariableName}, ")
+#set ($moreUrl = "${moreUrl}${pathVariableName}, ")
 #end
 #set ($paramBeanClassName = '')
 #if (${method.paramBean.className})
@@ -114,7 +115,7 @@ public abstract class ${data.className} extends ${data.abstractBehavior.classNam
 #set ($paramBeanClassName = "java.util.List<${paramBeanClassName}>")
 #end
 #set ($parameterDefinition = "${parameterDefinition}Consumer<${paramBeanClassName}> paramLambda")
-#set ($added = $parameterList.add({ "name": "paramLambda", "class": "Consumer", "description": "The callback for $paramBeanClassName. (NotNull)"}))
+#set ($added = $parameterList.add({ 'name': 'paramLambda', 'class': 'Consumer', 'description': "The callback for $paramBeanClassName. (NotNull)"}))
 #end
 #set ($parameterDefinition = $parameterDefinition.replaceAll(', $', ''))
 #set ($moreUrl = $moreUrl.replaceAll('^(.+), $', 'moreUrl($1)'))
@@ -133,7 +134,7 @@ public abstract class ${data.className} extends ${data.abstractBehavior.classNam
 #set ($behaviorRequestMethodSignature = "$behaviorRequestMethodName$parameterSignature")
 #if ($behaviorRequestMethodSignatureList.contains($behaviorRequestMethodSignature))
 #foreach($pathVariableEntry in $method.pathVariables.entrySet())
-#set ($behaviorRequestMethodName = "$behaviorRequestMethodName$manager.initCap($pathVariableEntry.key)")
+#set ($behaviorRequestMethodName = "$behaviorRequestMethodName$manager.initCap($pathVariableName)")
 #end
 #set ($behaviorRequestMethodSignature = "$behaviorRequestMethodName$parameterSignature")
 #end

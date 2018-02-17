@@ -81,7 +81,7 @@ function processRemoteApi(request) {
     // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
     // loop api
     // _/_/_/_/_/_/_/_/_/_/
-    for(apiIndex in apiList) {
+    for (apiIndex in apiList) {
         var api = apiList[apiIndex];
         // +------------------------+
         // |                        |
@@ -97,7 +97,7 @@ function processRemoteApi(request) {
         // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
         // loop parameters's elements, e.g. in, name, description, required, schema, ...
         // _/_/_/_/_/_/_/_/_/_/
-        for(parameterIndex in api.methodBean['parameters']) {
+        for (parameterIndex in api.methodBean['parameters']) {
             var parameter = api.methodBean['parameters'][parameterIndex];
             if (parameter.in === 'path') {
                 pathVariables[parameter.name] = parameter;
@@ -186,6 +186,7 @@ function processRemoteApi(request) {
                         }
                     }
                 }
+                returnBean.in = 'response';
             }
         }
         keepRemoteApiBehavior(rule, api, pathVariables, paramBean, returnBean, exBehaviorMap);

@@ -68,7 +68,7 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
 ## @param propertyEntry propertyEntry (NotNull)
 ## _/_/_/_/_/_/_/_/_/_/
 #macro(generateProperty, $class, $propertyEntry)
-#set ($fieldName = $propertyEntry.key)
+#set ($fieldName = ${scriptEngine.invokeMethod($rule, 'fieldName', $data.api, $data, $propertyEntry.key)})
 #set ($property = $propertyEntry.value)
 ## TODO p1us2er0 temporary for beanPropertyManualMappingDescription. (2017/10/10)
 #set ($property.name = $fieldName)
@@ -115,7 +115,7 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
 #set ($fieldClass = $adjustType)
 #generateIndent($nestList.size())@javax.validation.Valid
 #end
-#generateIndent($nestList.size())public ${fieldClass} ${scriptEngine.invokeMethod($rule, 'fieldName', $data.api, $fieldName)};
+#generateIndent($nestList.size())public $fieldClass $fieldName;
 #generateNestType($nestType)
 #end
 ## _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/

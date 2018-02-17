@@ -13,6 +13,7 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
+#set ($rule = $scriptEngine.get('remoteApiRule'))
 #if ($data.properties.size() > 0)
 <table>
     <thead>
@@ -25,7 +26,7 @@
 #foreach($propertyEntry in $data.properties.entrySet())
     <tr>
         <td class="rowcellnum" rowspan="$rowspan">${foreach.count}</td>
-        <td>${propertyEntry.key}</td>
+        <td>${scriptEngine.invokeMethod($rule, 'fieldName', $data.api, $data, $propertyEntry.key)}</td>
         <td>TODO</td>
     </tr>
 #end
