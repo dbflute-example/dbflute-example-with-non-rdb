@@ -15,7 +15,7 @@
 ##
 #if ($data.exBehaviorMap && $data.exBehaviorMap.size() > 0)
 #set ($rule = $scriptEngine.get('remoteApiRule'))
-<h2 id="rempteapi-$data.scheme">rempteapi ($data.scheme)</h2>
+<h2 id="rempteapi-$data.schema">rempteapi ($data.schema)</h2>
 <table>
     <thead>
     <tr>
@@ -25,7 +25,7 @@
         <th>class#method</th>
     </tr>
     </thead>
-    <tbody id="rempteapi-$data.scheme-list-body">
+    <tbody id="rempteapi-$data.schema-list-body">
 #foreach($exBehavior in $data.exBehaviorMap.values())
 #foreach($method in $exBehavior.bsBehavior.methodList)
     <tr>

@@ -10,7 +10,7 @@
 /**
  * API Type.
  * @typedef {Object} Api
- * @property {string} api.scheme - Scheme.
+ * @property {string} api.schema - Schema.
  * @property {string} api.url - URL.
  * @property {string} api.httpMethod - HttpMethod.
  * @property {string[]} api.consumes - Consumes.
@@ -51,7 +51,7 @@ var baseRule = {
     // ===================================================================================
     //                                                                               Const
     //                                                                               =====
-    FIELD_NAMING : {
+    FIELD_NAMING: {
         CAMEL_TO_LOWER_SNAKE: 'CAMEL_TO_LOWER_SNAKE'
     },
 
@@ -59,21 +59,21 @@ var baseRule = {
     //                                                                               Base
     //                                                                              ======
     /**
-     * Return scheme.
+     * Return schema.
      * @param {Request} request - Request. (NotNull)
-     * @return {string} scheme. (NotNull)
+     * @return {string} schema. (NotNull)
      */
-    scheme : function(request) {
+    schema: function(request) {
         return request.requestName.replace(/^RemoteApi/g, '');
     },
 
     /**
-     * Return scheme package.
+     * Return schema package.
      * @param {Api} api - API. (NotNull)
-     * @return {string} scheme package. (NotNull)
+     * @return {string} schema package. (NotNull)
      */
-    schemePackage : function(scheme) {
-        return manager.decamelize(scheme).replace(/_/g, '.').toLowerCase();
+    schemaPackage: function(schema) {
+        return manager.decamelize(schema).replace(/_/g, '.').toLowerCase();
     },
 
     /**
@@ -81,10 +81,10 @@ var baseRule = {
      * @param {Api} api - API. (NotNull)
      * @return {boolean} true if target. (NotNull)
      */
-    target : function(api) {
+    target: function(api) {
         var contentTypes = [];
-        Array.prototype.push.apply(contentTypes, api.consumes ? api.consumes : []);
-        Array.prototype.push.apply(contentTypes, api.produces ? api.produces : []);
+        Array.prototype.push.apply(contentTypes, api.consumes ? api.consumes: []);
+        Array.prototype.push.apply(contentTypes, api.produces ? api.produces: []);
         return (contentTypes.indexOf('application/json') !== -1) && api.url.indexOf('/swagger/json') !== 0;
     },
 
@@ -93,43 +93,43 @@ var baseRule = {
      * @param {Api} api - API. (NotNull)
      * @return {boolean} filtered URL. (NotNull)
      */
-    url : function(api) { return api.url; },
+    url: function(api) { return api.url; },
 
     /**
      * Return sub package.
      * @param {Api} api - API. (NotNull)
      * @return {string} sub package. (NotNull)
      */
-    subPackage : function(api) {
+    subPackage: function(api) {
         return api.url.replace(/(_|^\/|\/$)/g, '').replace(/\/\{.*?\}/g, '').replace(/\//g, '.').toLowerCase();
     },
 
     // ===================================================================================
     //                                                                               DiXml
     //                                                                               =====
-    diXmlPath : function(scheme, resourceFilePath) {
-        return '../resources/remoteapi/di/remoteapi_' + this.schemePackage(scheme).replace(/\./g, '-') + '.xml';
+    diXmlPath: function(schema, resourceFilePath) {
+        return '../resources/remoteapi/di/remoteapi_' + this.schemaPackage(schema).replace(/\./g, '-') + '.xml';
     },
 
-    diconPath : function(scheme, resourceFilePath) {
-        return '../resources/remoteapi/di/remoteapi_' + this.schemePackage(scheme).replace(/\./g, '-') + '.dicon';
+    diconPath: function(schema, resourceFilePath) {
+        return '../resources/remoteapi/di/remoteapi_' + this.schemaPackage(schema).replace(/\./g, '-') + '.dicon';
     },
 
     // ===================================================================================
     //                                                                            Behavior
     //                                                                            ========
-    behaviorClassGeneration : true,
-    behaviorMethodGeneration : true,
-    behaviorMethodAccessModifier : 'public',
-    frameworkBehaviorClass : 'org.lastaflute.remoteapi.LastaRemoteBehavior',
+    behaviorClassGeneration: true,
+    behaviorMethodGeneration: true,
+    behaviorMethodAccessModifier: 'public',
+    frameworkBehaviorClass: 'org.lastaflute.remoteapi.LastaRemoteBehavior',
 
     /**
      * Return abstractBehaviorClassName.
-     * @param {string} scheme - scheme. (NotNull)
+     * @param {string} schema - schema. (NotNull)
      * @return {string} abstractBehaviorClassName. (NotNull)
      */
-    abstractBehaviorClassName : function(scheme) {
-        return 'AbstractRemote' + scheme + 'Bhv';
+    abstractBehaviorClassName: function(schema) {
+        return 'AbstractRemote' + schema + 'Bhv';
     },
 
     /**
@@ -137,7 +137,7 @@ var baseRule = {
      * @param {Api} api - API. (NotNull)
      * @return {string} filtered Behavior SubPackage. (NotNull)
      */
-    behaviorSubPackage : function(api) {
+    behaviorSubPackage: function(api) {
         return this.subPackage(api).replace(/^([^.]*)\.(.+)/, '$1');
     },
 
@@ -146,8 +146,8 @@ var baseRule = {
      * @param {Api} api - API. (NotNull)
      * @return {string} bsBehaviorClassName. (NotNull)
      */
-    bsBehaviorClassName : function(api) {
-        return 'BsRemote' + api.scheme + manager.initCap(manager.camelize(this.behaviorSubPackage(api).replace(/\./g, '_'))) + 'Bhv';
+    bsBehaviorClassName: function(api) {
+        return 'BsRemote' + api.schema + manager.initCap(manager.camelize(this.behaviorSubPackage(api).replace(/\./g, '_'))) + 'Bhv';
     },
 
     /**
@@ -155,8 +155,8 @@ var baseRule = {
      * @param {Api} api - API. (NotNull)
      * @return {string} exBehaviorClassName. (NotNull)
      */
-    exBehaviorClassName : function(api) {
-        return 'Remote' + api.scheme + manager.initCap(manager.camelize(this.behaviorSubPackage(api).replace(/\./g, '_'))) + 'Bhv';
+    exBehaviorClassName: function(api) {
+        return 'Remote' + api.schema + manager.initCap(manager.camelize(this.behaviorSubPackage(api).replace(/\./g, '_'))) + 'Bhv';
     },
 
     /**
@@ -164,9 +164,9 @@ var baseRule = {
      * @param {Api} api - API. (NotNull)
      * @return {string} behaviorRequestMethodName. (NotNull)
      */
-    behaviorRequestMethodName : function(api) {
+    behaviorRequestMethodName: function(api) {
         var methodPart = manager.camelize(this.subPackage(api).replace(this.behaviorSubPackage(api), '').replace(/\./g, '_'));
-        return 'request' + manager.initCap(methodPart) + (api.multipleHttpMethod ? manager.initCap(api.httpMethod) : '');
+        return 'request' + manager.initCap(methodPart) + (api.multipleHttpMethod ? manager.initCap(api.httpMethod): '');
     },
 
     /**
@@ -174,9 +174,9 @@ var baseRule = {
      * @param {Api} api - API. (NotNull)
      * @return {string} behaviorRuleMethodName. (NotNull)
      */
-    behaviorRuleMethodName : function(api) {
+    behaviorRuleMethodName: function(api) {
         var methodPart = manager.camelize(this.subPackage(api).replace(this.behaviorSubPackage(api), '').replace(/\./g, '_'));
-        return 'ruleOf' + manager.initCap(methodPart) + (api.multipleHttpMethod ? manager.initCap(api.httpMethod) : '');
+        return 'ruleOf' + manager.initCap(methodPart) + (api.multipleHttpMethod ? manager.initCap(api.httpMethod): '');
     },
 
     // ===================================================================================
@@ -187,15 +187,15 @@ var baseRule = {
      * @param {Api} api - API. (NotNull)
      * @return {string} filtered Bean SubPackage. (NotNull)
      */
-    beanSubPackage : function(api) {
+    beanSubPackage: function(api) {
         var package = this.subPackage(api);
         if (package === this.behaviorSubPackage(api)) {
             package += '.index';
         }
         return package;
     },
-    definitionKey : function(definitionKey) { return definitionKey; },
-    unDefinitionKey : function(definitionKey) { return definitionKey; },
+    definitionKey: function(definitionKey) { return definitionKey; },
+    unDefinitionKey: function(definitionKey) { return definitionKey; },
 
     /**
      * Return beanClassName.
@@ -203,9 +203,9 @@ var baseRule = {
      * @param {boolean} detail - detail. (NotNull)
      * @return {string} beanClassName. (NotNull)
      */
-    beanClassName : function(api, detail) {
-        var namePart = detail ? api.url.replace(/(_|^\/|\/$|\{|\})/g, '').replace(/\//g, '_').toLowerCase() : this.subPackage(api);
-        return 'Remote' + manager.initCap(manager.camelize(namePart.replace(/\./g, '_'))) + (api.multipleHttpMethod ? manager.initCap(api.httpMethod) : '');
+    beanClassName: function(api, detail) {
+        var namePart = detail ? api.url.replace(/(_|^\/|\/$|\{|\})/g, '').replace(/\//g, '_').toLowerCase(): this.subPackage(api);
+        return 'Remote' + manager.initCap(manager.camelize(namePart.replace(/\./g, '_'))) + (api.multipleHttpMethod ? manager.initCap(api.httpMethod): '');
     },
 
     /**
@@ -214,7 +214,7 @@ var baseRule = {
      * @param {Object} properties - properties. (NotNull)
      * @return {string} paramExtendsClass. (NullAllowed)
      */
-    paramExtendsClass : function(api, properties) {
+    paramExtendsClass: function(api, properties) {
         return null;
     },
 
@@ -224,7 +224,7 @@ var baseRule = {
      * @param {Object} properties - properties. (NotNull)
      * @return {string} paramImplementsClasses. (NullAllowed)
      */
-    paramImplementsClasses : function(api, properties) {
+    paramImplementsClasses: function(api, properties) {
         return null;
     },
 
@@ -234,7 +234,7 @@ var baseRule = {
      * @param {boolean} detail - detail. (NotNull)
      * @return {string} paramClassName. (NotNull)
      */
-    paramClassName : function(api, detail) {
+    paramClassName: function(api, detail) {
         return this.beanClassName(api, detail) + 'Param';
     },
 
@@ -244,7 +244,7 @@ var baseRule = {
      * @param {Object} properties - properties. (NotNull)
      * @return {string} returnExtendsClass. (NullAllowed)
      */
-    returnExtendsClass : function(api, properties) {
+    returnExtendsClass: function(api, properties) {
         return null;
     },
 
@@ -254,7 +254,7 @@ var baseRule = {
      * @param {Object} properties - properties. (NotNull)
      * @return {string} returnImplementsClasses. (NullAllowed)
      */
-    returnImplementsClasses : function(api, properties) {
+    returnImplementsClasses: function(api, properties) {
         return null;
     },
 
@@ -264,7 +264,7 @@ var baseRule = {
      * @param {boolean} detail - detail. (NotNull)
      * @return {string} returnClassName. (NotNull)
      */
-    returnClassName : function(api, detail) {
+    returnClassName: function(api, detail) {
         return this.beanClassName(api, detail) + 'Return';
     },
 
@@ -274,7 +274,7 @@ var baseRule = {
      * @param {string} className - className. (NotNull)
      * @return {string} nestClassName. (NotNull)
      */
-    nestClassName : function(api, className) {
+    nestClassName: function(api, className) {
         return className.replace(/(Part|Result|Model|Bean)$/, '') + 'Part';
     },
 
@@ -284,7 +284,7 @@ var baseRule = {
      * @param {string} fieldName - fieldName. (NotNull)
      * @return {string} fieldName. (NotNull)
      */
-    fieldName : function(api, bean, fieldName) {
+    fieldName: function(api, bean, fieldName) {
         var fieldNaming = this.fieldNamingMapping()[bean.in];
         if (fieldNaming === this.FIELD_NAMING.CAMEL_TO_LOWER_SNAKE) {
             return manager.initUncap(manager.camelize(fieldName));
@@ -295,7 +295,7 @@ var baseRule = {
     // ===================================================================================
     //                                                                                 Doc
     //                                                                                 ===
-    docGeneration : true,
+    docGeneration: true,
 
     // ===================================================================================
     //                                                                              Option
@@ -312,7 +312,7 @@ var baseRule = {
      * Return field naming mapping.
      * @return field naming mapping. (NotNull)
      */
-    fieldNamingMapping : function() {
+    fieldNamingMapping: function() {
         return {
             'path': this.FIELD_NAMING.CAMEL_TO_LOWER_SNAKE,
             'query': this.FIELD_NAMING.CAMEL_TO_LOWER_SNAKE,
@@ -351,7 +351,7 @@ var baseRule = {
      * @param {PathVariable} pathVariable - pathVariable. (NotNull)
      * @return {string} pathVariableManualMappingClass. (NullAllowed)
      */
-    pathVariableManualMappingClass : function(api, pathVariable) {
+    pathVariableManualMappingClass: function(api, pathVariable) {
         return null;
     },
 
@@ -362,7 +362,7 @@ var baseRule = {
      * @param {Property} property - property. (NotNull)
      * @return {string} pathVariableManualMappingClass. (NullAllowed)
      */
-    beanPropertyManualMappingClass : function(api, beanClassName, property) {
+    beanPropertyManualMappingClass: function(api, beanClassName, property) {
         return null;
     },
 
@@ -372,7 +372,7 @@ var baseRule = {
      * @param {PathVariable} pathVariable - pathVariable. (NotNull)
      * @return {string} pathVariableManualMappingClass. (NullAllowed)
      */
-    pathVariableManualMappingDescription : function(api, pathVariable) {
+    pathVariableManualMappingDescription: function(api, pathVariable) {
         return null;
     },
 
@@ -383,8 +383,25 @@ var baseRule = {
      * @param {Property} property - property. (NotNull)
      * @return {string} beanPropertyManualMappingDescription. (NullAllowed)
      */
-    beanPropertyManualMappingDescription : function(api, beanClassName, property) {
+    beanPropertyManualMappingDescription: function(api, beanClassName, property) {
         return null;
+    },
+
+    /**
+     * Return delete target.
+     * @param {Request} request - Request. (NotNull)
+     * @return {File} file. (NotNull)
+     * @return {boolean} delete target. (NotNull)
+     */
+    deleteTarget: function(request, file) {
+        var nameFunctionList = ['bsBehaviorClassName', 'exBehaviorClassName', 'paramClassName', 'returnClassName'];
+        var dummyApi = {'schema': this.schema(request), 'url': '@@@'};
+        for (var nameFunctionIndex in nameFunctionList) {
+            if (file.getName().match(new RegExp(this[nameFunctionList[nameFunctionIndex]](dummyApi).replace('@@@', '.+')))) {
+                return true;
+            }
+        }
+        return false;
     }
 };
 

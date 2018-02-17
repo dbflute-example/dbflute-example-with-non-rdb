@@ -42,8 +42,8 @@ function processRemoteApi(request) {
     manager.info('...Generating remote api: ' + request.requestName);
 
     // schema name is from part of FreeGen request name e.g. RemoteApiSeaLand => SeaLand
-    var scheme = scriptEngine.invokeMethod(rule, 'scheme', request);
-    var schemePackage = scriptEngine.invokeMethod(rule, 'schemePackage', scheme);
+    var schema = scriptEngine.invokeMethod(rule, 'schema', request);
+    var schemaPackage = scriptEngine.invokeMethod(rule, 'schemaPackage', schema);
 
     // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
     // swagger.json's key
@@ -61,7 +61,7 @@ function processRemoteApi(request) {
             var multipleHttpMethod = pathMap[pathKey].size() > 1;
             var method = path[methodKey];
             var api = new java.util.LinkedHashMap();
-            api.scheme = scheme;
+            api.schema = schema;
             api.package = request.package;
             api.url = pathKey;
             api.httpMethod = methodKey;
@@ -191,9 +191,11 @@ function processRemoteApi(request) {
         }
         keepRemoteApiBehavior(rule, api, pathVariables, paramBean, returnBean, exBehaviorMap);
     }
-    processRemoteApiBean(rule, remoteApiBeanList);
-    processRemoteApiBhv(rule, request, exBehaviorMap);
+    var remoteApiBeanPathList = processRemoteApiBean(rule, remoteApiBeanList);
+    var remoteApiBhvPathList = processRemoteApiBhv(rule, request, exBehaviorMap);
+    var remoteApiSrcPathList = remoteApiBeanPathList.concat(remoteApiBhvPathList);
     processRemoteApiDoc(rule, request, exBehaviorMap);
+    clean(rule, request, remoteApiSrcPathList);
 }
 
 /**
@@ -204,9 +206,9 @@ function processRemoteApi(request) {
  * @param {Properties} properties - The information of property for the bean. (NotNull)
  */
 function createRemoteApiBean(rule, beanPurposeType, api, properties) {
-    var schemePackage = scriptEngine.invokeMethod(rule, 'schemePackage', api.scheme);
+    var schemaPackage = scriptEngine.invokeMethod(rule, 'schemaPackage', api.schema);
     var subPackage = scriptEngine.invokeMethod(rule, 'beanSubPackage', api);
-    var package = api.package + '.' + schemePackage;
+    var package = api.package + '.' + schemaPackage;
     if (subPackage) {
         package = package + '.' + subPackage;
     }
@@ -233,9 +235,9 @@ function createRemoteApiBean(rule, beanPurposeType, api, properties) {
  * @param {ExBehaviorMap} exBehaviorMap - The map of behavior information. (NotNull)
  */
 function keepRemoteApiBehavior(rule, api, pathVariables, paramBean, returnBean, exBehaviorMap) {
-    var schemePackage = scriptEngine.invokeMethod(rule, 'schemePackage', api.scheme);
+    var schemaPackage = scriptEngine.invokeMethod(rule, 'schemaPackage', api.schema);
     var subPackage = scriptEngine.invokeMethod(rule, 'behaviorSubPackage', api);
-    var package = api.package + '.' + schemePackage;
+    var package = api.package + '.' + schemaPackage;
     if (subPackage) {
         package = package + '.' + subPackage;
     }
@@ -286,11 +288,14 @@ function processRemoteApiBean(rule, remoteApiBeanList) {
         }
     }
 
+    var remoteApiBeanPathList = [];
     for (remoteApiBeanKey in uniqueRemoteApiBeanMap) {
         var remoteApiBean = uniqueRemoteApiBeanMap[remoteApiBeanKey];
         var path = remoteApiBean.package.replace(/\./g, '/') + '/' + remoteApiBean.className + '.java';
         generate('./remoteapi/RemoteApiBean.vm', path, remoteApiBean, true);
+        remoteApiBeanPathList.push(path);
     }
+    return remoteApiBeanPathList;
 }
 
 /**
@@ -302,17 +307,19 @@ function processRemoteApiBean(rule, remoteApiBeanList) {
  */
 function processRemoteApiBhv(rule, request, exBehaviorMap) {
     if (!rule['behaviorClassGeneration']) {
-        return;
+        return [];
     }
-    var scheme = scriptEngine.invokeMethod(rule, 'scheme', request);
-    var schemePackage = scriptEngine.invokeMethod(rule, 'schemePackage', scheme);
-    var className = scriptEngine.invokeMethod(rule, 'abstractBehaviorClassName', scheme);
+    var schema = scriptEngine.invokeMethod(rule, 'schema', request);
+    var schemaPackage = scriptEngine.invokeMethod(rule, 'schemaPackage', schema);
+    var className = scriptEngine.invokeMethod(rule, 'abstractBehaviorClassName', schema);
     var abstractBehavior = new java.util.LinkedHashMap();
-    abstractBehavior.package = request.package + '.' + schemePackage;
+    abstractBehavior.package = request.package + '.' + schemaPackage;
     abstractBehavior.className = className;
     abstractBehavior.remoteApiExp = request.requestName;
     abstractBehavior.frameworkBehaviorClass = rule['frameworkBehaviorClass'];
+    var remoteApiBhvPathList = [];
     var path = abstractBehavior.package.replace(/\./g, '/') + '/' + abstractBehavior.className + '.java';
+    remoteApiBhvPathList.push(path);
     generate('./remoteapi/RemoteApiAbstractBehavior.vm', path, abstractBehavior, false);
 
     for (exBehaviorKey in exBehaviorMap) {
@@ -320,24 +327,28 @@ function processRemoteApiBhv(rule, request, exBehaviorMap) {
 
         var bsBehavior = exBehavior.bsBehavior;
         bsBehavior.abstractBehavior = abstractBehavior;
-        var path = bsBehavior.package.replace(/\./g, '/') + '/' + bsBehavior.className + '.java';
+        path = bsBehavior.package.replace(/\./g, '/') + '/' + bsBehavior.className + '.java';
+        remoteApiBhvPathList.push(path);
         generate('./remoteapi/RemoteApiBsBehavior.vm', path, bsBehavior, true);
 
-        var path = exBehavior.package.replace(/\./g, '/') + '/' + exBehavior.className + '.java';
+        path = exBehavior.package.replace(/\./g, '/') + '/' + exBehavior.className + '.java';
+        remoteApiBhvPathList.push(path);
         generate('./remoteapi/RemoteApiExBehavior.vm', path, exBehavior, false);
     }
 
     var container = new java.util.LinkedHashMap();
-    container.schemePackage = schemePackage;
+    container.schemaPackage = schemaPackage;
     container.exBehaviorMap = exBehaviorMap;
     if (manager.isTargetContainerLastaDi()) {
-        var path = scriptEngine.invokeMethod(rule, 'diXmlPath', scheme, request.resourceFile);
+        var path = scriptEngine.invokeMethod(rule, 'diXmlPath', schema, request.resourceFile);
         generate('./remoteapi/container/lastadi/RemoteApiDiXml.vm', path, container, true);
     }
     if (manager.isTargetContainerSeasar()) {
-        var path = scriptEngine.invokeMethod(rule, 'diconPath', scheme, request.resourceFile);
+        var path = scriptEngine.invokeMethod(rule, 'diconPath', schema, request.resourceFile);
         generate('./remoteapi/container/seasar/RemoteApiDicon.vm', path, container, true);
     }
+
+    return remoteApiBhvPathList;
 }
 
 /**
@@ -351,8 +362,8 @@ function processRemoteApiDoc(rule, request, exBehaviorMap) {
         return;
     }
     var doc = new java.util.LinkedHashMap();
-    doc.scheme = scriptEngine.invokeMethod(rule, 'scheme', request);
-    doc.schemePackage = scriptEngine.invokeMethod(rule, 'schemePackage', doc.scheme);
+    doc.schema = scriptEngine.invokeMethod(rule, 'schema', request);
+    doc.schemaPackage = scriptEngine.invokeMethod(rule, 'schemaPackage', doc.schema);
     doc.exBehaviorMap = exBehaviorMap;
     var remoteApiDocHtml = generate('./remoteapi/doc/RemoteApiDocHtml.vm', null, doc, true);
     var lastaDocHtmlPathList = manager.getLastaDocHtmlPathList();
@@ -370,6 +381,24 @@ function processRemoteApiDoc(rule, request, exBehaviorMap) {
             remoteApiDocHtml = naviLinkDestinationHtml + remoteApiDocHtml;
         }
         java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, remoteApiDocHtml + '\n' + markBody).getBytes());
+    }
+}
+
+function clean(rule, request, remoteApiSrcPathList) {
+    var generateAbsolutePathList = [];
+    for (var remoteApiSrcPathIndex in remoteApiSrcPathList) {
+        generateAbsolutePathList.push(new java.io.File(generator.outputPath, remoteApiSrcPathList[remoteApiSrcPathIndex]).getAbsolutePath());
+    }
+    var schema = scriptEngine.invokeMethod(rule, 'schema', request);
+    var schemaPackage = scriptEngine.invokeMethod(rule, 'schemaPackage', schema);
+    var list = listFiles(new java.io.File(generator.outputPath, (request.package + '.' + schemaPackage).replace(/\./g, '/')));
+    for (var index in list) {
+        var file = list[index];
+        if (generateAbsolutePathList.indexOf(file.getAbsolutePath()) === -1
+                && scriptEngine.invokeMethod(rule, 'deleteTarget', request, file)) {
+           print('delete(' + file + ')');
+           file.delete();
+        }
     }
 }
 
@@ -393,4 +422,18 @@ function generate(src, dest, data, overwite) {
         return generator.parse(src, dest, 'data', data);
     }
     return '';
+}
+
+function listFiles(dir) {
+    var list = [];
+    var fileList = dir.listFiles();
+    for (var fileIndex in fileList) {
+        var file = fileList[fileIndex];
+        if (file.isDirectory()) {
+            list = list.concat(this.listFiles(file));
+        } else if (file.isFile()) {
+            list.push(file);
+        }
+    }
+    return list;
 }
