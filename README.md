@@ -25,6 +25,7 @@ SolrPagingResultBean<SolrExample> result = solrExampleBhv.selectPage(cb -> {
     cb.paging(10, 1);
 });
 ```
+[How to use SolrFlute](/etc/doc/solrflute.md)  
 contributed by U-NEXT: http://video.unext.jp/
 
 ## KVSFlute for KVS (Redis)
@@ -33,6 +34,16 @@ OptionalEntity<Product> result = kvsProductBhv.selectEntityByProductId(cb -> {
     cb.query().setProductId_Equal(productId);
 });
 ```
+[How to use KvsFlute](/etc/doc/kvsflute.md)  
+contributed by U-NEXT: http://video.unext.jp/
+
+## RemoFlute
+```java
+RemoteProductDetailReturn ret = remoteProductBhv.requestDetail(param -> {
+    param.productId = productId;
+});
+```
+[How to use RemoFlute](/etc/doc/remoflute.md)  
 contributed by U-NEXT: http://video.unext.jp/
 
 # Quick Trial

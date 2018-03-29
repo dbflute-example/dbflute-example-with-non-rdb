@@ -3,27 +3,39 @@
  * @param {Request} request - request (NotNull)
  */
 function process(request) {
-    var rule = null;
-    processSolrDoc(rule, request);
+    try {
+        processSolr(request);
+    } catch (e) {
+        var message = '/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n';
+        message += 'Error in solr generation.\n';
+        message += '\n';
+        message += '[Advice]\n';
+        message += '1. Upgrade version of dbflute engine to 1.1.6 or later.\n';
+        message += '2. If you can not upgrade the version, you may be able to avoid errors by chang setting.\n';
+        message += '3. Still if you do not improve it, there is a possibility of a bug.\n';
+        message += '_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/\n';
+        print(message);
+        throw e;
+    }
 }
 
 /**
- * generate file.
- * @param {string} src - src (NotNull)
- * @param {string} dest - dest (NotNull)
- * @param {map} data - data (NotNull)
- * @param {boolean} overwite - overwite (NotNull)
+ * process solr.
+ * @param {Request} request - request (NotNull)
  */
-function generate(src, dest, data, overwite) {
-    if (dest === null) {
-        return generator.parse(src, dest, 'data', data);
+function processSolr(request) {
+    var optionMap = request.optionMap;
+    request.enableOutputDirectory();
+    manager.makeDirectory(request.generateDirPath);
+
+    scriptEngine.eval('load("./freegen/solr/SolrRule.js");');
+    if (optionMap.ruleJsPath && optionMap.ruleJsPath != '') {
+        // load application rule settings if exists
+        scriptEngine.eval('load("' + optionMap.ruleJsPath + '");');
     }
-    if (!java.nio.file.Files.exists(java.nio.file.Paths.get(generator.outputPath, dest)) || overwite) {
-        manager.makeDirectory(dest);
-        print('generate("' + dest + '")');
-        return generator.parse(src, dest, 'data', data);
-    }
-    return '';
+    var rule = scriptEngine.get('solrRule');
+
+    processSolrDoc(rule, request);
 }
 
 /**
@@ -32,6 +44,9 @@ function generate(src, dest, data, overwite) {
  * @param {Request} request - request (NotNull)
  */
 function processSolrDoc(rule, request) {
+    if (!rule['docGeneration']) {
+        return;
+    }
     var doc = new java.util.LinkedHashMap();
     var solrDocHtml = generate('./solr/doc/SolrDocHtml.vm', null, doc, true);
     var lastaDocHtmlPathList = manager.getLastaDocHtmlPathList();
@@ -50,4 +65,26 @@ function processSolrDoc(rule, request) {
         }
         java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, solrDocHtml + '\n' + markBody).getBytes());
     }
+}
+
+// ===================================================================================
+//                                                                              Common
+//                                                                              ======
+/**
+ * generate file.
+ * @param {string} src - src (NotNull)
+ * @param {string} dest - dest (NotNull)
+ * @param {map} data - data (NotNull)
+ * @param {boolean} overwite - overwite (NotNull)
+ */
+function generate(src, dest, data, overwite) {
+    if (dest === null) {
+        return generator.parse(src, dest, 'data', data);
+    }
+    if (!java.nio.file.Files.exists(java.nio.file.Paths.get(generator.outputPath, dest)) || overwite) {
+        manager.makeDirectory(dest);
+        print('generate("' + dest + '")');
+        return generator.parse(src, dest, 'data', data);
+    }
+    return '';
 }

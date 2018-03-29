@@ -16,10 +16,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE components PUBLIC "-//DBFLUTE//DTD LastaDi 1.0//EN"
     "http://dbflute.org/meta/lastadi10.dtd">
-<components namespace="remoteapi_${data.schemePackage.replaceAll('\.', '-')}">
+<components namespace="remoteapi_${data.schemaPackage.replaceAll('\.', '-')}">
     <include path="lastaflute.xml"/>
     <include condition="#exists('#path')" path="remoteapi/di/remoteapi_all_included.xml"/>
-    <include condition="#exists('#path')" path="remoteapi/di/remoteapi_${data.schemePackage.replaceAll('\.', '-')}_included.xml"/>
+    <include condition="#exists('#path')" path="remoteapi/di/remoteapi_${data.schemaPackage.replaceAll('\.', '-')}_included.xml"/>
 
     <!-- Remote API Behavior -->
 #foreach($exBehavior in $data.exBehaviorMap.values())
