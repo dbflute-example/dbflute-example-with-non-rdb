@@ -15,6 +15,8 @@
  */
 package org.docksidestage.remote.petstore.pet.index;
 
+import javax.xml.bind.annotation.XmlElement;
+
 import org.lastaflute.core.util.Lato;
 import org.lastaflute.web.validation.Required;
 
@@ -25,9 +27,11 @@ import org.lastaflute.web.validation.Required;
 public class RemotePetPutParam {
 
     /** The property of id. (NullAllowed) */
+    @XmlElement(name = "id")
     public Long id;
 
     /** The property of category. (NullAllowed) */
+    @XmlElement(name = "category")
     @javax.validation.Valid
     public CategoryPart category;
 
@@ -38,21 +42,26 @@ public class RemotePetPutParam {
     public static class CategoryPart {
 
         /** The property of id. (NullAllowed) */
+        @XmlElement(name = "id")
         public Long id;
 
         /** The property of name. (NullAllowed) */
+        @XmlElement(name = "name")
         public String name;
     }
 
     /** The property of name. */
+    @XmlElement(name = "name")
     @Required
     public String name;
 
     /** The property of photoUrls. */
+    @XmlElement(name = "photoUrls")
     @Required
     public java.util.List<String> photoUrls;
 
     /** The property of tags. (NullAllowed) */
+    @XmlElement(name = "tags")
     @javax.validation.Valid
     public java.util.List<TagPart> tags;
 
@@ -63,13 +72,16 @@ public class RemotePetPutParam {
     public static class TagPart {
 
         /** The property of id. (NullAllowed) */
+        @XmlElement(name = "id")
         public Long id;
 
         /** The property of name. (NullAllowed) */
+        @XmlElement(name = "name")
         public String name;
     }
 
     /** The property of status. (enumValue=[available, pending, sold]) (pet status in the store) (NullAllowed) */
+    @XmlElement(name = "status")
     public String status;
 
     @Override

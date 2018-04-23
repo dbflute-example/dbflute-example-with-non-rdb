@@ -44,6 +44,12 @@ public abstract class ${data.className} extends ${data.frameworkBehaviorClass} {
     @Override
     protected void yourDefaultRule(FlutyRemoteApiRule rule) {
         // TODO you #change_it set your common default rule here
+        // e.g. When you want to convert the field naming from CAMEL to LOWER_SNAKE.
+        // FlSelectedMappingPolicy selectedMappingPolicy = new LaSelectedMappingPolicy().fieldNaming(FormFieldNaming.CAMEL_TO_LOWER_SNAKE);
+        // JsonMappingOption jsonMappingOption = new JsonMappingOption().asFieldNaming(JsonFieldNaming.CAMEL_TO_LOWER_SNAKE);
+        // rule.sendQueryBy(new LaQuerySender(selectedMappingPolicy));
+        // rule.sendBodyBy(new LaJsonSender(requestManager, jsonMappingOption)); or rule.sendBodyBy(new LaFormSender(selectedMappingPolicy));
+        // rule.receiveBodyBy(new LaJsonReceiver(requestManager, jsonMappingOption));
         throw new IllegalStateException("set your common default rule here.");
     }
 

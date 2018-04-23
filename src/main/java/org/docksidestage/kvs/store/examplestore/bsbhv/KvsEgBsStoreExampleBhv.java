@@ -25,7 +25,6 @@ import javax.annotation.Resource;
 
 import org.dbflute.optional.OptionalEntity;
 import org.dbflute.util.DfCollectionUtil;
-
 import org.docksidestage.kvs.store.examplestore.bsentity.dbmeta.KvsEgStoreExampleDbm;
 import org.docksidestage.kvs.store.examplestore.cbean.KvsEgStoreExampleCB;
 import org.docksidestage.kvs.store.examplestore.exentity.KvsEgStoreExample;
@@ -74,10 +73,10 @@ public abstract class KvsEgBsStoreExampleBhv {
         KvsEgStoreExampleCB cb = new KvsEgStoreExampleCB();
         cbLambda.accept(cb);
 
-        KvsEgStoreExampleDbm kvsEgstoreExampleDbm = asDBMeta();
-        kvsEgstoreExampleDbm.validateKeyColumn(cb);
+        KvsEgStoreExampleDbm dbMeta = asDBMeta();
+        dbMeta.validateKeyColumn(cb);
 
-        return examplestoreKvsStoreFacade.findEntity(kvsEgstoreExampleDbm, kvsEgstoreExampleDbm.extractKeyList(cb));
+        return examplestoreKvsStoreFacade.findEntity(dbMeta, dbMeta.extractKeyList(cb));
     }
 
     /**
@@ -114,15 +113,14 @@ public abstract class KvsEgBsStoreExampleBhv {
     /**
      * Insert or update the entity.
      * <pre>
-     * <span style="color: #0000C0">kvsCalcEvaluationBhv</span>.<span style="color: #CC4747">insertOrUpdate</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
-     *     KvsCalcEvaluation evaluation = <span style="color: #70226C">new</span> KvsCalcEvaluation();
+     * <span style="color: #0000C0">kvsEgStoreExampleBhv</span>.<span style="color: #CC4747">insertOrUpdate</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     KvsEgStoreExample entity = <span style="color: #70226C">new</span> KvsEgStoreExample();
      *     <span style="color: #3F7E5E">// Setting KVS-key(s) is required</span>
-     *     evaluation.setSakuhinPublicCode(<span style="color: #553000">sakuhinCode</span>);
-     *     evaluation.setPlatformPublicCode(<span style="color: #553000">platformCode</span>);
+     *     entity.setXxx(<span style="color: #553000">xxx</span>);
      *     <span style="color: #3F7E5E">// Set other column value(s) for insert/update</span>
-     *     evaluation.set...;
+     *     entity.set...;
      *     ...
-     *     <span style="color: #70226C">return</span> evaluation;
+     *     <span style="color: #70226C">return</span> entity;
      * });
      * </pre>
      * @param entityLambda The handler of entity row of KvsEgStoreExample (NotNull)
@@ -130,24 +128,23 @@ public abstract class KvsEgBsStoreExampleBhv {
      */
     public KvsEgStoreExample insertOrUpdate(Supplier<KvsEgStoreExample> entityLambda) {
         KvsEgStoreExample storeExample = entityLambda.get();
-        KvsEgStoreExampleDbm storeExampleDbm = asDBMeta();
-        storeExampleDbm.validateAllColumn(storeExample);
-        examplestoreKvsStoreFacade.insertOrUpdate(storeExampleDbm, storeExampleDbm.extractKeyList(storeExample), storeExample);
+        KvsEgStoreExampleDbm dbMeta = asDBMeta();
+        dbMeta.validateAllColumn(storeExample);
+        examplestoreKvsStoreFacade.insertOrUpdate(dbMeta, dbMeta.extractKeyList(storeExample), storeExample);
         return storeExample;
     }
 
     /**
      * Insert or update the entity with TTL.
      * <pre>
-     * <span style="color: #0000C0">kvsCalcEvaluationBhv</span>.<span style="color: #CC4747">insertOrUpdate</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
-     *     KvsCalcEvaluation evaluation = <span style="color: #70226C">new</span> KvsCalcEvaluation();
+     * <span style="color: #0000C0">kvsEgStoreExampleBhv</span>.<span style="color: #CC4747">insertOrUpdate</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     KvsEgStoreExample entity = <span style="color: #70226C">new</span> KvsEgStoreExample();
      *     <span style="color: #3F7E5E">// Setting KVS-key(s) is required</span>
-     *     evaluation.setSakuhinPublicCode(<span style="color: #553000">sakuhinCode</span>);
-     *     evaluation.setPlatformPublicCode(<span style="color: #553000">platformCode</span>);
+     *     entity.setXxx(<span style="color: #553000">xxx</span>);
      *     <span style="color: #3F7E5E">// Set other column value(s) for insert/update</span>
-     *     evaluation.set...;
+     *     entity.set...;
      *     ...
-     *     <span style="color: #70226C">return</span> evaluation;
+     *     <span style="color: #70226C">return</span> entity;
      * }, LocalDateTime.now().plus(<span style="color: #553000">86400000</span>, ChronoUnit.MILLIS));
      * </pre>
      * @param entityLambda The handler of entity row of KvsEgStoreExample (NotNull)
@@ -156,9 +153,9 @@ public abstract class KvsEgBsStoreExampleBhv {
      */
     public KvsEgStoreExample insertOrUpdate(Supplier<KvsEgStoreExample> entityLambda, LocalDateTime expireDateTime) {
         KvsEgStoreExample storeExample = entityLambda.get();
-        KvsEgStoreExampleDbm storeExampleDbm = asDBMeta();
-        storeExampleDbm.validateAllColumn(storeExample);
-        examplestoreKvsStoreFacade.insertOrUpdate(storeExampleDbm, storeExampleDbm.extractKeyList(storeExample), storeExample, expireDateTime);
+        KvsEgStoreExampleDbm dbMeta = asDBMeta();
+        dbMeta.validateAllColumn(storeExample);
+        examplestoreKvsStoreFacade.insertOrUpdate(dbMeta, dbMeta.extractKeyList(storeExample), storeExample, expireDateTime);
 
         return storeExample;
     }
@@ -166,12 +163,11 @@ public abstract class KvsEgBsStoreExampleBhv {
     /**
      * Delete the entity.
      * <pre>
-     * <span style="color: #0000C0">kvsCalcEvaluationBhv</span>.<span style="color: #CC4747">delete</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
-     *     KvsCalcEvaluation evaluation = <span style="color: #70226C">new</span> KvsCalcEvaluation();
+     * <span style="color: #0000C0">kvsEgStoreExampleBhv</span>.<span style="color: #CC4747">delete</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     KvsEgStoreExample entity = <span style="color: #70226C">new</span> KvsEgStoreExample();
      *     <span style="color: #3F7E5E">// Set KVS-key(s)</span>
-     *     evaluation.setSakuhinPublicCode(<span style="color: #553000">sakuhinCode</span>);
-     *     evaluation.setPlatformPublicCode(<span style="color: #553000">platformCode</span>);
-     *     <span style="color: #70226C">return</span> evaluation;
+     *     entity.setXxx(<span style="color: #553000">xxx</span>);
+     *     <span style="color: #70226C">return</span> entity;
      * });
      * </pre>
      * @param entityLambda The handler of entity row of KvsEgStoreExample (NotNull)
@@ -179,9 +175,9 @@ public abstract class KvsEgBsStoreExampleBhv {
      */
     public KvsEgStoreExample delete(Supplier<KvsEgStoreExample> entityLambda) {
         KvsEgStoreExample storeExample = entityLambda.get();
-        KvsEgStoreExampleDbm storeExampleDbm = asDBMeta();
-        storeExampleDbm.validateKeyColumn(storeExample);
-        examplestoreKvsStoreFacade.delete(storeExampleDbm, storeExampleDbm.extractKeyList(storeExample));
+        KvsEgStoreExampleDbm dbMeta = asDBMeta();
+        dbMeta.validateKeyColumn(storeExample);
+        examplestoreKvsStoreFacade.delete(dbMeta, dbMeta.extractKeyList(storeExample));
 
         return storeExample;
     }

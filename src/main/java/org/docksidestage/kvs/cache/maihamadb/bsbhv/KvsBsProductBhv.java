@@ -32,7 +32,6 @@ import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.kvs.cache.bhv.AbstractKvsCacheBehaviorWritable;
 import org.dbflute.optional.OptionalEntity;
 import org.dbflute.util.DfCollectionUtil;
-
 import org.docksidestage.dbflute.bsentity.dbmeta.ProductDbm;
 import org.docksidestage.dbflute.cbean.ProductCB;
 import org.docksidestage.dbflute.exentity.Product;

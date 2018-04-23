@@ -105,7 +105,7 @@ function processKvsCacheDoc(rule, request) {
         if (!lastaDocHtml.contains(naviLinkDestinationHtml)) {
             kvsCacheDocHtml = naviLinkDestinationHtml + kvsCacheDocHtml;
         }
-        java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, kvsCacheDocHtml + '\n' + markBody).getBytes());
+        java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, kvsCacheDocHtml + '\n' + markBody).getBytes('UTF-8'));
     }
 }
 

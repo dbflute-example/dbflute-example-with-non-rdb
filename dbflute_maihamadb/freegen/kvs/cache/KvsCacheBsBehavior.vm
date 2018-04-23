@@ -13,6 +13,7 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
+#set ($rule = $scriptEngine.get('kvsRule'))
 #set ($_existsSingleKvsKeyMethod = false)
 #set ($_existsCompositeKvsKeyMethod = false)
 #foreach ($column in $table.columnList)
@@ -23,37 +24,31 @@
 #set ($_existsCompositeKvsKeyMethod = true)
 #end
 #end
-${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.bsbhv;
-
+#set ($importList = [])
+#set($added = $importList.add('javax.annotation.Resource'))
+#set($added = $importList.add("${request.package}.${tableMap.schema}.facade.${manager.initCap($tableMap.schema)}KvsCacheFacade"))
 #if ($tableMap.suppressBehaviorBasicMethodGen != 'true')
-import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.annotation.Resource;
-
-import org.dbflute.dbmeta.info.ColumnInfo;
-import org.dbflute.kvs.cache.bhv.AbstractKvsCacheBehaviorWritable;
-import org.dbflute.optional.OptionalEntity;
-import org.dbflute.util.DfCollectionUtil;
-
-import ${tableMap.dbflutePackage}.bsentity.dbmeta.$!{tableMap.schemaPrefix}${table.camelizedName}Dbm;
-import ${tableMap.dbflutePackage}.cbean.$!{tableMap.schemaPrefix}${table.camelizedName}CB;
-import ${tableMap.dbflutePackage}.exentity.$!{tableMap.schemaPrefix}${table.camelizedName};
-import ${request.package}.${tableMap.schema}.cbean.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB;
-import ${request.package}.${tableMap.schema}.facade.${manager.initCap($tableMap.schema)}KvsCacheFacade;
-#else
-import javax.annotation.Resource;
-
-import ${request.package}.${tableMap.schema}.facade.${manager.initCap($tableMap.schema)}KvsCacheFacade;
+#set($added = $importList.add('java.time.LocalDateTime'))
+#set($added = $importList.add('java.util.Comparator'))
+#set($added = $importList.add('java.util.List'))
+#set($added = $importList.add('java.util.Map'))
+#set($added = $importList.add('java.util.function.Consumer'))
+#set($added = $importList.add('java.util.function.Function'))
+#set($added = $importList.add('java.util.function.Predicate'))
+#set($added = $importList.add('java.util.function.Supplier'))
+#set($added = $importList.add('java.util.stream.Collectors'))
+#set($added = $importList.add('java.util.stream.Stream'))
+#set($added = $importList.add('org.dbflute.dbmeta.info.ColumnInfo'))
+#set($added = $importList.add('org.dbflute.kvs.cache.bhv.AbstractKvsCacheBehaviorWritable'))
+#set($added = $importList.add('org.dbflute.optional.OptionalEntity'))
+#set($added = $importList.add('org.dbflute.util.DfCollectionUtil'))
+#set($added = $importList.add("${tableMap.dbflutePackage}.bsentity.dbmeta.$!{tableMap.schemaPrefix}${table.camelizedName}Dbm"))
+#set($added = $importList.add("${tableMap.dbflutePackage}.cbean.$!{tableMap.schemaPrefix}${table.camelizedName}CB"))
+#set($added = $importList.add("${tableMap.dbflutePackage}.exentity.$!{tableMap.schemaPrefix}${table.camelizedName}"))
+#set($added = $importList.add("${request.package}.${tableMap.schema}.cbean.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB"))
 #end
+${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.bsbhv;
+#generateImports($importList, $data.package, $scriptEngine.invokeMethod($rule, 'importOrderList'))
 
 /**
  * The behavior of (${table.comment})${table.capCamelName}.

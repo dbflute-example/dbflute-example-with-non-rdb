@@ -290,3 +290,32 @@ $manager.makeDirectory($request.generateDirPath)
     $generator.parse($src, $dest, "", "")
   #end
 #end
+
+## _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+## generate imports.
+## @param importList importList (NotNull)
+## @param package package (NotNull)
+## @param importOrderList importOrderList (NotNull)
+## _/_/_/_/_/_/_/_/_/_/
+#macro(generateImports, $importList, $package, $importOrderList)
+#set ($sortImportMap = $generator.getClass().forName('java.util.TreeMap').newInstance())
+#foreach($import in $importList)
+#if ($import.substring(0, $import.lastIndexOf('.')) != $package)
+#set ($importOrderIndex = -1)
+#foreach($importOrder in $importOrderList)
+#if ($importOrder != -1 && $importOrder == $import.substring(0, $import.indexOf('.')))
+#set ($importOrderIndex = $foreach.index)
+#end
+#end
+#set($put = $sortImportMap.put("${importOrderIndex}$import.substring(0, $import.lastIndexOf('.'))     $import.substring($import.lastIndexOf('.'))", $import))
+#end
+#end
+#set ($preImport = '.')
+#foreach($import in $sortImportMap.values())
+#if ($import.substring(0, $import.indexOf('.')) != $preImport.substring(0, $preImport.indexOf('.')))
+#set ($preImport = $import)
+
+#end
+import ${import};
+#end
+#end

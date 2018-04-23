@@ -63,7 +63,7 @@ function processSolrDoc(rule, request) {
         if (!lastaDocHtml.contains(naviLinkDestinationHtml)) {
             solrDocHtml = naviLinkDestinationHtml + solrDocHtml;
         }
-        java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, solrDocHtml + '\n' + markBody).getBytes());
+        java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, solrDocHtml + '\n' + markBody).getBytes('UTF-8'));
     }
 }
 

@@ -120,7 +120,7 @@ function processRemoteApi(request) {
                     }
                 }
                 var remoteApiBean = createRemoteApiBean(rule, 'param', api, bodyProperties);
-                remoteApiBean.in = 'body';
+                remoteApiBean.in = api.consumes && api.consumes.indexOf('application/xml') !== -1 ? 'xml' : 'json';
                 remoteApiBean.array = parameter.schema.type === 'array';
                 paramBean = remoteApiBean;
                 remoteApiBeanList.push(paramBean);
@@ -186,7 +186,7 @@ function processRemoteApi(request) {
                         }
                     }
                 }
-                returnBean.in = 'response';
+                returnBean.in = api.produces.indexOf('application/xml') !== -1 ? 'xml' : 'json';
             }
         }
         keepRemoteApiBehavior(rule, api, pathVariables, paramBean, returnBean, exBehaviorMap);
@@ -380,7 +380,7 @@ function processRemoteApiDoc(rule, request, exBehaviorMap) {
         if (!lastaDocHtml.contains(naviLinkDestinationHtml)) {
             remoteApiDocHtml = naviLinkDestinationHtml + remoteApiDocHtml;
         }
-        java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, remoteApiDocHtml + '\n' + markBody).getBytes());
+        java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, remoteApiDocHtml + '\n' + markBody).getBytes('UTF-8'));
     }
 }
 

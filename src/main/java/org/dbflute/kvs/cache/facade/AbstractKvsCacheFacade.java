@@ -39,6 +39,7 @@ import org.dbflute.kvs.cache.KvsCacheManager;
 import org.dbflute.kvs.core.exception.KvsException;
 import org.dbflute.optional.OptionalEntity;
 import org.dbflute.util.DfCollectionUtil;
+import org.lastaflute.core.magic.ThreadCacheContext;
 
 /**
  * @author FreeGen
@@ -152,7 +153,9 @@ public abstract class AbstractKvsCacheFacade implements KvsCacheFacade {
         dbMeta.extractPrimaryKeyMap(entity).forEach((key, value) -> {
             keyStringList.add(value);
         });
-        kvsCacheManager.delete(generateKeyForColumnNullObject(dbMeta.getProjectName(), dbMeta.getTableDbName(), keyStringList));
+        String key = generateKeyForColumnNullObject(dbMeta.getProjectName(), dbMeta.getTableDbName(), keyStringList);
+        ThreadCacheContext.removeObject(key);
+        kvsCacheManager.delete(key);
     }
 
     // ===================================================================================
@@ -175,7 +178,7 @@ public abstract class AbstractKvsCacheFacade implements KvsCacheFacade {
     // ===================================================================================
     //                                                                             DB Info
     //                                                                             =======
-    protected BehaviorSelector mySelector() {
+    public BehaviorSelector mySelector() {
         return this.behaviorSelector;
     }
 

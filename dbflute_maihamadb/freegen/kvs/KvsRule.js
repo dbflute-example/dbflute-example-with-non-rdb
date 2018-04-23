@@ -4,10 +4,22 @@
 //                                                                              ==========
 
 var baseRule = {
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    /**
+     * Return java import order list.
+     * @return java import order list. (NotNull)
+     */
+    importOrderList: function() {
+        return ['java', 'javax', 'junit', 'org', 'com', 'net', 'ognl', 'mockit', 'jp'];
+    },
+
     // ===================================================================================
     //                                                                                 Doc
     //                                                                                 ===
-    docGeneration : true,
+    docGeneration : true
 };
 
 var kvsRule = {};

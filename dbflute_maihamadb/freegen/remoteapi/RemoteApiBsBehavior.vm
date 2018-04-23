@@ -200,7 +200,8 @@ public abstract class ${data.className} extends ${data.abstractBehavior.classNam
         paramLambda.accept(param);
 #set($put = $paramMap.put('query', 'query(param)'))
 #set($put = $paramMap.put('formData', 'param'))
-#set($put = $paramMap.put('body', 'param'))
+#set($put = $paramMap.put('json', 'param'))
+#set($put = $paramMap.put('xml', 'param'))
 #end
 #if ($paramMap.containsKey("$!{method.paramBean.in}"))
 #set ($param = $paramMap["$!{method.paramBean.in}"])

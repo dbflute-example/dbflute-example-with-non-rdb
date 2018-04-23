@@ -85,7 +85,8 @@ var baseRule = {
         var contentTypes = [];
         Array.prototype.push.apply(contentTypes, api.consumes ? api.consumes: []);
         Array.prototype.push.apply(contentTypes, api.produces ? api.produces: []);
-        return (contentTypes.indexOf('application/json') !== -1) && api.url.indexOf('/swagger/json') !== 0;
+        return (contentTypes.indexOf('application/json') !== -1 || (contentTypes.indexOf('application/xml') !== -1))
+                && api.url.indexOf('/swagger/json') !== 0;
     },
 
     /**
@@ -101,7 +102,7 @@ var baseRule = {
      * @return {string} sub package. (NotNull)
      */
     subPackage: function(api) {
-        return api.url.replace(/(_|^\/|\/$)/g, '').replace(/\/\{.*?\}/g, '').replace(/\//g, '.').toLowerCase();
+        return api.url.replace(/(_|^\/|\/$)/g, '').replace(/\/\{.*?\}/g, '').replace(/\..+$/g, '').replace(/\//g, '.').toLowerCase();
     },
 
     // ===================================================================================
@@ -317,8 +318,8 @@ var baseRule = {
             'path': this.FIELD_NAMING.CAMEL_TO_LOWER_SNAKE,
             'query': this.FIELD_NAMING.CAMEL_TO_LOWER_SNAKE,
             'formData': this.FIELD_NAMING.CAMEL_TO_LOWER_SNAKE,
-            'body': this.FIELD_NAMING.CAMEL_TO_LOWER_SNAKE,
-            'response': this.FIELD_NAMING.CAMEL_TO_LOWER_SNAKE
+            'json': this.FIELD_NAMING.CAMEL_TO_LOWER_SNAKE,
+            'xml': this.FIELD_NAMING.CAMEL_TO_LOWER_SNAKE
         };
     },
 

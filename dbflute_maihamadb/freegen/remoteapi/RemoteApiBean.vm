@@ -21,6 +21,9 @@
 ${manager.allClassCopyright}package ${data.package};
 #set ($importList = [])
 #set($added = $importList.add('org.lastaflute.core.util.Lato'))
+#if ($data.in == 'xml')
+#set($added = $importList.add('javax.xml.bind.annotation.XmlElement'))
+#end
 #foreach($propertyEntry in $data.properties.entrySet())
 #set ($property = $propertyEntry.value)
 #if (${property.required})
@@ -86,6 +89,9 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
 #generateIndent($nestList.size())/** The property of ${fieldName}. ${enumValueComment}(${property.description}) #if (!${property.required})(NullAllowed) #end*/
 #else
 #generateIndent($nestList.size())/** The property of ${fieldName}. ${enumValueComment}#if (!${property.required})(NullAllowed) #end*/
+#end
+#if ($data.in == 'xml')
+#generateIndent($nestList.size())@XmlElement(name = "$propertyEntry.key")
 #end
 #if (${property.required})
 #generateIndent($nestList.size())@Required

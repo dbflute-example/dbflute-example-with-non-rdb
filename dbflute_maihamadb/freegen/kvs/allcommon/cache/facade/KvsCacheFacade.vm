@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.dbflute.Entity;
+import org.dbflute.bhv.BehaviorSelector;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
@@ -182,6 +183,12 @@ public interface KvsCacheFacade {
     // ===================================================================================
     //                                                                             DB Info
     //                                                                             =======
+    /**
+     * Get the behavior selector.
+     * @return behavior selector (NotNull)
+     */
+    BehaviorSelector mySelector();
+
     /**
      * Get the cache ttl.
      * @return The cache ttl (NullAllowed)

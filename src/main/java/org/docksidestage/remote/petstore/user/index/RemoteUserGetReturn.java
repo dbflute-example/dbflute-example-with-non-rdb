@@ -15,6 +15,8 @@
  */
 package org.docksidestage.remote.petstore.user.index;
 
+import javax.xml.bind.annotation.XmlElement;
+
 import org.lastaflute.core.util.Lato;
 
 /**
@@ -24,27 +26,35 @@ import org.lastaflute.core.util.Lato;
 public class RemoteUserGetReturn {
 
     /** The property of id. (NullAllowed) */
+    @XmlElement(name = "id")
     public Long id;
 
     /** The property of username. (NullAllowed) */
+    @XmlElement(name = "username")
     public String username;
 
     /** The property of firstName. (NullAllowed) */
+    @XmlElement(name = "firstName")
     public String firstName;
 
     /** The property of lastName. (NullAllowed) */
+    @XmlElement(name = "lastName")
     public String lastName;
 
     /** The property of email. (NullAllowed) */
+    @XmlElement(name = "email")
     public String email;
 
     /** The property of password. (NullAllowed) */
+    @XmlElement(name = "password")
     public String password;
 
     /** The property of phone. (NullAllowed) */
+    @XmlElement(name = "phone")
     public String phone;
 
     /** The property of userStatus. (User Status) (NullAllowed) */
+    @XmlElement(name = "userStatus")
     public Integer userStatus;
 
     @Override
