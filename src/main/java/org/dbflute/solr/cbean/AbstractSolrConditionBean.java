@@ -21,6 +21,8 @@ import java.util.List;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
 
+import org.dbflute.util.DfStringUtil;
+
 /**
  * Abstract class to generate query condition for Solr.
  * @author FreeGen
@@ -68,6 +70,20 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
             return pageSize;
         }
         return DEFAULT_PAGE_SIZE;
+    }
+
+    // ===================================================================================
+    //                                                                             Routing
+    //                                                                           =========
+    private static final String SOLR_ROUTER_KEY = "_route_";
+    protected String route;
+
+    public void setRoute(String route) {
+        this.route = route;
+    }
+
+    public String getRoute() {
+        return this.route;
     }
 
     // ===================================================================================
@@ -161,6 +177,10 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
         SolrSpecification facetSpecifyBean = getFacetSpecification();
         if (facetSpecifyBean.getSpecifyFields().length > 0) {
             query.addFacetField(facetSpecifyBean.getSpecifyFields());
+        }
+
+        if (DfStringUtil.is_NotNull_and_NotEmpty(route)) {
+            query.add(SOLR_ROUTER_KEY, route);
         }
 
         query.setStart(this.getPageStart());
