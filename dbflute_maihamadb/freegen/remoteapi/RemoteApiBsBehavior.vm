@@ -140,7 +140,7 @@ public abstract class ${data.className} extends ${data.abstractBehavior.classNam
 #set ($behaviorRequestMethodSignature = "$behaviorRequestMethodName$parameterSignature")
 #end
 #set($added = $behaviorRequestMethodSignatureList.add($behaviorRequestMethodSignature))
-#set($added = $behaviorRequestMethodSignatureList.add("$behaviorRequestMethodSignature|Consumer"))
+#set($added = $behaviorRequestMethodSignatureList.add("do$behaviorRequestMethodSignature|Consumer"))
     /**
      * Request remote call to $method.api.url. (auto-generated method)<br>
      * <pre>
@@ -156,7 +156,7 @@ public abstract class ${data.className} extends ${data.abstractBehavior.classNam
      */
     $rule['behaviorMethodAccessModifier'] $returnBeanClassName $behaviorRequestMethodName($!{parameterDefinition}) {
 #set ($ruleParam = 'rule -> {}')
-       #if ($returnBeanClassName != 'void') return#end $behaviorRequestMethodName(#foreach($parameter in $parameterList)$parameter.name, #end$ruleParam);
+       #if ($returnBeanClassName != 'void') return#end do$manager.initCap($behaviorRequestMethodName)(#foreach($parameter in $parameterList)$parameter.name, #end$ruleParam);
     }
 
     /**
@@ -184,7 +184,7 @@ public abstract class ${data.className} extends ${data.abstractBehavior.classNam
 #else
 #set ($returnType = "${returnBeanClassName}.class")
 #end
-    protected $returnBeanClassName $behaviorRequestMethodName($!{parameterDefinitionRule}) {
+    protected $returnBeanClassName do$manager.initCap($behaviorRequestMethodName)($!{parameterDefinitionRule}) {
 #set ($paramMap = {})
 #if ($method.api.httpMethod == 'get' || $method.api.httpMethod == 'delete')
 #set ($param = 'noQuery()')

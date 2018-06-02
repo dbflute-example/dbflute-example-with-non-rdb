@@ -28,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Because this class is cache setting and retrieval processing,
+ * we should continue processing even if an error occurs, so ignore the error.
  * @author FreeGen
  */
 public class KvsCacheRedisDelegator extends AbstractKvsRedisDelegator {
@@ -36,7 +38,7 @@ public class KvsCacheRedisDelegator extends AbstractKvsRedisDelegator {
     //                                                                          Definition
     //                                                                          ==========
     /** Slf4jのロガー。 */
-    private static final Logger LOG = LoggerFactory.getLogger(KvsCacheConverterHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KvsCacheRedisDelegator.class);
 
     // ===================================================================================
     //                                                                                Get

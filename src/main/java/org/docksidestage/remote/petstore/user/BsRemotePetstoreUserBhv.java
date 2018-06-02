@@ -55,7 +55,7 @@ public abstract class BsRemotePetstoreUserBhv extends AbstractRemotePetstoreBhv 
      * @param paramLambda The callback for RemoteUserParam. (NotNull)
      */
     public void request(Consumer<RemoteUserParam> paramLambda) {
-        request(paramLambda, rule -> {});
+        doRequest(paramLambda, rule -> {});
     }
 
     /**
@@ -67,7 +67,7 @@ public abstract class BsRemotePetstoreUserBhv extends AbstractRemotePetstoreBhv 
      * @param paramLambda The callback for RemoteUserParam. (NotNull)
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      */
-    protected void request(Consumer<RemoteUserParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected void doRequest(Consumer<RemoteUserParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         RemoteUserParam param = new RemoteUserParam();
         paramLambda.accept(param);
         doRequestPost(void.class, "/user", noMoreUrl(), param, rule -> {
@@ -92,7 +92,7 @@ public abstract class BsRemotePetstoreUserBhv extends AbstractRemotePetstoreBhv 
      * @param paramLambda The callback for java.util.List<RemoteUserCreatewitharrayParam>. (NotNull)
      */
     public void requestCreatewitharray(Consumer<java.util.List<RemoteUserCreatewitharrayParam>> paramLambda) {
-        requestCreatewitharray(paramLambda, rule -> {});
+        doRequestCreatewitharray(paramLambda, rule -> {});
     }
 
     /**
@@ -104,7 +104,7 @@ public abstract class BsRemotePetstoreUserBhv extends AbstractRemotePetstoreBhv 
      * @param paramLambda The callback for java.util.List<RemoteUserCreatewitharrayParam>. (NotNull)
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      */
-    protected void requestCreatewitharray(Consumer<java.util.List<RemoteUserCreatewitharrayParam>> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected void doRequestCreatewitharray(Consumer<java.util.List<RemoteUserCreatewitharrayParam>> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         java.util.List<RemoteUserCreatewitharrayParam> param = new java.util.ArrayList<RemoteUserCreatewitharrayParam>();
         paramLambda.accept(param);
         doRequestPost(void.class, "/user/createWithArray", noMoreUrl(), param, rule -> {
@@ -129,7 +129,7 @@ public abstract class BsRemotePetstoreUserBhv extends AbstractRemotePetstoreBhv 
      * @param paramLambda The callback for java.util.List<RemoteUserCreatewithlistParam>. (NotNull)
      */
     public void requestCreatewithlist(Consumer<java.util.List<RemoteUserCreatewithlistParam>> paramLambda) {
-        requestCreatewithlist(paramLambda, rule -> {});
+        doRequestCreatewithlist(paramLambda, rule -> {});
     }
 
     /**
@@ -141,7 +141,7 @@ public abstract class BsRemotePetstoreUserBhv extends AbstractRemotePetstoreBhv 
      * @param paramLambda The callback for java.util.List<RemoteUserCreatewithlistParam>. (NotNull)
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      */
-    protected void requestCreatewithlist(Consumer<java.util.List<RemoteUserCreatewithlistParam>> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected void doRequestCreatewithlist(Consumer<java.util.List<RemoteUserCreatewithlistParam>> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         java.util.List<RemoteUserCreatewithlistParam> param = new java.util.ArrayList<RemoteUserCreatewithlistParam>();
         paramLambda.accept(param);
         doRequestPost(void.class, "/user/createWithList", noMoreUrl(), param, rule -> {
@@ -167,7 +167,7 @@ public abstract class BsRemotePetstoreUserBhv extends AbstractRemotePetstoreBhv 
      * @return The bean object as return type, receiving response body. (NotNull)
      */
     public String requestLogin(Consumer<RemoteUserLoginParam> paramLambda) {
-        return requestLogin(paramLambda, rule -> {});
+        return doRequestLogin(paramLambda, rule -> {});
     }
 
     /**
@@ -180,7 +180,7 @@ public abstract class BsRemotePetstoreUserBhv extends AbstractRemotePetstoreBhv 
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      * @return The bean object as return type, receiving response body. (NotNull)
      */
-    protected String requestLogin(Consumer<RemoteUserLoginParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected String doRequestLogin(Consumer<RemoteUserLoginParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         RemoteUserLoginParam param = new RemoteUserLoginParam();
         paramLambda.accept(param);
         return doRequestGet(String.class, "/user/login", noMoreUrl(), query(param), rule -> {
@@ -204,7 +204,7 @@ public abstract class BsRemotePetstoreUserBhv extends AbstractRemotePetstoreBhv 
      * </pre>
      */
     public void requestLogout() {
-        requestLogout(rule -> {});
+        doRequestLogout(rule -> {});
     }
 
     /**
@@ -215,7 +215,7 @@ public abstract class BsRemotePetstoreUserBhv extends AbstractRemotePetstoreBhv 
      * </pre>
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      */
-    protected void requestLogout(Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected void doRequestLogout(Consumer<FlutyRemoteApiRule> ruleLambda) {
         doRequestGet(void.class, "/user/logout", noMoreUrl(), noQuery(), rule -> {
             ruleOfLogout(rule);
             ruleLambda.accept(rule);
@@ -239,7 +239,7 @@ public abstract class BsRemotePetstoreUserBhv extends AbstractRemotePetstoreBhv 
      * @return The bean object as return type, receiving response body. (NotNull)
      */
     public RemoteUserGetReturn requestGet(String username) {
-        return requestGet(username, rule -> {});
+        return doRequestGet(username, rule -> {});
     }
 
     /**
@@ -252,7 +252,7 @@ public abstract class BsRemotePetstoreUserBhv extends AbstractRemotePetstoreBhv 
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      * @return The bean object as return type, receiving response body. (NotNull)
      */
-    protected RemoteUserGetReturn requestGet(String username, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected RemoteUserGetReturn doRequestGet(String username, Consumer<FlutyRemoteApiRule> ruleLambda) {
         return doRequestGet(RemoteUserGetReturn.class, "/user/{username}", moreUrl(username), noQuery(), rule -> {
             ruleOfGetUsername(rule);
             ruleLambda.accept(rule);
@@ -276,7 +276,7 @@ public abstract class BsRemotePetstoreUserBhv extends AbstractRemotePetstoreBhv 
      * @param paramLambda The callback for RemoteUserPutParam. (NotNull)
      */
     public void requestPut(String username, Consumer<RemoteUserPutParam> paramLambda) {
-        requestPut(username, paramLambda, rule -> {});
+        doRequestPut(username, paramLambda, rule -> {});
     }
 
     /**
@@ -289,7 +289,7 @@ public abstract class BsRemotePetstoreUserBhv extends AbstractRemotePetstoreBhv 
      * @param paramLambda The callback for RemoteUserPutParam. (NotNull)
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      */
-    protected void requestPut(String username, Consumer<RemoteUserPutParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected void doRequestPut(String username, Consumer<RemoteUserPutParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         RemoteUserPutParam param = new RemoteUserPutParam();
         paramLambda.accept(param);
         doRequestPut(void.class, "/user/{username}", moreUrl(username), param, rule -> {
@@ -314,7 +314,7 @@ public abstract class BsRemotePetstoreUserBhv extends AbstractRemotePetstoreBhv 
      * @param username The value of path variable for username. (The name that needs to be deleted) (NotNull)
      */
     public void requestDelete(String username) {
-        requestDelete(username, rule -> {});
+        doRequestDelete(username, rule -> {});
     }
 
     /**
@@ -326,7 +326,7 @@ public abstract class BsRemotePetstoreUserBhv extends AbstractRemotePetstoreBhv 
      * @param username The value of path variable for username. (The name that needs to be deleted) (NotNull)
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      */
-    protected void requestDelete(String username, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected void doRequestDelete(String username, Consumer<FlutyRemoteApiRule> ruleLambda) {
         doRequestDelete(void.class, "/user/{username}", moreUrl(username), noQuery(), rule -> {
             ruleOfDeleteUsername(rule);
             ruleLambda.accept(rule);

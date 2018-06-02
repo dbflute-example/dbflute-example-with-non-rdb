@@ -59,7 +59,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @param paramLambda The callback for RemotePetPostParam. (NotNull)
      */
     public void requestPost(Consumer<RemotePetPostParam> paramLambda) {
-        requestPost(paramLambda, rule -> {});
+        doRequestPost(paramLambda, rule -> {});
     }
 
     /**
@@ -71,7 +71,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @param paramLambda The callback for RemotePetPostParam. (NotNull)
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      */
-    protected void requestPost(Consumer<RemotePetPostParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected void doRequestPost(Consumer<RemotePetPostParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         RemotePetPostParam param = new RemotePetPostParam();
         paramLambda.accept(param);
         doRequestPost(void.class, "/pet", noMoreUrl(), param, rule -> {
@@ -96,7 +96,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @param paramLambda The callback for RemotePetPutParam. (NotNull)
      */
     public void requestPut(Consumer<RemotePetPutParam> paramLambda) {
-        requestPut(paramLambda, rule -> {});
+        doRequestPut(paramLambda, rule -> {});
     }
 
     /**
@@ -108,7 +108,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @param paramLambda The callback for RemotePetPutParam. (NotNull)
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      */
-    protected void requestPut(Consumer<RemotePetPutParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected void doRequestPut(Consumer<RemotePetPutParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         RemotePetPutParam param = new RemotePetPutParam();
         paramLambda.accept(param);
         doRequestPut(void.class, "/pet", noMoreUrl(), param, rule -> {
@@ -134,7 +134,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @return The bean object as return type, receiving response body. (NotNull)
      */
     public java.util.List<RemotePetFindbystatusReturn> requestFindbystatus(Consumer<RemotePetFindbystatusParam> paramLambda) {
-        return requestFindbystatus(paramLambda, rule -> {});
+        return doRequestFindbystatus(paramLambda, rule -> {});
     }
 
     /**
@@ -147,7 +147,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      * @return The bean object as return type, receiving response body. (NotNull)
      */
-    protected java.util.List<RemotePetFindbystatusReturn> requestFindbystatus(Consumer<RemotePetFindbystatusParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected java.util.List<RemotePetFindbystatusReturn> doRequestFindbystatus(Consumer<RemotePetFindbystatusParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         RemotePetFindbystatusParam param = new RemotePetFindbystatusParam();
         paramLambda.accept(param);
         return doRequestGet(new org.lastaflute.di.helper.misc.ParameterizedRef<java.util.List<RemotePetFindbystatusReturn>>() {
@@ -174,7 +174,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @return The bean object as return type, receiving response body. (NotNull)
      */
     public java.util.List<RemotePetFindbytagsReturn> requestFindbytags(Consumer<RemotePetFindbytagsParam> paramLambda) {
-        return requestFindbytags(paramLambda, rule -> {});
+        return doRequestFindbytags(paramLambda, rule -> {});
     }
 
     /**
@@ -187,7 +187,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      * @return The bean object as return type, receiving response body. (NotNull)
      */
-    protected java.util.List<RemotePetFindbytagsReturn> requestFindbytags(Consumer<RemotePetFindbytagsParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected java.util.List<RemotePetFindbytagsReturn> doRequestFindbytags(Consumer<RemotePetFindbytagsParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         RemotePetFindbytagsParam param = new RemotePetFindbytagsParam();
         paramLambda.accept(param);
         return doRequestGet(new org.lastaflute.di.helper.misc.ParameterizedRef<java.util.List<RemotePetFindbytagsReturn>>() {
@@ -214,7 +214,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @return The bean object as return type, receiving response body. (NotNull)
      */
     public RemotePetGetReturn requestGet(Long petId) {
-        return requestGet(petId, rule -> {});
+        return doRequestGet(petId, rule -> {});
     }
 
     /**
@@ -227,7 +227,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      * @return The bean object as return type, receiving response body. (NotNull)
      */
-    protected RemotePetGetReturn requestGet(Long petId, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected RemotePetGetReturn doRequestGet(Long petId, Consumer<FlutyRemoteApiRule> ruleLambda) {
         return doRequestGet(RemotePetGetReturn.class, "/pet/{petId}", moreUrl(petId), noQuery(), rule -> {
             ruleOfGetPetId(rule);
             ruleLambda.accept(rule);
@@ -251,7 +251,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @param paramLambda The callback for RemotePetPetidPostParam. (NotNull)
      */
     public void requestPost(Long petId, Consumer<RemotePetPetidPostParam> paramLambda) {
-        requestPost(petId, paramLambda, rule -> {});
+        doRequestPost(petId, paramLambda, rule -> {});
     }
 
     /**
@@ -264,7 +264,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @param paramLambda The callback for RemotePetPetidPostParam. (NotNull)
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      */
-    protected void requestPost(Long petId, Consumer<RemotePetPetidPostParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected void doRequestPost(Long petId, Consumer<RemotePetPetidPostParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         RemotePetPetidPostParam param = new RemotePetPetidPostParam();
         paramLambda.accept(param);
         doRequestPost(void.class, "/pet/{petId}", moreUrl(petId), param, rule -> {
@@ -291,7 +291,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @param petId The value of path variable for petId. (Pet id to delete) (NotNull)
      */
     public void requestDelete(Long petId) {
-        requestDelete(petId, rule -> {});
+        doRequestDelete(petId, rule -> {});
     }
 
     /**
@@ -303,7 +303,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @param petId The value of path variable for petId. (Pet id to delete) (NotNull)
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      */
-    protected void requestDelete(Long petId, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected void doRequestDelete(Long petId, Consumer<FlutyRemoteApiRule> ruleLambda) {
         doRequestDelete(void.class, "/pet/{petId}", moreUrl(petId), noQuery(), rule -> {
             ruleOfDeletePetId(rule);
             ruleLambda.accept(rule);
@@ -328,7 +328,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @return The bean object as return type, receiving response body. (NotNull)
      */
     public RemotePetUploadimageReturn requestUploadimage(Long petId, Consumer<RemotePetUploadimageParam> paramLambda) {
-        return requestUploadimage(petId, paramLambda, rule -> {});
+        return doRequestUploadimage(petId, paramLambda, rule -> {});
     }
 
     /**
@@ -342,7 +342,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      * @return The bean object as return type, receiving response body. (NotNull)
      */
-    protected RemotePetUploadimageReturn requestUploadimage(Long petId, Consumer<RemotePetUploadimageParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected RemotePetUploadimageReturn doRequestUploadimage(Long petId, Consumer<RemotePetUploadimageParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         RemotePetUploadimageParam param = new RemotePetUploadimageParam();
         paramLambda.accept(param);
         return doRequestPost(RemotePetUploadimageReturn.class, "/pet/{petId}/uploadImage", moreUrl(petId), param, rule -> {

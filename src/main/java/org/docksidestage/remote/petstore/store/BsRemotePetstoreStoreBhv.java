@@ -52,7 +52,7 @@ public abstract class BsRemotePetstoreStoreBhv extends AbstractRemotePetstoreBhv
      * @return The bean object as return type, receiving response body. (NotNull)
      */
     public Object requestInventory() {
-        return requestInventory(rule -> {});
+        return doRequestInventory(rule -> {});
     }
 
     /**
@@ -64,7 +64,7 @@ public abstract class BsRemotePetstoreStoreBhv extends AbstractRemotePetstoreBhv
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      * @return The bean object as return type, receiving response body. (NotNull)
      */
-    protected Object requestInventory(Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected Object doRequestInventory(Consumer<FlutyRemoteApiRule> ruleLambda) {
         return doRequestGet(Object.class, "/store/inventory", noMoreUrl(), noQuery(), rule -> {
             ruleOfInventory(rule);
             ruleLambda.accept(rule);
@@ -88,7 +88,7 @@ public abstract class BsRemotePetstoreStoreBhv extends AbstractRemotePetstoreBhv
      * @return The bean object as return type, receiving response body. (NotNull)
      */
     public RemoteStoreOrderReturn requestOrder(Consumer<RemoteStoreOrderParam> paramLambda) {
-        return requestOrder(paramLambda, rule -> {});
+        return doRequestOrder(paramLambda, rule -> {});
     }
 
     /**
@@ -101,7 +101,7 @@ public abstract class BsRemotePetstoreStoreBhv extends AbstractRemotePetstoreBhv
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      * @return The bean object as return type, receiving response body. (NotNull)
      */
-    protected RemoteStoreOrderReturn requestOrder(Consumer<RemoteStoreOrderParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected RemoteStoreOrderReturn doRequestOrder(Consumer<RemoteStoreOrderParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         RemoteStoreOrderParam param = new RemoteStoreOrderParam();
         paramLambda.accept(param);
         return doRequestPost(RemoteStoreOrderReturn.class, "/store/order", noMoreUrl(), param, rule -> {
@@ -127,7 +127,7 @@ public abstract class BsRemotePetstoreStoreBhv extends AbstractRemotePetstoreBhv
      * @return The bean object as return type, receiving response body. (NotNull)
      */
     public RemoteStoreOrderGetReturn requestOrderGet(Long orderId) {
-        return requestOrderGet(orderId, rule -> {});
+        return doRequestOrderGet(orderId, rule -> {});
     }
 
     /**
@@ -140,7 +140,7 @@ public abstract class BsRemotePetstoreStoreBhv extends AbstractRemotePetstoreBhv
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      * @return The bean object as return type, receiving response body. (NotNull)
      */
-    protected RemoteStoreOrderGetReturn requestOrderGet(Long orderId, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected RemoteStoreOrderGetReturn doRequestOrderGet(Long orderId, Consumer<FlutyRemoteApiRule> ruleLambda) {
         return doRequestGet(RemoteStoreOrderGetReturn.class, "/store/order/{orderId}", moreUrl(orderId), noQuery(), rule -> {
             ruleOfOrderGetOrderId(rule);
             ruleLambda.accept(rule);
@@ -163,7 +163,7 @@ public abstract class BsRemotePetstoreStoreBhv extends AbstractRemotePetstoreBhv
      * @param orderId The value of path variable for orderId. (ID of the order that needs to be deleted) (NotNull)
      */
     public void requestOrderDelete(Long orderId) {
-        requestOrderDelete(orderId, rule -> {});
+        doRequestOrderDelete(orderId, rule -> {});
     }
 
     /**
@@ -175,7 +175,7 @@ public abstract class BsRemotePetstoreStoreBhv extends AbstractRemotePetstoreBhv
      * @param orderId The value of path variable for orderId. (ID of the order that needs to be deleted) (NotNull)
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      */
-    protected void requestOrderDelete(Long orderId, Consumer<FlutyRemoteApiRule> ruleLambda) {
+    protected void doRequestOrderDelete(Long orderId, Consumer<FlutyRemoteApiRule> ruleLambda) {
         doRequestDelete(void.class, "/store/order/{orderId}", moreUrl(orderId), noQuery(), rule -> {
             ruleOfOrderDeleteOrderId(rule);
             ruleLambda.accept(rule);
