@@ -1,4 +1,5 @@
 $manager.info("requestList: ${requestList.size()}")
+#parse("./c7a/ControlFreeGenC7aJava.vm")
 #parse("./kvs/ControlFreeGenKvsJava.vm")
 #parse("./solr/ControlFreeGenSolrJava.vm")
 #parse("./remoteapi/ControlFreeGenRemoteApiJava.vm")

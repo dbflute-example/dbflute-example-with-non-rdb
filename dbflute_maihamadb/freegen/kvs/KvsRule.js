@@ -16,6 +16,18 @@ var baseRule = {
         return ['java', 'javax', 'junit', 'org', 'com', 'net', 'ognl', 'mockit', 'jp'];
     },
 
+    /**
+     * Return java import order list.
+     * @return java import order list. (NotNull)
+     */
+    converterHandler: function() {
+        // MapListString Instantiate everytime because of the statefulness of...
+        return {
+            'toMapString': 'new org.dbflute.helper.dfmap.DfMapStyle().toMapString(map)',
+            'fromMapString': 'new org.dbflute.helper.dfmap.DfMapStyle().fromMapString(mapString)'
+        };
+    },
+
     // ===================================================================================
     //                                                                                 Doc
     //                                                                                 ===

@@ -1,0 +1,518 @@
+##
+## Copyright 2014-2018 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${manager.allClassCopyright}package org.dbflute.c7a.bhv;
+
+import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+import org.dbflute.bhv.exception.BehaviorExceptionThrower;
+import org.dbflute.c7a.cbean.C7aConditionBean;
+import org.dbflute.c7a.entity.C7aEntity;
+import org.dbflute.c7a.entity.C7aPagingResultBean;
+import org.dbflute.c7a.entity.dbmeta.C7aDBMeta;
+import org.dbflute.exception.EntityAlreadyExistsException;
+import org.dbflute.exception.EntityAlreadyUpdatedException;
+import org.dbflute.helper.beans.DfBeanDesc;
+import org.dbflute.helper.beans.factory.DfBeanDescFactory;
+import org.dbflute.optional.OptionalEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.datastax.driver.core.ConsistencyLevel;
+import com.datastax.driver.core.PagingState;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Statement;
+import com.datastax.driver.core.querybuilder.Delete;
+import com.datastax.driver.core.querybuilder.Insert;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.datastax.driver.core.querybuilder.Update;
+import com.datastax.driver.mapping.Mapper;
+import com.datastax.driver.mapping.Result;
+import com.datastax.driver.mapping.annotations.ClusteringColumn;
+import com.datastax.driver.mapping.annotations.Column;
+import com.datastax.driver.mapping.annotations.PartitionKey;
+import com.google.common.collect.Lists;
+
+/**
+ * @author FreeGen
+ */
+public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB extends C7aConditionBean> {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Logger logger = LoggerFactory.getLogger(AbstractC7aBehaviorWritable.class);
+
+    protected abstract String getKeyspace();
+
+    protected abstract CB newConditionBean();
+
+    protected abstract Class<ENTITY> typeOfSelectedEntity();
+
+    protected abstract <R> R execute(Function<Mapper<ENTITY>, R> mapperLambda);
+
+    protected abstract void handleCommonColumnOfInsertIfNeeds(C7aEntity targetEntity);
+
+    protected abstract void handleCommonColumnOfUpdateIfNeeds(C7aEntity targetEntity);
+
+    protected void filterEntityOfInsert(ENTITY entity) {
+
+    }
+
+    protected void filterEntityOfUpdate(ENTITY entity) {
+
+    }
+
+    // ===================================================================================
+    //                                                                        Count Select
+    //                                                                        ============
+    public int selectCount(Consumer<CB> cbLambda) {
+        CB cb = newConditionBean();
+        cbLambda.accept(cb);
+        Statement selectCount = cb.buildSelectCount();
+        logger.debug("#c7a cql={}", selectCount.toString());
+        int count = execute(mapper -> {
+            ResultSet resultSet = mapper.getManager().getSession().execute(selectCount);
+            Row row = resultSet.one();
+            return row == null ? 0 : (int) row.getLong(0);
+        });
+        return count;
+    }
+
+    // ===================================================================================
+    //                                                                       Entity Select
+    //                                                                       =============
+    public OptionalEntity<ENTITY> selectEntity(Consumer<CB> cbLambda) {
+        CB cb = newConditionBean();
+        cbLambda.accept(cb);
+        Statement statement = cb.buildSelect();
+        logger.debug("#c7a cql={}", statement.toString());
+        Result<ENTITY> result = execute(mapper -> {
+            ResultSet resultSet = mapper.getManager().getSession().execute(statement);
+            return mapper.map(resultSet);
+        });
+
+        Iterator<ENTITY> iterator = result.iterator();
+        if (!iterator.hasNext()) {
+            return OptionalEntity.ofNullable(null, () -> {
+                createBehaviorExceptionThrower().throwSelectEntityAlreadyDeletedException(statement);
+            });
+        }
+        ENTITY entity = iterator.next();
+        if (iterator.hasNext()) {
+            createBehaviorExceptionThrower().throwSelectEntityDuplicatedException("1 < resultCount", statement, null);
+        }
+        return OptionalEntity.of(entity);
+    }
+
+    // ===================================================================================
+    //                                                                         List Select
+    //                                                                         ===========
+    // TODO #c7a pri.C selectList、selectPageのときにpage系の設定のアサートをする。 by p1us2er0 (2018/06/14)
+    public List<ENTITY> selectList(Consumer<CB> cbLambda) {
+        CB cb = newConditionBean();
+        cbLambda.accept(cb);
+        Statement statement = cb.buildSelect();
+
+        logger.debug("#c7a cql={}", statement.toString());
+        List<ENTITY> entityList = execute(mapper -> {
+            ResultSet resultSet = mapper.getManager().getSession().execute(statement);
+            return Lists.newArrayList(mapper.map(resultSet));
+        });
+        return entityList;
+    }
+
+    // ===================================================================================
+    //                                                                         Page Select
+    //                                                                         ===========
+    public C7aPagingResultBean<ENTITY> selectPage(Consumer<CB> cbLambda) {
+        CB cb = newConditionBean();
+        cbLambda.accept(cb);
+        Statement select = cb.buildSelect();
+        logger.debug("#c7a cql={}", select.toString());
+        C7aPagingResultBean<ENTITY> pagingResultBean = execute(mapper -> {
+            ResultSet resultSet = mapper.getManager().getSession().execute(select);
+            Result<ENTITY> result = mapper.map(resultSet);
+            PagingState nextPage = result.getExecutionInfo().getPagingState();
+            int remaining = result.getAvailableWithoutFetching();
+            // result.all () ignores the fetch size internally and gets all the results. by p1us2er0 (2018/07/31)
+            Iterator<ENTITY> iterator = result.iterator();
+            List<ENTITY> list = Lists.newArrayList();
+            while (iterator.hasNext() && remaining != 0) {
+                ENTITY entity = iterator.next();
+                list.add(entity);
+                remaining--;
+            }
+            // TODO set allRecordCount、pageSize、currentPageNumber by p1us2er0 (2018/08/01)
+            C7aPagingResultBean<ENTITY> bean = new C7aPagingResultBean<ENTITY>();
+            bean.setSelectedList(list);
+            if (nextPage != null) {
+                bean.setPagingState(nextPage.toString());
+            }
+            return bean;
+        });
+
+        pagingResultBean.setTableDbName(cb.asTableDbName());
+        pagingResultBean.setPageSize(cb.getFetchSize());
+        if (cb.canPagingCount()) {
+            int allRecordCount = selectCount(cbLambda);
+            pagingResultBean.setAllRecordCount(allRecordCount);
+        }
+
+        return pagingResultBean;
+    }
+
+    public void insert(ENTITY entity) {
+        varyingInsert(entity, op -> {});
+    }
+
+    public void varyingInsert(ENTITY entity, Consumer<InsertOption> op) {
+        doInsert(entity, op);
+    }
+
+    protected void doInsert(ENTITY entity, Consumer<InsertOption> op) {
+        Insert insert = QueryBuilder.insertInto(entity.asTableDbName());
+
+        handleCommonColumnOfInsertIfNeeds(entity);
+        filterEntityOfInsert(entity);
+
+        DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(entity.getClass());
+        beanDesc.getProppertyNameList().stream().map(proppertyName -> beanDesc.getPropertyDesc(proppertyName)).forEach(propertyDesc -> {
+            Column column = propertyDesc.getField().getAnnotation(Column.class);
+            Object value = propertyDesc.getValue(entity);
+            if (column != null && entity.mymodifiedProperties().contains(propertyDesc.getPropertyName())) {
+                insert.value(column.name(), value);
+            }
+        });
+
+        insert.ifNotExists();
+        InsertOption option = new InsertOption();
+        op.accept(option);
+        option.getTtl().ifPresent(ttl -> insert.using(QueryBuilder.ttl(ttl)));
+        option.getTimestamp().ifPresent(timestamp -> insert.using(QueryBuilder.timestamp(timestamp)));
+        option.getConsistencyLevel().ifPresent(consistencyLevel -> insert.setConsistencyLevel(consistencyLevel));
+        logger.debug("#c7a cql={}", insert.getQueryString());
+        ResultSet resultSet = execute(mapper -> mapper.getManager().getSession().execute(insert));
+        Row one = resultSet.one();
+        if (one != null && !one.getBool(0)) {
+            throw new EntityAlreadyExistsException(one.toString(), new SQLException(one.toString()));
+        }
+    }
+
+    public void update(ENTITY entity) {
+        varyingUpdate(entity, op -> {});
+    }
+
+    public void updateNonstrict(ENTITY entity) {
+        varyingUpdateNonstrict(entity, op -> {});
+    }
+
+    public void varyingUpdate(ENTITY entity, Consumer<UpdateOption> op) {
+        doUpdate(entity, op, false);
+    }
+
+    public void varyingUpdateNonstrict(ENTITY entity, Consumer<UpdateOption> op) {
+        doUpdate(entity, op, true);
+    }
+
+    protected void doUpdate(ENTITY entity, Consumer<UpdateOption> op, boolean nonStrict) {
+        Update update = QueryBuilder.update(entity.asTableDbName());
+        DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(entity.getClass());
+        C7aDBMeta dbMeta = entity.asDBMeta();
+        if (!nonStrict && dbMeta.hasVersionNo()) {
+            beanDesc.getProppertyNameList().stream().map(proppertyName -> beanDesc.getPropertyDesc(proppertyName)).forEach(propertyDesc -> {
+                Column column = propertyDesc.getField().getAnnotation(Column.class);
+                if (column != null && column.name().equalsIgnoreCase(dbMeta.getVersionNoColumnName())) {
+                    update.onlyIf().and(QueryBuilder.eq(dbMeta.getVersionNoColumnName(), propertyDesc.getValue(entity)));
+                }
+            });
+        }
+        if (!update.onlyIf().hasValues()) {
+            update.where().ifExists();
+        }
+
+        handleCommonColumnOfUpdateIfNeeds(entity);
+        filterEntityOfUpdate(entity);
+
+        beanDesc.getProppertyNameList().stream().map(proppertyName -> beanDesc.getPropertyDesc(proppertyName)).forEach(propertyDesc -> {
+            PartitionKey partitionKey = propertyDesc.getField().getAnnotation(PartitionKey.class);
+            ClusteringColumn clusteringColumn = propertyDesc.getField().getAnnotation(ClusteringColumn.class);
+            Column column = propertyDesc.getField().getAnnotation(Column.class);
+            Object value = propertyDesc.getValue(entity);
+            if (partitionKey != null || clusteringColumn != null) {
+                update.where().and(QueryBuilder.eq(column.name(), value));
+            } else if (column != null && entity.mymodifiedProperties().contains(propertyDesc.getPropertyName())) {
+                update.with().and(QueryBuilder.set(column.name(), value));
+            }
+        });
+
+        UpdateOption option = new UpdateOption();
+        op.accept(option);
+        option.getTtl().ifPresent(ttl -> update.using(QueryBuilder.ttl(ttl)));
+        option.getTimestamp().ifPresent(timestamp -> update.using(QueryBuilder.timestamp(timestamp)));
+        option.getConsistencyLevel().ifPresent(consistencyLevel -> update.setConsistencyLevel(consistencyLevel));
+        logger.debug("#c7a cql={}", update.getQueryString());
+        ResultSet resultSet = execute(mapper -> mapper.getManager().getSession().execute(update));
+        Row one = resultSet.one();
+        if (one != null && !one.getBool(0)) {
+            throw new EntityAlreadyUpdatedException(one.toString(), 1);
+        }
+    }
+
+    public void insertOrUpdate(ENTITY entity) {
+        varyingInsertOrUpdate(entity, op -> {});
+    }
+
+    public void varyingInsertOrUpdate(ENTITY entity, Consumer<InsertOrUpdateOption> op) {
+        doInsertOrUpdate(entity, op);
+    }
+
+    protected void doInsertOrUpdate(ENTITY entity, Consumer<InsertOrUpdateOption> op) {
+        Insert insert = QueryBuilder.insertInto(entity.asTableDbName());
+
+        handleCommonColumnOfInsertIfNeeds(entity);
+        filterEntityOfInsert(entity);
+
+        DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(entity.getClass());
+        beanDesc.getProppertyNameList().stream().map(proppertyName -> beanDesc.getPropertyDesc(proppertyName)).forEach(propertyDesc -> {
+            Column column = propertyDesc.getField().getAnnotation(Column.class);
+            Object value = propertyDesc.getValue(entity);
+            if (column != null && entity.mymodifiedProperties().contains(propertyDesc.getPropertyName())) {
+                insert.value(column.name(), value);
+            }
+        });
+
+        InsertOrUpdateOption option = new InsertOrUpdateOption();
+        op.accept(option);
+        option.getTtl().ifPresent(ttl -> insert.using(QueryBuilder.ttl(ttl)));
+        option.getTimestamp().ifPresent(timestamp -> insert.using(QueryBuilder.timestamp(timestamp)));
+        option.getConsistencyLevel().ifPresent(consistencyLevel -> insert.setConsistencyLevel(consistencyLevel));
+        logger.debug("#c7a cql={}", insert.getQueryString());
+        ResultSet resultSet = execute(mapper -> mapper.getManager().getSession().execute(insert));
+        Row one = resultSet.one();
+        if (one != null && !one.getBool(0)) {
+            throw new EntityAlreadyExistsException(one.toString(), new SQLException(one.toString()));
+        }
+    }
+
+    public void delete(ENTITY entity) {
+        varyingDelete(entity, op -> {});
+    }
+
+    public void deleteNonstrict(ENTITY entity) {
+        varyingDeleteNonstrict(entity, op -> {});
+    }
+
+    public void varyingDelete(ENTITY entity, Consumer<DeleteOption> op) {
+        doDelete(entity, op, false);
+    }
+
+    public void varyingDeleteNonstrict(ENTITY entity, Consumer<DeleteOption> op) {
+        doDelete(entity, op, true);
+    }
+
+    protected void doDelete(ENTITY entity, Consumer<DeleteOption> op, boolean nonStrict) {
+        Delete delete = QueryBuilder.delete().all().from(entity.asTableDbName());
+        DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(entity.getClass());
+        C7aDBMeta dbMeta = entity.asDBMeta();
+        if (!nonStrict && dbMeta.hasVersionNo()) {
+            beanDesc.getProppertyNameList().stream().map(proppertyName -> beanDesc.getPropertyDesc(proppertyName)).forEach(propertyDesc -> {
+                Column column = propertyDesc.getField().getAnnotation(Column.class);
+                if (column != null && column.name().equals(dbMeta.getVersionNoColumnName())) {
+                    delete.onlyIf().and(QueryBuilder.eq(dbMeta.getVersionNoColumnName(), propertyDesc.getValue(entity)));
+                }
+            });
+        }
+        if (!delete.onlyIf().hasValues()) {
+            delete.where().ifExists();
+        }
+
+        beanDesc.getProppertyNameList().stream().map(proppertyName -> beanDesc.getPropertyDesc(proppertyName)).forEach(propertyDesc -> {
+            PartitionKey partitionKey = propertyDesc.getField().getAnnotation(PartitionKey.class);
+            ClusteringColumn clusteringColumn = propertyDesc.getField().getAnnotation(ClusteringColumn.class);
+            Column column = propertyDesc.getField().getAnnotation(Column.class);
+            Object value = propertyDesc.getValue(entity);
+            if (partitionKey != null || clusteringColumn != null) {
+                delete.where().and(QueryBuilder.eq(column.name(), value));
+            }
+        });
+
+        DeleteOption option = new DeleteOption();
+        op.accept(option);
+        option.getTimestamp().ifPresent(timestamp -> delete.using(QueryBuilder.timestamp(timestamp)));
+        option.getConsistencyLevel().ifPresent(consistencyLevel -> delete.setConsistencyLevel(consistencyLevel));
+
+        logger.debug("#c7a cql={}", delete.getQueryString());
+        ResultSet resultSet = execute(mapper -> mapper.getManager().getSession().execute(delete));
+        Row one = resultSet.one();
+        if (one != null && !one.getBool(0)) {
+            //throw new EntityAlreadyDeletedException(one.toString());
+            throw new EntityAlreadyUpdatedException(one.toString(), 1);
+        }
+    }
+
+    protected BehaviorExceptionThrower createBehaviorExceptionThrower() {
+        return new BehaviorExceptionThrower();
+    }
+
+    public class InsertOption {
+        protected Integer _ttl;
+        protected Long _timestamp;
+        protected ConsistencyLevel _consistencyLevel;
+
+        public InsertOption setTtl(Integer ttl) {
+            _ttl = ttl;
+            return this;
+        }
+
+        public OptionalEntity<Integer> getTtl() {
+            return OptionalEntity.ofNullable(_ttl, () -> {
+                throw new IllegalStateException("ttl is not set.");
+            });
+        }
+
+        public InsertOption setTimestamp(Long timestamp) {
+            _timestamp = timestamp;
+            return this;
+        }
+
+        public OptionalEntity<Long> getTimestamp() {
+            return OptionalEntity.ofNullable(_timestamp, () -> {
+                throw new IllegalStateException("timestamp is not set.");
+            });
+        }
+
+        public InsertOption setConsistencyLevel(ConsistencyLevel consistencyLevel) {
+            _consistencyLevel = consistencyLevel;
+            return this;
+        }
+
+        public OptionalEntity<ConsistencyLevel> getConsistencyLevel() {
+            return OptionalEntity.ofNullable(_consistencyLevel, () -> {
+                throw new IllegalStateException("consistencyLevel is not set.");
+            });
+        }
+    }
+
+    public class UpdateOption {
+        protected Integer _ttl;
+        protected Long _timestamp;
+        protected ConsistencyLevel _consistencyLevel;
+
+        public UpdateOption setTtl(Integer ttl) {
+            _ttl = ttl;
+            return this;
+        }
+
+        public OptionalEntity<Integer> getTtl() {
+            return OptionalEntity.ofNullable(_ttl, () -> {
+                throw new IllegalStateException("ttl is not set.");
+            });
+        }
+
+        public UpdateOption setTimestamp(Long timestamp) {
+            _timestamp = timestamp;
+            return this;
+        }
+
+        public OptionalEntity<Long> getTimestamp() {
+            return OptionalEntity.ofNullable(_timestamp, () -> {
+                throw new IllegalStateException("timestamp is not set.");
+            });
+        }
+
+        public UpdateOption setConsistencyLevel(ConsistencyLevel consistencyLevel) {
+            _consistencyLevel = consistencyLevel;
+            return this;
+        }
+
+        public OptionalEntity<ConsistencyLevel> getConsistencyLevel() {
+            return OptionalEntity.ofNullable(_consistencyLevel, () -> {
+                throw new IllegalStateException("consistencyLevel is not set.");
+            });
+        }
+    }
+
+    public class InsertOrUpdateOption {
+        protected Integer _ttl;
+        protected Long _timestamp;
+        protected ConsistencyLevel _consistencyLevel;
+
+        public InsertOrUpdateOption setTtl(Integer ttl) {
+            _ttl = ttl;
+            return this;
+        }
+
+        public OptionalEntity<Integer> getTtl() {
+            return OptionalEntity.ofNullable(_ttl, () -> {
+                throw new IllegalStateException("ttl is not set.");
+            });
+        }
+
+        public InsertOrUpdateOption setTimestamp(Long timestamp) {
+            _timestamp = timestamp;
+            return this;
+        }
+
+        public OptionalEntity<Long> getTimestamp() {
+            return OptionalEntity.ofNullable(_timestamp, () -> {
+                throw new IllegalStateException("timestamp is not set.");
+            });
+        }
+
+        public InsertOrUpdateOption setConsistencyLevel(ConsistencyLevel consistencyLevel) {
+            _consistencyLevel = consistencyLevel;
+            return this;
+        }
+
+        public OptionalEntity<ConsistencyLevel> getConsistencyLevel() {
+            return OptionalEntity.ofNullable(_consistencyLevel, () -> {
+                throw new IllegalStateException("consistencyLevel is not set.");
+            });
+        }
+    }
+
+    public class DeleteOption {
+        protected Long _timestamp;
+        protected ConsistencyLevel _consistencyLevel;
+
+        public DeleteOption setTimestamp(Long timestamp) {
+            _timestamp = timestamp;
+            return this;
+        }
+
+        public OptionalEntity<Long> getTimestamp() {
+            return OptionalEntity.ofNullable(_timestamp, () -> {
+                throw new IllegalStateException("timestamp is not set.");
+            });
+        }
+
+        public DeleteOption setConsistencyLevel(ConsistencyLevel consistencyLevel) {
+            _consistencyLevel = consistencyLevel;
+            return this;
+        }
+
+        public OptionalEntity<ConsistencyLevel> getConsistencyLevel() {
+            return OptionalEntity.ofNullable(_consistencyLevel, () -> {
+                throw new IllegalStateException("consistencyLevel is not set.");
+            });
+        }
+    }
+}

@@ -1,0 +1,143 @@
+##
+## Copyright 2017-2018 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+#set ($rule = $scriptEngine.get('c7aRule'))
+${manager.allClassCopyright}package ${data.package};
+#set ($importList = [])
+#set($added = $importList.add('java.util.Map'))
+#set($added = $importList.add('org.dbflute.util.DfCollectionUtil'))
+#set($added = $importList.add('com.datastax.driver.core.querybuilder.QueryBuilder'))
+#set($added = $importList.add('com.datastax.driver.core.querybuilder.Select'))
+#set($added = $importList.add('com.datastax.driver.core.querybuilder.Select.Where'))
+#set($added = $importList.add("${data.exConditionQuery.package}.${data.exConditionQuery.className}"))
+#generateImports($importList, $data.package, $scriptEngine.invokeMethod($rule, 'importOrderList'))
+
+/**
+ * The conditionBean class as ${data.tableName} for c7a of ${data.c7a.schema}.
+ * @author FreeGen
+ */
+public abstract class ${data.className}#if ($data.extendsClass && $data.extendsClass != '') extends $data.extendsClass#end#if ($data.implementsClasses && $data.implementsClasses != '') implements $data.implementsClasses#end {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected ${data.exConditionQuery.className} _conditionQuery;
+
+    // ===================================================================================
+    //                                                                             DB Meta
+    //                                                                             =======
+    @Override
+    public String asTableDbName() {
+        return "${data.tableName}";
+    }
+
+    protected Map<String, String> asTableDbNameMap() {
+#set($tableDbNameMap = {})
+#set($nomal = '')
+#foreach($clustering in $data.clusteringColumnList)
+#set($velocityIndex = $velocityCount - 1)
+#set($nomal = $nomal + $clustering + ' ' + $data.clusteringOrderList[$velocityIndex].toLowerCase() + ', ')
+#end
+#set($put = $tableDbNameMap.put($nomal, $data.tableName))
+#foreach($materializedViewMeta in $data.materializedViewMetaList)
+#set($nomal = '')
+#foreach($clustering in $materializedViewMeta.clusteringColumnList)
+#set($velocityIndex = $velocityCount - 1)
+#set($nomal = $nomal + $clustering + ' ' + $materializedViewMeta.clusteringOrderList[$velocityIndex].toLowerCase() + ', ')
+#end
+#set($put = $tableDbNameMap.put($nomal, $materializedViewMeta.name))
+#end
+        Map<String, String> map = DfCollectionUtil.newLinkedHashMap();
+#foreach($entry in $tableDbNameMap.entrySet())
+        map.put("$entry.key", "$entry.value");
+        map.put("$entry.key.replaceAll(' asc, ', ' xxx, ').replaceAll(' desc, ', ' asc, ').replaceAll('xxx, ', 'desc, ')", "$entry.value");
+#end
+        return map;
+    }
+
+    // ===================================================================================
+    //                                                                               Query
+    //                                                                               =====
+    public ${data.exConditionQuery.className} query() {
+        return doGetConditionQuery();
+    }
+
+    protected ${data.exConditionQuery.className} doGetConditionQuery() {
+        if (_conditionQuery == null) {
+            _conditionQuery = new ${data.exConditionQuery.className}();
+        }
+        return _conditionQuery;
+    }
+
+#set ($partitionKeyArgsString = '')
+#foreach($partitionKey in $data.exConditionQuery.bs.partitionKeyList)
+#set ($primaryKeyVelocityHasNext = $velocityHasNext)
+#foreach($property in $data.exConditionQuery.bs.properties)
+#if($partitionKey == $property.name)
+#set ($partitionKeyArgsString = $partitionKeyArgsString + $property.fieldClass + ' ' + $property.fieldName)
+#if(${primaryKeyVelocityHasNext})
+#set ($partitionKeyArgsString = $partitionKeyArgsString + ', ')
+#end
+#end
+#end
+#end
+    public ${data.className} acceptPartitionKey($partitionKeyArgsString) {
+        ${data.className} cb = this;
+#foreach($partitionKey in $data.exConditionQuery.bs.partitionKeyList)
+#foreach($property in $data.exConditionQuery.bs.properties)
+#if($partitionKey == $property.name)
+        cb.query().set${manager.initCap($property.fieldName)}_Equal($property.fieldName);
+#end
+#end
+#end
+
+        return this;
+    }
+
+#set ($primaryKeyArgsString = '')
+#foreach($primaryKey in $data.exConditionQuery.bs.primaryKeyList)
+#set ($primaryKeyVelocityHasNext = $velocityHasNext)
+#foreach($property in $data.exConditionQuery.bs.properties)
+#if($primaryKey == $property.name)
+#set ($primaryKeyArgsString = $primaryKeyArgsString + $property.fieldClass + ' ' + $property.fieldName)
+#if(${primaryKeyVelocityHasNext})
+#set ($primaryKeyArgsString = $primaryKeyArgsString + ', ')
+#end
+#end
+#end
+#end
+    public ${data.className} acceptPK($primaryKeyArgsString) {
+        ${data.className} cb = this;
+#foreach($primaryKey in $data.exConditionQuery.bs.primaryKeyList)
+#foreach($property in $data.exConditionQuery.bs.properties)
+#if($primaryKey == $property.name)
+        cb.query().set${manager.initCap($property.fieldName)}_Equal($property.fieldName);
+#end
+#end
+#end
+
+        return this;
+    }
+
+    protected void buildWhere(Select select) {
+        Where where = select.where();
+#foreach($property in $data.exConditionQuery.bs.properties)
+#set($property.fieldName = $fieldName)
+        if (query().get${manager.initCap($property.fieldName)}_Equal() != null) {
+            where.and(QueryBuilder.eq("${property.name}", query().get${manager.initCap($property.fieldName)}_Equal()));
+        }
+#end
+    }
+}

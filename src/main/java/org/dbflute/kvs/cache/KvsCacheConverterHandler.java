@@ -25,7 +25,6 @@ import java.util.stream.IntStream;
 
 import org.dbflute.Entity;
 import org.dbflute.dbmeta.DBMeta;
-import org.dbflute.helper.mapstring.MapListString;
 import org.dbflute.util.DfCollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +49,7 @@ public class KvsCacheConverterHandler {
      * @return A String value representing MapString in KVS (NotNull)
      */
     public <ENTITY extends Entity> String toMapString(ENTITY entity) {
-        return createMapListString().buildMapString(entity.asDBMeta().extractAllColumnMap(entity));
+        return toMapString(entity.asDBMeta().extractAllColumnMap(entity));
     }
 
     /**
@@ -61,7 +60,7 @@ public class KvsCacheConverterHandler {
      */
     public <ENTITY extends Entity> List<String> toMapStringList(List<ENTITY> entityList) {
         List<String> list = entityList.stream().map(entity -> {
-            return createMapListString().buildMapString(entity.asDBMeta().extractAllColumnMap(entity));
+            return toMapString(entity.asDBMeta().extractAllColumnMap(entity));
         }).collect(Collectors.toList());
 
         return list;
@@ -79,7 +78,7 @@ public class KvsCacheConverterHandler {
      */
     @SuppressWarnings("unchecked")
     public <ENTITY extends Entity> ENTITY toEntity(String mapString, DBMeta dbmeta) {
-        Map<String, Object> columnValueMap = createMapListString().generateMap(mapString);
+        Map<String, Object> columnValueMap = fromMapString(mapString);
 
         // Only if all columns of the table to which the result Entity belongs exist
         if (existsAllColumn(dbmeta, columnValueMap)) {
@@ -136,7 +135,7 @@ public class KvsCacheConverterHandler {
     public <ENTITY extends Entity> List<ENTITY> toEntityList(List<String> mapStringList, DBMeta dbmeta) {
         // Only if all columns of the table to which the result Entity belongs exist
         // (examine only the first element of the list because all elements should have the same field).
-        if (existsAllColumn(dbmeta, createMapListString().generateMap(mapStringList.get(0)))) {
+        if (existsAllColumn(dbmeta, fromMapString(mapStringList.get(0)))) {
             final List<ENTITY> foundList = new ArrayList<ENTITY>();
             final boolean success = mapStringList.stream().allMatch(value -> {
                 return matchesAll(mapStringList, dbmeta, foundList, value);
@@ -154,7 +153,7 @@ public class KvsCacheConverterHandler {
     protected <ENTITY extends Entity> boolean matchesAll(List<String> mapStringList, DBMeta dbmeta, List<ENTITY> foundList, String value) {
         final Entity foundEntity = dbmeta.newEntity();
         try {
-            dbmeta.acceptAllColumnMap(foundEntity, createMapListString().generateMap(value));
+            dbmeta.acceptAllColumnMap(foundEntity, fromMapString(value));
         } catch (RuntimeException e) {
             // Reload from RDB if deserialization failed
             logger.info("DDL changes. deserialize error. reload RDB.mapStringList={}, exceptionMessage={}", mapStringList, e.getMessage());
@@ -177,7 +176,14 @@ public class KvsCacheConverterHandler {
         return columnValueMap.keySet().containsAll(columnNameSet);
     }
 
-    protected MapListString createMapListString() {
-        return new MapListString(); // Instantiate everytime because of the statefulness of...
+    // ===================================================================================
+    //                                                                           Converter
+    //                                                                           =========
+    protected String toMapString(Map<String, ? extends Object> map) {
+        return new org.dbflute.helper.dfmap.DfMapStyle().toMapString(map);
+    }
+
+    protected Map<String, Object> fromMapString(String mapString) {
+        return new org.dbflute.helper.dfmap.DfMapStyle().fromMapString(mapString);
     }
 }

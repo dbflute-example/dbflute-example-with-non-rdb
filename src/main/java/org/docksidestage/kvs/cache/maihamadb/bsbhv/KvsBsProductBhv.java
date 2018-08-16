@@ -117,7 +117,7 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
         cb.specify().everyColumn();
     }
 
-    // ProductId 用の キー条件を CB に設定します。
+    // ProductId 用のキー条件を CB に設定します。
     protected void addDefaultWhereOfProductId(KvsProductCB kvsCB, ProductCB cb) {
         Map<ColumnInfo, Object> columnEqualValue = kvsCB.query().xdfgetColumnEqualValue();
 

@@ -1,0 +1,45 @@
+##
+## Copyright 2014-2018 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+#if ($data.exEntityList && $data.exEntityList.size() > 0)
+#set ($rule = $scriptEngine.get('c7aRule'))
+<h2 id="c7a-$data.c7a.schema">c7a ($data.c7a.schema)</h2>
+<table>
+    <thead>
+    <tr>
+        <th>No.</th>
+        <th>Alias</th>
+        <th>Name</th>
+        <th>Type</th>
+        <th>TableComment</th>
+        <th>KeyspaceName</th>        
+        <th>EntityName</th>
+    </tr>
+    </thead>
+    <tbody id="c7a-$data.schema-list-body">
+#foreach($exEntity in $data.exEntityList)
+    <tr>
+        <td class="rowcellnum">${foreach.count}</td>
+        <td class="rowcell">$!exEntity.bs.alias</td>
+        <td class="rowcell">$exEntity.bs.tableName</td>
+        <td class="rowcell">table</td>
+        <td class="rowcell">$!exEntity.bs.comment</td>
+        <td class="rowcell">$exEntity.bs.keyspaceName</td>
+        <td class="rowcell">$exEntity.className</td>
+    </td>
+#end
+    </tbody>
+</table>
+#end

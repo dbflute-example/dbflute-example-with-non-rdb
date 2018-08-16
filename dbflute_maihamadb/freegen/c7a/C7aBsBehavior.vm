@@ -1,0 +1,58 @@
+##
+## Copyright 2017-2018 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+#set ($rule = $scriptEngine.get('c7aRule'))
+${manager.allClassCopyright}package ${data.package};
+#set ($importList = [])
+#set($added = $importList.add("${data.extendsClass}"))
+#set($added = $importList.add("${data.exConditionBean.package}.${data.exConditionBean.className}"))
+#set($added = $importList.add("${data.exEntity.package}.${data.exEntity.className}"))
+#generateImports($importList, $data.package, $scriptEngine.invokeMethod($rule, 'importOrderList'))
+
+/**
+ * The behavior class as ${data.tableName} for c7a of ${data.c7a.schema}.
+ * @author FreeGen
+ */
+public abstract class ${data.className}#if ($data.extendsClassName && $data.extendsClassName != '') extends ${data.extendsClassName}<${data.exEntity.className}, ${data.exConditionBean.className}>#end#if ($data.implementsClasses && $data.implementsClasses != '') implements $data.implementsClasses#end {
+
+    @Override
+    protected String getKeyspace() {
+        return "${data.keyspaceName}";
+    }
+
+    @Override
+    protected ${data.exConditionBean.className} newConditionBean() {
+        return new ${data.exConditionBean.className}();
+    }
+
+    @Override
+    protected Class<${data.exEntity.className}> typeOfSelectedEntity() {
+        return ${data.exEntity.className}.class;
+    }
+#foreach($property in $data.properties)
+#if($property.name.equalsIgnoreCase($data.c7a.optimisticLock.fieldName))
+
+    @Override
+    protected void filterEntityOfInsert($data.exEntity.className entity) {
+        entity.set${manager.initCap($property.fieldName)}($data.c7a.optimisticLock.operation);
+    }
+
+    @Override
+    protected void filterEntityOfUpdate($data.exEntity.className entity) {
+        entity.set${manager.initCap($property.fieldName)}($data.c7a.optimisticLock.operation);
+    }
+#end
+#end
+}

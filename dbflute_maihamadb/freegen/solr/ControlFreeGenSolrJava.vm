@@ -147,86 +147,86 @@ $manager.makeDirectory($request.generateDirPath)
   #end
 
   ## Meta
-  #set ($path = "${request.generateDirPath}/bsentity/meta/Solr${tableMap.schema}Dbm.java")
+  #set ($path = "${request.generateDirPath}bsentity/meta/Solr${tableMap.schema}Dbm.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
   $generator.parse("./solr/SolrDBMeta.vm", $path, "", "")
 
   ## Condition Bean
-  #set ($path = "${request.generateDirPath}/cbean/bs/SolrBs${tableMap.schema}CB.java")
+  #set ($path = "${request.generateDirPath}cbean/bs/SolrBs${tableMap.schema}CB.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
   $generator.parse("./solr/SolrBsConditionBean.vm", $path, "", "")
 
-  #set ($path = "${request.generateDirPath}/cbean/Solr${tableMap.schema}CB.java")
+  #set ($path = "${request.generateDirPath}cbean/Solr${tableMap.schema}CB.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
-  #if (!$files.file(${generator.outputPath},$path).exists())
+  #if (!$files.file(${generator.outputPath}, $path).exists())
     $generator.parse("./solr/SolrExConditionBean.vm", $path, "", "")
   #end
 
   ## Entity
-  #set ($path = "${request.generateDirPath}/bsentity/SolrBs${tableMap.schema}.java")
+  #set ($path = "${request.generateDirPath}bsentity/SolrBs${tableMap.schema}.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
   $generator.parse("./solr/SolrBsEntity.vm", $path, "", "")
 
-  #set ($path = "${request.generateDirPath}/exentity/Solr${tableMap.schema}.java")
+  #set ($path = "${request.generateDirPath}exentity/Solr${tableMap.schema}.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
-  #if (!$files.file(${generator.outputPath},$path).exists())
+  #if (!$files.file(${generator.outputPath}, $path).exists())
     $generator.parse("./solr/SolrExEntity.vm", $path, "", "")
   #end
 
   ## Query Bean
-  #set ($path = "${request.generateDirPath}/cbean/cq/bs/SolrBs${tableMap.schema}CQ.java")
+  #set ($path = "${request.generateDirPath}cbean/cq/bs/SolrBs${tableMap.schema}CQ.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
   $generator.parse("./solr/SolrBsQueryBean.vm", $path, "", "")
 
-  #set ($path = "${request.generateDirPath}/cbean/cq/Solr${tableMap.schema}CQ.java")
+  #set ($path = "${request.generateDirPath}cbean/cq/Solr${tableMap.schema}CQ.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
-  #if (!$files.file(${generator.outputPath},$path).exists())
+  #if (!$files.file(${generator.outputPath}, $path).exists())
     $generator.parse("./solr/SolrExQueryBean.vm", $path, "", "")
   #end
 
   ## Filter Query Bean
-  #set ($path = "${request.generateDirPath}/cbean/cfq/bs/SolrBs${tableMap.schema}CFQ.java")
+  #set ($path = "${request.generateDirPath}cbean/cfq/bs/SolrBs${tableMap.schema}CFQ.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
   $generator.parse("./solr/SolrBsFilterQueryBean.vm", $path, "", "")
 
-  #set ($path = "${request.generateDirPath}/cbean/cfq/Solr${tableMap.schema}CFQ.java")
+  #set ($path = "${request.generateDirPath}cbean/cfq/Solr${tableMap.schema}CFQ.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
-  #if (!$files.file(${generator.outputPath},$path).exists())
+  #if (!$files.file(${generator.outputPath}, $path).exists())
     $generator.parse("./solr/SolrExFilterQueryBean.vm", $path, "", "")
   #end
 
   ## Behavior
-  #set ($path = "${request.generateDirPath}/bsbhv/SolrBs${tableMap.schema}Bhv.java")
+  #set ($path = "${request.generateDirPath}bsbhv/SolrBs${tableMap.schema}Bhv.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
   $generator.parse("./solr/SolrBsBehavior.vm", $path, "", "")
 
-  #set ($path = "${request.generateDirPath}/exbhv/Solr${tableMap.schema}Bhv.java")
+  #set ($path = "${request.generateDirPath}exbhv/Solr${tableMap.schema}Bhv.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
-  #if (!$files.file(${generator.outputPath},$path).exists())
+  #if (!$files.file(${generator.outputPath}, $path).exists())
     $generator.parse("./solr/SolrExBehavior.vm", $path, "", "")
   #end
 
   ## Index Entity
-  #set ($path = "${request.generateDirPath}/bsentity/index/SolrBs${tableMap.schema}Index.java")
+  #set ($path = "${request.generateDirPath}bsentity/index/SolrBs${tableMap.schema}Index.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
   $generator.parse("./solr/SolrBsIndexEntity.vm", $path, "", "")
 
-  #set ($path = "${request.generateDirPath}/exentity/index/Solr${tableMap.schema}Index.java")
+  #set ($path = "${request.generateDirPath}exentity/index/Solr${tableMap.schema}Index.java")
   $manager.makeDirectory($path)
   $request.info("parse('${path}')")
-  #if (!$files.file(${generator.outputPath},$path).exists())
+  #if (!$files.file(${generator.outputPath}, $path).exists())
     $generator.parse("./solr/SolrExIndexEntity.vm", $path, "", "")
   #end
 

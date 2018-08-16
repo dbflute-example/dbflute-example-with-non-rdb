@@ -90,8 +90,8 @@ public class KvsCacheColumnNullObject {
         final Set<ColumnInfo> specifiedColumnInfoSet;
         if (allColumnNullObject) {
             specifiedColumnInfoSet = entity.myspecifiedProperties().stream().map(property -> {
-                return dbMeta.findColumnInfo(columnName);
-            }).collect(Collectors.toSet());
+                return dbMeta.findColumnInfo(property);
+            }).filter(columnInfo -> columnInfo.canBeNullObject()).collect(Collectors.toSet());
         } else {
             specifiedColumnInfoSet = DfCollectionUtil.newLinkedHashSet(dbMeta.findColumnInfo(columnName));
         }

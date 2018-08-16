@@ -1,0 +1,129 @@
+##
+## Copyright 2017-2018 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+#set ($rule = $scriptEngine.get('c7aRule'))
+${manager.allClassCopyright}package ${data.package};
+#set ($importList = [])
+#set($added = $importList.add('org.lastaflute.core.util.Lato'))
+#set($added = $importList.add('org.lastaflute.web.validation.Required'))
+#if (!$data.clusteringColumnList.isEmpty())
+#set($added = $importList.add('com.datastax.driver.mapping.annotations.ClusteringColumn'))
+#end
+#set($added = $importList.add('com.datastax.driver.mapping.annotations.Column'))
+#set($added = $importList.add('com.datastax.driver.mapping.annotations.PartitionKey'))
+#foreach($userType in $data.userTypeList)
+#set($added = $importList.add("$data.exUserTypeMap[$userType].package.$data.exUserTypeMap[$userType].className"))
+#end
+#set($added = $importList.add("$data.exDBMeta.package.$data.exDBMeta.className"))
+#generateImports($importList, $data.package, $scriptEngine.invokeMethod($rule, 'importOrderList'))
+
+/**
+ * The entity class as ${data.tableName} for c7a of ${data.c7a.schema}.
+ * @author FreeGen
+ */
+public abstract class ${data.className}#if ($data.extendsClass && $data.extendsClass != '') extends $data.extendsClass#end#if ($data.implementsClasses && $data.implementsClasses != '') implements $data.implementsClasses#end {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** The serial version UID for object serialization. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+#foreach($property in $data.properties)
+#set($nestList = [])
+#generateC7aProperty($data, $property)
+#set($nestList = [])
+
+#end
+    // ===================================================================================
+    //                                                                             DB Meta
+    //                                                                             =======
+    @Override
+    public ${data.exDBMeta.className} asDBMeta() {
+        return ${data.exDBMeta.className}.getInstance();
+    }
+
+    @Override
+    public String asTableDbName() {
+        return "${data.tableName}";
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+#foreach($property in $data.properties)
+#set($nestList = [])
+#generateC7aAccessor($data, $property)
+#set($nestList = [])
+
+#end
+    @Override
+    public String toString() {
+        return Lato.string(this);
+    }
+}
+## _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+## generate c7a property.
+## @param class class (NotNull)
+## @param property property (NotNull)
+## _/_/_/_/_/_/_/_/_/_/
+#macro(generateC7aProperty, $data, $property)
+#if ($data.partitionKeyList.contains($property.name))
+#generateIndent($nestList.size())/** The property of ${property.fieldName}. */
+#generateIndent($nestList.size())@PartitionKey($data.partitionKeyList.indexOf($property.name))
+#generateIndent($nestList.size())@Required
+#elseif ($data.clusteringColumnList.contains($property.name))
+#generateIndent($nestList.size())/** The property of ${property.fieldName}. */
+#generateIndent($nestList.size())@ClusteringColumn($data.clusteringColumnList.indexOf($property.name))
+#generateIndent($nestList.size())@Required
+#else
+#generateIndent($nestList.size())/** The property of ${property.fieldName}. (NullAllowed) */
+#end
+#generateIndent($nestList.size())@Column(name = "${property.name}")
+#generateIndent($nestList.size())protected $property.fieldClass $property.fieldName;
+#end
+## _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+## generate c7a property.
+## @param class class (NotNull)
+## @param property property (NotNull)
+## _/_/_/_/_/_/_/_/_/_/
+#macro(generateC7aAccessor, $data, $property)
+#set ($requiredComment = '')
+#if ($data.partitionKeyList.contains($property.name) or $data.clusteringColumnList.contains($property.name))
+#set ($requiredComment = ' (NotNull)')
+#else
+#set ($requiredComment = ' (NullAllowed)')
+#end
+#generateIndent($nestList.size())/**
+#generateIndent($nestList.size()) * [get] ${property.fieldName} <br>
+#generateIndent($nestList.size()) * @return The value of the column '${property.name}'.${requiredComment}
+#generateIndent($nestList.size()) */
+#generateIndent($nestList.size())public $property.fieldClass get${manager.initCap($property.fieldName)}() {
+#generateIndent($nestList.size())    checkSpecifiedProperty("$property.fieldName");
+#generateIndent($nestList.size())    return $property.fieldName;
+#generateIndent($nestList.size())}
+
+#generateIndent($nestList.size())/**
+#generateIndent($nestList.size()) * [set] ${property.fieldName} <br>
+#generateIndent($nestList.size()) * @param ${property.fieldName} The value of the column ${property.name}.${requiredComment}
+#generateIndent($nestList.size()) */
+#generateIndent($nestList.size())public void set${manager.initCap($property.fieldName)}($property.fieldClass ${property.fieldName}) {
+#generateIndent($nestList.size())    registerModifiedProperty("$property.fieldName");
+#generateIndent($nestList.size())    this.$property.fieldName = $property.fieldName;
+#generateIndent($nestList.size())}
+#end

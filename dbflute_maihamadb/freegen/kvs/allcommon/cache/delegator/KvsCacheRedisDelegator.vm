@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.dbflute.kvs.cache.KvsCacheConverterHandler;
 import org.dbflute.kvs.core.delegator.AbstractKvsRedisDelegator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

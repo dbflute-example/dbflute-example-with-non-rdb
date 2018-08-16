@@ -1,0 +1,225 @@
+##
+## Copyright 2014-2018 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${manager.allClassCopyright}package org.dbflute.c7a.entity;
+
+import java.io.Serializable;
+import java.util.Set;
+
+import org.dbflute.dbmeta.accessory.EntityModifiedProperties;
+import org.dbflute.dbmeta.accessory.EntityUniqueDrivenProperties;
+import org.dbflute.exception.NonSpecifiedColumnAccessException;
+import org.dbflute.helper.message.ExceptionMessageBuilder;
+import org.dbflute.util.DfCollectionUtil;
+
+import com.datastax.driver.mapping.annotations.Transient;
+
+/**
+ * @author FreeGen
+ */
+public abstract class AbstractC7aEntity implements C7aEntity, Serializable, Cloneable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** The serial version UID for object serialization. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    // -----------------------------------------------------
+    //                                              Internal
+    //                                              --------
+    /** The unique-driven properties for this entity. (NotNull) */
+    @Transient
+    protected final EntityUniqueDrivenProperties __uniqueDrivenProperties = newUniqueDrivenProperties();
+
+    /** The modified properties for this entity. (NotNull) */
+    @Transient
+    protected final EntityModifiedProperties __modifiedProperties = newModifiedProperties();
+
+    /** The modified properties for this entity. (NullAllowed: normally null, created when specified-check) */
+    @Transient
+    protected EntityModifiedProperties __specifiedProperties;
+
+    /** Is the entity created by DBFlute select process? */
+    @Transient
+    protected boolean __createdBySelect;
+
+    // ===================================================================================
+    //                                                                 Modified Properties
+    //                                                                 ===================
+    // -----------------------------------------------------
+    //                                              Modified
+    //                                              --------
+    @Override
+    public Set<String> mymodifiedProperties() {
+        return __modifiedProperties.getPropertyNames();
+    }
+
+    @Override
+    public void mymodifyProperty(String propertyName) {
+        registerModifiedProperty(propertyName);
+    }
+
+    @Override
+    public void mymodifyPropertyCancel(String propertyName) {
+        __modifiedProperties.remove(propertyName);
+    }
+
+    @Override
+    public void clearModifiedInfo() {
+        __modifiedProperties.clear();
+    }
+
+    @Override
+    public boolean hasModification() {
+        return !__modifiedProperties.isEmpty();
+    }
+
+    protected EntityModifiedProperties newModifiedProperties() {
+        return new EntityModifiedProperties();
+    }
+
+    protected void registerModifiedProperty(String propertyName) {
+        __modifiedProperties.addPropertyName(propertyName);
+        registerSpecifiedProperty(propertyName); // synchronize if exists, basically for user's manual call
+    }
+
+    // -----------------------------------------------------
+    //                                             Specified
+    //                                             ---------
+    @Override
+    public void modifiedToSpecified() {
+        if (__modifiedProperties.isEmpty()) {
+            return; // basically no way when called in Framework (because called when SpecifyColumn exists)
+        }
+        __specifiedProperties = newModifiedProperties();
+        __specifiedProperties.accept(__modifiedProperties);
+    }
+
+    @Override
+    public Set<String> myspecifiedProperties() {
+        if (__specifiedProperties != null) {
+            return __specifiedProperties.getPropertyNames();
+        }
+        return DfCollectionUtil.emptySet();
+    }
+
+    @Override
+    public void myspecifyProperty(String propertyName) {
+        registerSpecifiedProperty(propertyName);
+    }
+
+    @Override
+    public void myspecifyPropertyCancel(String propertyName) {
+        if (__specifiedProperties != null) {
+            __specifiedProperties.remove(propertyName);
+        }
+    }
+
+    @Override
+    public void clearSpecifiedInfo() {
+        if (__specifiedProperties != null) {
+            __specifiedProperties.clear();
+        }
+    }
+
+    protected void checkSpecifiedProperty(String propertyName) {
+        checkSpecifiedProperty(this, propertyName, __specifiedProperties);
+    }
+
+    protected void registerSpecifiedProperty(String propertyName) { // basically called by modified property registration
+        if (__specifiedProperties != null) { // normally false, true if e.g. setting after selected
+            __specifiedProperties.addPropertyName(propertyName);
+        }
+    }
+
+    public static void checkSpecifiedProperty(C7aEntity entity, String propertyName, EntityModifiedProperties specifiedProperties) {
+        if (specifiedProperties == null) { // means no need to check (e.g. all columns are selected)
+            return;
+        }
+        if (!entity.createdBySelect()) { // basically no way, selected when the properties exists but just in case
+            return;
+        }
+        // SpecifyColumn is used for the entity
+        if (specifiedProperties.isModifiedProperty(propertyName)) { // yes, setter is called when select mapping
+            return; // OK, OK
+        }
+        // no, you get the non-specified column, throws exception
+        throwNonSpecifiedColumnAccessException(entity, propertyName, specifiedProperties);
+    }
+
+    protected static void throwNonSpecifiedColumnAccessException(C7aEntity entity, String propertyName,
+            EntityModifiedProperties specifiedProperties) {
+        final ExceptionMessageBuilder br = new ExceptionMessageBuilder();
+        br.addNotice("Non-specified column was accessed.");
+        br.addItem("Advice");
+        br.addElement("To get non-specified column from entity is not allowd.");
+        br.addElement("Non-specified means using SpecifyColumn but the column is non-specified.");
+        br.addElement("Mistake? Or specify the column by your condition-bean if you need it.");
+        br.addElement("For example:");
+        br.addElement("  (x):");
+        br.addElement("    memberBhv.selectEntity(cb -> {");
+        br.addElement("        cb.specify().columnMemberName();");
+        br.addElement("        cb.query().set...");
+        br.addElement("    }).alwaysPresent(member -> {");
+        br.addElement("        ... = member.getMemberName();");
+        br.addElement("        ... = member.getBirthdate(); // *NG: exception");
+        br.addElement("    });");
+        br.addElement("  (o):");
+        br.addElement("    memberBhv.selectEntity(cb -> {");
+        br.addElement("        cb.specify().columnMemberName();");
+        br.addElement("        cb.specify().columnBirthdate(); // *Point");
+        br.addElement("        cb.query().set...");
+        br.addElement("    }).alwaysPresent(member -> {");
+        br.addElement("        ... = member.getMemberName();");
+        br.addElement("        ... = member.getBirthdate(); // OK");
+        br.addElement("    });");
+        br.addElement("");
+        br.addElement("While, reluctantly you need to get the column without change conditions,");
+        br.addElement("you can enable non-specified column access by the condition-bean option.");
+        br.addElement("The method is cb.enable...()");
+        br.addItem("Table");
+        br.addElement(entity.asTableDbName());
+        br.addItem("Non-Specified and Accessed");
+        br.addElement(propertyName);
+        br.addItem("Specified Column in the Table");
+        br.addElement(specifiedProperties);
+        final String msg = br.buildExceptionMessage();
+        throw new NonSpecifiedColumnAccessException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                        Key Handling
+    //                                                                        ============
+    protected EntityUniqueDrivenProperties newUniqueDrivenProperties() {
+        return new EntityUniqueDrivenProperties();
+    }
+
+    // ===================================================================================
+    //                                                                     Birthplace Mark
+    //                                                                     ===============
+    @Override
+    public void markAsSelect() {
+        __createdBySelect = true;
+    }
+
+    @Override
+    public boolean createdBySelect() {
+        return __createdBySelect;
+    }
+}

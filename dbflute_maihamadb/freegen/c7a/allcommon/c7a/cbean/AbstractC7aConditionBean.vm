@@ -1,0 +1,154 @@
+##
+## Copyright 2014-2018 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${manager.allClassCopyright}package org.dbflute.c7a.cbean;
+
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.dbflute.optional.OptionalEntity;
+import org.dbflute.util.DfStringUtil;
+
+import com.datastax.driver.core.ConsistencyLevel;
+import com.datastax.driver.core.PagingState;
+import com.datastax.driver.core.Statement;
+import com.datastax.driver.core.querybuilder.Ordering;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.datastax.driver.core.querybuilder.Select;
+import com.datastax.driver.core.querybuilder.Select.Builder;
+
+/**
+ * @author FreeGen
+ */
+public abstract class AbstractC7aConditionBean implements C7aConditionBean {
+
+    protected int _fetchSize;
+
+    protected String _pagingState;
+
+    protected boolean _paging;
+
+    protected boolean _pagingCountEnabled;
+
+    protected ConsistencyLevel _consistencyLevel;
+
+    @Override
+    public Statement buildSelect() {
+        Builder builder = QueryBuilder.select().all();
+        final Select select;
+        if (query().getOrderByList().isEmpty()) {
+            select = builder.from(asTableDbName());
+        } else {
+            String orderByString = query().getOrderByList().stream().map(orderBy -> {
+                return orderBy.getColumnName() + ' ' + orderBy.getAscDesc();
+            }).collect(Collectors.joining(", "));
+            String tableDbName = asTableDbNameMap().entrySet()
+                    .stream()
+                    .filter(tableDbNameEntry -> tableDbNameEntry.getKey().startsWith(orderByString))
+                    .map(tableDbNameEntry -> tableDbNameEntry.getValue())
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("[Invalid query] message=Unsupported order by relation"));
+            select = builder.from(tableDbName);
+            select.orderBy(query().getOrderByList().stream().map(orderBy -> {
+                return orderBy.getAscDesc().equals("asc") ? QueryBuilder.asc(orderBy.getColumnName())
+                        : QueryBuilder.desc(orderBy.getColumnName());
+            }).toArray(size -> new Ordering[size]));
+        }
+        buildWhere(select);
+        if (_fetchSize != 0) {
+            if (_paging) {
+                select.setFetchSize(_fetchSize);
+            } else {
+                select.limit(_fetchSize);
+            }
+        }
+
+        if (DfStringUtil.is_NotNull_and_NotEmpty(_pagingState)) {
+            select.setPagingState(PagingState.fromString(_pagingState));
+        }
+
+        getConsistencyLevel().ifPresent(consistencyLevel -> {
+            select.setConsistencyLevel(consistencyLevel);
+        });
+
+        return select;
+    }
+
+    protected abstract Map<String, String> asTableDbNameMap();
+
+    protected abstract void buildWhere(Select select);
+
+    @Override
+    public Statement buildSelectCount() {
+        Builder builder = QueryBuilder.select().countAll();
+        final Select select = builder.from(asTableDbName());
+        buildWhere(select);
+        getConsistencyLevel().ifPresent(consistencyLevel -> {
+            select.setConsistencyLevel(consistencyLevel);
+        });
+
+        return select;
+    }
+
+    public void paging(int pageSize, String pagingState) {
+        if (pageSize <= 0) {
+            throw new IllegalArgumentException("Page size for paging should not be minus or zero.");
+        }
+        fetchFirst(pageSize);
+        if (pagingState != null) {
+            xfetchPage(pagingState);
+        }
+        _paging = true;
+        enablePagingCount();
+    }
+
+    @Override
+    public void enablePagingCount() {
+        _pagingCountEnabled = true;
+    }
+
+    @Override
+    public void disablePagingCount() {
+        _pagingCountEnabled = false;
+    }
+
+    @Override
+    public boolean canPagingCount() {
+        return _pagingCountEnabled;
+    }
+
+    public void fetchFirst(int fetchSize) {
+        _fetchSize = fetchSize;
+    }
+
+    @Override
+    public int getFetchSize() {
+        return _fetchSize;
+    }
+
+    protected void xfetchPage(String pagingState) {
+        _pagingState = pagingState;
+    }
+
+    public void setConsistencyLevel(ConsistencyLevel consistencyLevel) {
+        _consistencyLevel = consistencyLevel;
+    }
+
+    public OptionalEntity<ConsistencyLevel> getConsistencyLevel() {
+        return OptionalEntity.ofNullable(_consistencyLevel, () -> {
+            throw new IllegalStateException("consistencyLevel is not set.");
+        });
+    }
+}

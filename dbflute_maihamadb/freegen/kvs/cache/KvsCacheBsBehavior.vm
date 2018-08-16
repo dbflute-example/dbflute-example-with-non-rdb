@@ -129,10 +129,19 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
 
     // ${column.capCamelName} 用の select 句の列挙されるカラムを CB に設定します。
     protected void addDefaultSpecifyColumnOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB, $!{tableMap.schemaPrefix}${table.camelizedName}CB cb) {
+#set ($targetdb = $tableMap.databaseMap[${tableMap.schema}].instance)
+#set ($dbTable = $targetdb.getTable($table.uncapCamelName))
+#if ($dbTable.isDeprecatedSpecifyBatchColumn())
+#foreach ($dbColumn in $dbTable.columnList)
+#set ($initCapName = ${manager.initCap($dbColumn.javaName)})
+        cb.specify().column${initCapName}();
+#end
+#else
         cb.specify().everyColumn();
+#end
     }
 
-    // ${column.capCamelName} 用の キー条件を CB に設定します。
+    // ${column.capCamelName} 用のキー条件を CB に設定します。
     protected void addDefaultWhereOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB, $!{tableMap.schemaPrefix}${table.camelizedName}CB cb) {
         Map<ColumnInfo, Object> columnEqualValue = kvsCB.query().xdfgetColumnEqualValue();
 
@@ -216,7 +225,16 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
 
     // ${column.capCamelName} 用の select 句の列挙されるカラムを CB に設定します。
     protected void addDefaultSpecifyColumnOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB, $!{tableMap.schemaPrefix}${table.camelizedName}CB cb) {
+#set ($targetdb = $tableMap.databaseMap[${tableMap.schema}].instance)
+#set ($dbTable = $targetdb.getTable($table.uncapCamelName))
+#if ($dbTable.isDeprecatedSpecifyBatchColumn())
+#foreach ($dbColumn in $dbTable.columnList)
+#set ($initCapName = ${manager.initCap($dbColumn.javaName)})
+        cb.specify().column${initCapName}();
+#end
+#else
         cb.specify().everyColumn();
+#end
     }
 
     // ${column.capCamelName} 用のキー条件を CB に設定します。

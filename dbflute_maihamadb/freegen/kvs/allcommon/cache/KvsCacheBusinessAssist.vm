@@ -489,13 +489,9 @@ public class KvsCacheBusinessAssist {
 
         Entity entity = readable.readEntity(cb);
 
-        if (entity != null) {
-            return (OptionalEntity<ENTITY>) OptionalEntity.of(entity);
-        } else {
-            return (OptionalEntity<ENTITY>) OptionalEntity.ofNullable(entity, () -> {
-                throw new IllegalArgumentException("Not found the entity by the condition. (might be deleted?)");
-            });
-        }
+        return (OptionalEntity<ENTITY>) OptionalEntity.ofNullable(entity, () -> {
+            throw new IllegalArgumentException("Not found the entity by the condition. (might be deleted?)");
+        });
     }
 
     /**

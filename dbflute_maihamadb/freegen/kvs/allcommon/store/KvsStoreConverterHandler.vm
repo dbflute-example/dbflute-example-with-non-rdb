@@ -13,12 +13,13 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
+#set ($rule = $scriptEngine.get('kvsRule'))
 ${manager.allClassCopyright}package org.dbflute.kvs.store;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.dbflute.helper.mapstring.MapListString;
 import org.dbflute.kvs.store.entity.KvsStoreEntity;
 import org.dbflute.kvs.store.entity.dbmeta.KvsStoreDBMeta;
 
@@ -27,61 +28,74 @@ import org.dbflute.kvs.store.entity.dbmeta.KvsStoreDBMeta;
  */
 public class KvsStoreConverterHandler {
 
+    // ===================================================================================
+    //                                                                        to MapString
+    //                                                                        ============
     /**
-     * エンティティをマップ文字列に変換します。
-     * @param entity エンティティ (NotNull)
-     * @param <ENTITY> エンティティ
-     * @return マップ文字列 (NotNull)
+     * Convert an Entity object to a MapString in KVS represented by String.
+     * @param entity Entity of DBFlute (NotNull)
+     * @param <ENTITY> Entity class of DBFlute
+     * @return A String value representing MapString in KVS (NotNull)
      */
     public <ENTITY extends KvsStoreEntity> String toMapString(ENTITY entity) {
-        return createMapListString().buildMapString(entity.asDBMeta().extractAllColumnMap(entity));
+        return toMapString(entity.asDBMeta().extractAllColumnMap(entity));
     }
 
     /**
-     * エンティティリストをマップ文字列リストに変換します。
-     * @param entityList エンティティリスト (NotNull)
-     * @param <ENTITY> エンティティ
-     * @return マップ文字列リスト (NotNull)
+     * Convert Entity objects in the assigned list to MapString values in KVS represented by String.
+     * @param entityList A list of Entity objects (NotNull)
+     * @param <ENTITY> Entity class of DBFlute
+     * @return A list of String values representing MapString in KVS (NotNull)
      */
     public <ENTITY extends KvsStoreEntity> List<String> toMapStringList(List<ENTITY> entityList) {
         List<String> list = entityList.stream().map(entity -> {
-            return createMapListString().buildMapString(entity.asDBMeta().extractAllColumnMap(entity));
+            return toMapString(entity.asDBMeta().extractAllColumnMap(entity));
         }).collect(Collectors.toList());
         return list;
     }
 
+    // ===================================================================================
+    //                                                                           to Entity
+    //                                                                           =========
     /**
-     * マップ文字列をエンティティに変換します。
-     * @param mapString マップ文字列 (NotNull)
-     * @param kvsStoreDBMeta KVSストアメタ (NotNull)
-     * @param <ENTITY> エンティティ
-     * @return エンティティ (NotNull)
+     * Convert A MapString in KVS represented by Java String to an Entity object.
+     * @param mapString A String value representing MapString (NotNull)
+     * @param dbmeta DBMeta (NotNull)
+     * @param <ENTITY> Entity class of DBFlute
+     * @return An Entity object of DBFlute (NotNull)
      */
     @SuppressWarnings("unchecked")
     public <ENTITY extends KvsStoreEntity> ENTITY toEntity(String mapString, KvsStoreDBMeta kvsStoreDBMeta) {
         KvsStoreEntity entity = kvsStoreDBMeta.newKvsStoreEntity();
-        kvsStoreDBMeta.acceptAllColumnMap(entity, createMapListString().generateMap(mapString));
+        kvsStoreDBMeta.acceptAllColumnMap(entity, fromMapString(mapString));
         return (ENTITY) entity;
     }
 
-    /**
-     * マップ文字列リストをエンティティリストに変換します。
-     * @param mapStringList マップ文字列リスト (NotNull)
-     * @param kvsStoreDBMeta KVSストアメタ (NotNull)
-     * @param <ENTITY> エンティティ
-     * @return エンティティリスト (NotNull)
+     /**
+     * Convert Mapstrings in KVS represented by Java String to Entity objects.
+     * @param mapStringList A list of String values representing MapString (NotNull)
+     * @param dbmeta DBMeta (NotNull)
+     * @param <ENTITY> Entity class of DBFlute
+     * @return A list of Entity objects of DBFlute (NotNull)
      */
     @SuppressWarnings("unchecked")
     public <ENTITY extends KvsStoreEntity> List<ENTITY> toEntityList(List<String> mapStringList, KvsStoreDBMeta kvsStoreDBMeta) {
         List<KvsStoreEntity> entityList = mapStringList.stream().map(mapString -> {
             KvsStoreEntity entity = kvsStoreDBMeta.newKvsStoreEntity();
-            kvsStoreDBMeta.acceptAllColumnMap(entity, createMapListString().generateMap(mapString));
+            kvsStoreDBMeta.acceptAllColumnMap(entity, fromMapString(mapString));
             return entity;
         }).collect(Collectors.toList());
         return (List<ENTITY>) entityList;
     }
 
-    protected MapListString createMapListString() {
-        return new MapListString(); // ステートフルなので毎回new
+    // ===================================================================================
+    //                                                                           Converter
+    //                                                                           =========
+    protected String toMapString(Map<String, ? extends Object> map) {
+        return $scriptEngine.invokeMethod($rule, 'converterHandler').toMapString;
+    }
+
+    protected Map<String, Object> fromMapString(String mapString) {
+        return $scriptEngine.invokeMethod($rule, 'converterHandler').fromMapString;
     }
 }
