@@ -28,6 +28,9 @@ ${manager.allClassCopyright}package ${data.package};
  * </p>
  * @author FreeGen
  */
+#if($manager.isTargetContainerSpring())
+@org.springframework.stereotype.Component("${manager.initUncap($data.className)}")
+#end
 public class ${data.className} extends ${data.bsBehavior.className} {
 
     // ===================================================================================

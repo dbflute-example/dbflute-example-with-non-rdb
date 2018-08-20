@@ -347,6 +347,16 @@ function processRemoteApiBhv(rule, request, exBehaviorMap) {
         var path = scriptEngine.invokeMethod(rule, 'diconPath', schema, request.resourceFile);
         generate('./remoteapi/container/seasar/RemoteApiDicon.vm', path, container, true);
     }
+    if (manager.isTargetContainerSpring()) {
+        var javaConfigClass = new java.util.LinkedHashMap();
+        javaConfigClass.package = request.package + '.' + schemaPackage;
+        javaConfigClass.className = scriptEngine.invokeMethod(rule, 'javaConfigClassName', schema);;
+        var path = abstractBehavior.package.replace(/\./g, '/') + '/' + javaConfigClass.className + '.java';
+        generate('./remoteapi/container/spring/RemoteApiBeansJavaConfig.vm', path, javaConfigClass, true);
+
+        path = 'org/lastaflute/spring/LastafluteBeansJavaConfig.java';
+        generate('./remoteapi/container/spring/LastafluteBeansJavaConfig.vm', path, javaConfigClass, true);
+    }
 
     return remoteApiBhvPathList;
 }

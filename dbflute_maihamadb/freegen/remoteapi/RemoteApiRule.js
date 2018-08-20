@@ -116,6 +116,10 @@ var baseRule = {
         return '../resources/remoteapi/di/remoteapi_' + this.schemaPackage(schema).replace(/\./g, '-') + '.dicon';
     },
 
+    javaConfigClassName: function(schema, resourceFilePath) {
+        return 'Remote' + schema + 'BeansJavaConfig';
+    },
+
     // ===================================================================================
     //                                                                            Behavior
     //                                                                            ========

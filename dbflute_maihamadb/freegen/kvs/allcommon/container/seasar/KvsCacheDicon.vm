@@ -21,6 +21,15 @@
     <include path="${tableMap.kvsPoolDiFile}"/>
     <include path="${tableMap.dbfluteDiFile}"/>
 
+    <component name="kvsCacheManager" class="org.dbflute.kvs.cache.KvsCacheManagerImpl" />
+    <component name="kvsCacheBusinessAssist" class="org.dbflute.kvs.cache.KvsCacheBusinessAssist" />
+
+    <component name="kvsCacheDelegator">
+        provider.config().isKvsMock()
+                ? new org.dbflute.kvs.core.delegator.KvsLocalMapDelegator()
+                : new org.dbflute.kvs.cache.delegator.KvsCacheRedisDelegator()
+    </component>
+
     <component name="cacheTtl">provider.config().getKvsCache${manager.initCap($tableMap.schema)}TtlAsInteger()</component>
     <component name="${tableMap.schema}KvsCacheFacade" class="${request.package}.${tableMap.schema}.facade.${manager.initCap($tableMap.schema)}KvsCacheFacade" />
 #if ($tableMap.suppressBehaviorGen != 'true')

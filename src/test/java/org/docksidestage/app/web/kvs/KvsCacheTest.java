@@ -33,6 +33,7 @@ public class KvsCacheTest extends UnitNonrdbTestCase {
             Product product = new Product();
             product.setProductName(productName);
             product.setProductCategoryCode(ProductCategory.Music.code());
+            product.setProductStatusCode_OnSaleProduction();
             product.setProductHandleCode(productHandleCode);
             product.setRegularPrice(price);
             return product;

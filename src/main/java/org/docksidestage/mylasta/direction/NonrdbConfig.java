@@ -68,6 +68,9 @@ public interface NonrdbConfig extends NonrdbEnv {
     /** The key of the configuration. e.g. 30000 */
     String KVS_EXAMPLEKVS_TIME_BETWEEN_EVICTION_RUNS_MILLIS = "kvs.examplekvs.timeBetweenEvictionRunsMillis";
 
+    /** The key of the configuration. e.g. 3600000 */
+    String KVS_CACHE_MAIHAMADB_TTL = "kvs.cache.maihamadb.ttl";
+
     /** The key of the configuration. e.g. / */
     String COOKIE_DEFAULT_PATH = "cookie.default.path";
 
@@ -331,6 +334,23 @@ public interface NonrdbConfig extends NonrdbEnv {
     Integer getKvsExamplekvsTimeBetweenEvictionRunsMillisAsInteger();
 
     /**
+     * Get the value for the key 'kvs.cache.maihamadb.ttl'. <br>
+     * The value is, e.g. 3600000 <br>
+     * comment: ---------------------
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     */
+    String getKvsCacheMaihamadbTtl();
+
+    /**
+     * Get the value for the key 'kvs.cache.maihamadb.ttl' as {@link Integer}. <br>
+     * The value is, e.g. 3600000 <br>
+     * comment: ---------------------
+     * @return The value of found property. (NotNull: if not found, exception but basically no way)
+     * @throws NumberFormatException When the property is not integer.
+     */
+    Integer getKvsCacheMaihamadbTtlAsInteger();
+
+    /**
      * Get the value for the key 'cookie.default.path'. <br>
      * The value is, e.g. / <br>
      * comment: The default path of cookie (basically '/' if no context path)
@@ -499,6 +519,14 @@ public interface NonrdbConfig extends NonrdbEnv {
 
         public Integer getKvsExamplekvsTimeBetweenEvictionRunsMillisAsInteger() {
             return getAsInteger(NonrdbConfig.KVS_EXAMPLEKVS_TIME_BETWEEN_EVICTION_RUNS_MILLIS);
+        }
+
+        public String getKvsCacheMaihamadbTtl() {
+            return get(NonrdbConfig.KVS_CACHE_MAIHAMADB_TTL);
+        }
+
+        public Integer getKvsCacheMaihamadbTtlAsInteger() {
+            return getAsInteger(NonrdbConfig.KVS_CACHE_MAIHAMADB_TTL);
         }
 
         public String getCookieDefaultPath() {

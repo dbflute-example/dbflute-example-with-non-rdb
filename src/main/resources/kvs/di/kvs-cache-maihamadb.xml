@@ -7,6 +7,16 @@
     <include path="kvs/di/kvs-pool-examplekvs.xml"/>
     <include path="dbflute.xml"/>
 
+    <component name="kvsCacheManager" class="org.dbflute.kvs.cache.KvsCacheManagerImpl" />
+    <component name="kvsCacheBusinessAssist" class="org.dbflute.kvs.cache.KvsCacheBusinessAssist" />
+
+    <component name="kvsCacheDelegator">
+        provider.config().isKvsMock()
+                ? new org.dbflute.kvs.core.delegator.KvsLocalMapDelegator()
+                : new org.dbflute.kvs.cache.delegator.KvsCacheRedisDelegator()
+        <property name="kvsRedisPool">kvsRedisPool</property>
+    </component>
+
     <component name="cacheTtl">provider.config().getKvsCacheMaihamadbTtlAsInteger()</component>
     <component name="maihamadbKvsCacheFacade" class="org.docksidestage.kvs.cache.maihamadb.facade.MaihamadbKvsCacheFacade" />
 

@@ -5,6 +5,15 @@
     <include condition="#exists('#path')" path="my_included_kvs-store.xml"/>
     <include path="kvs/di/kvs-pool-examplekvs.xml"/>
 
+    <component name="kvsStoreManager" class="org.dbflute.kvs.store.KvsStoreManagerImpl" />
+
+    <component name="kvsStoreDelegator">
+        provider.config().isKvsMock()
+                ? new org.dbflute.kvs.core.delegator.KvsLocalMapDelegator()
+                : new org.dbflute.kvs.store.delegator.KvsStoreRedisDelegator()
+        <property name="kvsRedisPool">kvsRedisPool</property>
+    </component>
+
     <component name="examplestoreKvsStoreFacade" class="org.docksidestage.kvs.store.examplestore.facade.ExamplestoreKvsStoreFacade" />
 
     <!-- The components of Behavior. -->

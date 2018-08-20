@@ -23,21 +23,4 @@
     <component name="kvsRedisPool" class="org.dbflute.kvs.core.delegator.KvsRedisPool">
         @${request.package}.KvsRedisPoolFactory@create${table.camelizedName}()
     </component>
-
-    <component name="kvsStoreManager" class="org.dbflute.kvs.store.KvsStoreManagerImpl" />
-
-    <component name="kvsStoreDelegator">
-        provider.config().isKvsMock()
-                ? new org.dbflute.kvs.core.delegator.KvsLocalMapDelegator()
-                : new org.dbflute.kvs.store.delegator.KvsStoreRedisDelegator()
-    </component>
-
-    <component name="kvsCacheManager" class="org.dbflute.kvs.cache.KvsCacheManagerImpl" />
-    <component name="kvsCacheBusinessAssist" class="org.dbflute.kvs.cache.KvsCacheBusinessAssist" />
-
-    <component name="kvsCacheDelegator">
-        provider.config().isKvsMock()
-                ? new org.dbflute.kvs.core.delegator.KvsLocalMapDelegator()
-                : new org.dbflute.kvs.cache.delegator.KvsCacheRedisDelegator()
-    </component>
 </components>

@@ -5,4 +5,6 @@
     <include path="dbflute.xml"/>
     <include path="lastaflute.xml"/>
     <include path="es/di/es_maihama.xml"/>
+    <include path="kvs/di/kvs-cache-maihamadb.xml"/>
+    <include path="kvs/di/kvs-store-examplestore.xml"/>
 </components>
