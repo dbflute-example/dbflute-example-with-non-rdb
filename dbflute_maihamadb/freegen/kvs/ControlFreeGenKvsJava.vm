@@ -106,6 +106,10 @@ $manager.makeDirectory($request.generateDirPath)
       #mkdir($path)
       #generate("./kvs/allcommon/store/facade/AbstractKvsStoreFacade.vm", $path)
 
+      #set ($path = "org/dbflute/kvs/store/facade/AbstractKvsStoreHashFacade.java")
+      #mkdir($path)
+      #generate("./kvs/allcommon/store/facade/AbstractKvsStoreHashFacade.vm", $path)
+
       #set ($path = "org/dbflute/kvs/store/KvsStoreConverterHandler.java")
       #mkdir($path)
       #generate("./kvs/allcommon/store/KvsStoreConverterHandler.vm", $path)

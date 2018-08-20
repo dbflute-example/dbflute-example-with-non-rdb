@@ -17,7 +17,7 @@ package org.dbflute.kvs.store.facade;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,11 +31,12 @@ import org.dbflute.kvs.store.entity.KvsStoreEntity;
 import org.dbflute.kvs.store.entity.dbmeta.KvsStoreDBMeta;
 import org.dbflute.optional.OptionalEntity;
 import org.dbflute.util.DfCollectionUtil;
+import org.dbflute.util.DfTypeUtil;
 
 /**
  * @author FreeGen
  */
-public abstract class AbstractKvsStoreFacade implements KvsStoreFacade {
+public abstract class AbstractKvsStoreHashFacade implements KvsStoreFacade {
 
     // ===================================================================================
     //                                                                          Definition
@@ -55,8 +56,9 @@ public abstract class AbstractKvsStoreFacade implements KvsStoreFacade {
     //                                                                                ====
     @Override
     public <ENTITY extends KvsStoreEntity> OptionalEntity<ENTITY> findEntity(KvsStoreDBMeta kvsStoreDBMeta, List<Object> serchKeyList) {
-        String value =
-                kvsStoreManager.findString(generateKey(kvsStoreDBMeta.getProjectName(), kvsStoreDBMeta.getTableName(), serchKeyList));
+        Map<String, Object> allColumnMap = kvsStoreDBMeta.extractAllColumnMap(kvsStoreDBMeta.newKvsStoreEntity());
+        List<String> value = kvsStoreManager
+                .findHash(generateKey(kvsStoreDBMeta.getProjectName(), kvsStoreDBMeta.getTableName(), serchKeyList), allColumnMap.keySet());
         return OptionalEntity.ofNullable(kvsStoreConverterHandler.toEntity(value, kvsStoreDBMeta), () -> {
             createBhvExThrower().throwSelectEntityAlreadyDeletedException(serchKeyList);
         });
@@ -69,10 +71,8 @@ public abstract class AbstractKvsStoreFacade implements KvsStoreFacade {
             return generateKey(kvsStoreDBMeta.getProjectName(), kvsStoreDBMeta.getTableName(), serchKeyList);
         }).collect(Collectors.toList());
 
-        List<String> list = kvsStoreManager.findMultiString(keyList);
-        if (isEmpty(list)) {
-            return Collections.emptyMap();
-        }
+        Map<String, Object> allColumnMap = kvsStoreDBMeta.extractAllColumnMap(kvsStoreDBMeta.newKvsStoreEntity());
+        List<List<String>> list = kvsStoreManager.findMultiHash(keyList, allColumnMap.keySet());
 
         Map<List<Object>, ENTITY> valueMap = DfCollectionUtil.newLinkedHashMap();
 
@@ -88,14 +88,7 @@ public abstract class AbstractKvsStoreFacade implements KvsStoreFacade {
 
     @Override
     public <ENTITY extends KvsStoreEntity> List<ENTITY> findList(KvsStoreDBMeta kvsStoreDBMeta, List<Object> searchKeyList) {
-        List<String> list =
-                kvsStoreManager.findList(generateKey(kvsStoreDBMeta.getProjectName(), kvsStoreDBMeta.getTableName(), searchKeyList));
-
-        if (isEmpty(list)) {
-            return Collections.emptyList();
-        }
-
-        return kvsStoreConverterHandler.toEntityList(list, kvsStoreDBMeta);
+        throw new UnsupportedOperationException();
     }
 
     // ===================================================================================
@@ -110,7 +103,11 @@ public abstract class AbstractKvsStoreFacade implements KvsStoreFacade {
     public <ENTITY extends KvsStoreEntity> void insertOrUpdate(KvsStoreDBMeta kvsStoreDBMeta, List<Object> searchKeyList, ENTITY entity,
             LocalDateTime expireDateTime) {
         String key = generateKey(kvsStoreDBMeta.getProjectName(), kvsStoreDBMeta.getTableName(), searchKeyList);
-        kvsStoreManager.registerString(key, kvsStoreConverterHandler.toMapString(entity), expireDateTime);
+        Map<String, String> columnMap = kvsStoreDBMeta.extractAllColumnMap(entity)
+                .entrySet()
+                .stream()
+                .collect(HashMap::new, (map, column) -> map.put(column.getKey(), DfTypeUtil.toString(column.getValue())), Map::putAll);
+        kvsStoreManager.registerHash(key, columnMap, expireDateTime);
     }
 
     @Override
@@ -122,8 +119,7 @@ public abstract class AbstractKvsStoreFacade implements KvsStoreFacade {
     @Override
     public <ENTITY extends KvsStoreEntity> void insertOrUpdate(KvsStoreDBMeta kvsStoreDBMeta, List<Object> searchKeyList,
             List<ENTITY> entityList, LocalDateTime expireDateTime) {
-        String key = generateKey(kvsStoreDBMeta.getProjectName(), kvsStoreDBMeta.getTableName(), searchKeyList);
-        kvsStoreManager.registerList(key, kvsStoreConverterHandler.toMapStringList(entityList), expireDateTime);
+        throw new UnsupportedOperationException();
     }
 
     // ===================================================================================

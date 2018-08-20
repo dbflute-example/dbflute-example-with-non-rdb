@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.dbflute.bhv.exception.BehaviorExceptionThrower;
 import org.dbflute.kvs.store.KvsStoreConverterHandler;
 import org.dbflute.kvs.store.KvsStoreManager;
 import org.dbflute.kvs.store.entity.KvsStoreEntity;
@@ -56,12 +57,9 @@ public abstract class AbstractKvsStoreFacade implements KvsStoreFacade {
     public <ENTITY extends KvsStoreEntity> OptionalEntity<ENTITY> findEntity(KvsStoreDBMeta kvsStoreDBMeta, List<Object> serchKeyList) {
         String value =
                 kvsStoreManager.findString(generateKey(kvsStoreDBMeta.getProjectName(), kvsStoreDBMeta.getTableName(), serchKeyList));
-
-        if (value == null) {
-            return OptionalEntity.empty();
-        }
-
-        return OptionalEntity.of(kvsStoreConverterHandler.toEntity(value, kvsStoreDBMeta));
+        return OptionalEntity.ofNullable(kvsStoreConverterHandler.toEntity(value, kvsStoreDBMeta), () -> {
+            createBhvExThrower().throwSelectEntityAlreadyDeletedException(serchKeyList);
+        });
     }
 
     @Override
@@ -170,11 +168,15 @@ public abstract class AbstractKvsStoreFacade implements KvsStoreFacade {
     // ===================================================================================
     //                                                                        Small Helper
     //                                                                        ============
-    public String toString(final Object obj) {
+    protected String toString(final Object obj) {
         return obj == null ? "" : obj.toString();
     }
 
-    public boolean isEmpty(Collection<?> coll) {
+    protected boolean isEmpty(Collection<?> coll) {
         return coll == null || coll.isEmpty();
+    }
+
+    protected BehaviorExceptionThrower createBhvExThrower() {
+        return new BehaviorExceptionThrower();
     }
 }

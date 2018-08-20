@@ -22,6 +22,7 @@ public class KvsStoreTest extends UnitNonrdbTestCase {
 
     public void test_name() {
         // ## Arrange ##
+        String key = "key";
         Integer id = 1;
         String name = "foo";
         LocalDateTime expireDatetime = currentLocalDateTime();
@@ -29,6 +30,7 @@ public class KvsStoreTest extends UnitNonrdbTestCase {
         // ## Act ##
         KvsEgStoreExample insertedEntity = kvsEgStoreExampleBhv.insertOrUpdate(() -> {
             KvsEgStoreExample entity = new KvsEgStoreExample();
+            entity.setEgkey(key);
             entity.setEgId(id);
             entity.setEgName(name);
             entity.setExpireDatetime(expireDatetime);

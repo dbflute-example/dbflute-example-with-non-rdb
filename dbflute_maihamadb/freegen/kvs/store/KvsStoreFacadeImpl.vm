@@ -15,10 +15,14 @@
 ##
 ${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.facade;
 
-import org.dbflute.kvs.store.facade.AbstractKvsStoreFacade;
+#set ($extendsClassName = 'AbstractKvsStoreFacade')
+#if ($tableMap.type == 'hash')
+#set ($extendsClassName = 'AbstractKvsStoreHashFacade')
+#end
+import org.dbflute.kvs.store.facade.$extendsClassName;
 
 /**
  * @author FreeGen
  */
-public class ${manager.initCap($tableMap.schema)}KvsStoreFacade extends AbstractKvsStoreFacade {
+public class ${manager.initCap($tableMap.schema)}KvsStoreFacade extends $extendsClassName {
 }
