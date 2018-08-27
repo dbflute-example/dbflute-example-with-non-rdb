@@ -15,10 +15,8 @@
  */
 package org.docksidestage.kvs.store.examplestore.facade;
 
-import org.dbflute.kvs.store.facade.AbstractKvsStoreHashFacade;
-
 /**
  * @author FreeGen
  */
-public class ExamplestoreKvsStoreFacade extends AbstractKvsStoreHashFacade {
+public class ExamplestoreKvsStoreFacade extends org.dbflute.kvs.store.facade.AbstractKvsStoreFacade {
 }

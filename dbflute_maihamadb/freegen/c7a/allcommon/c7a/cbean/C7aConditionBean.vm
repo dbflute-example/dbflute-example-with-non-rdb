@@ -41,6 +41,8 @@ public interface C7aConditionBean {
 
     int getFetchSize();
 
+    String getPagingState();
+
     void enablePagingCount();
 
     void disablePagingCount();

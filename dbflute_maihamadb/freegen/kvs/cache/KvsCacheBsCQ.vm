@@ -13,7 +13,7 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.cbean.cq.bs;
+${manager.allClassCopyright}package ${data.package};
 
 import java.util.Comparator;
 import java.util.Map;
@@ -26,33 +26,33 @@ import org.dbflute.util.DfCollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ${tableMap.dbflutePackage}.bsentity.dbmeta.$!{tableMap.schemaPrefix}${table.capCamelName}Dbm;
-import ${tableMap.dbflutePackage}.exentity.$!{tableMap.schemaPrefix}${table.capCamelName};
+import ${data.dbflute.dbMeta.package}.${data.dbflute.dbMeta.className};
+import ${data.dbflute.exEntity.package}.${data.dbflute.exEntity.className};
 
 /**
- * The base condition-query of (${table.comment})${table.capCamelName}.
+ * The base condition-query of (${data.comment})${data.tableName}.
  * @author FreeGen
  */
-public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ {
+public abstract class ${data.className} {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Logger logger = LoggerFactory.getLogger(Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ.class);
+    private static final Logger logger = LoggerFactory.getLogger(${data.className}.class);
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected $!{tableMap.schemaPrefix}${table.camelizedName}Dbm dbMeta = $!{tableMap.schemaPrefix}${table.camelizedName}Dbm.getInstance();
-    protected Comparator<$!{tableMap.schemaPrefix}${table.camelizedName}> orderBy;
+    protected ${data.dbflute.dbMeta.className} dbMeta = ${data.dbflute.dbMeta.className}.getInstance();
+    protected Comparator<${data.dbflute.exEntity.className}> orderBy;
     protected Map<ColumnInfo, Object> columnEqualValue = DfCollectionUtil.newHashMap();
     protected Map<ColumnInfo, Boolean> columnOrderBy = DfCollectionUtil.newHashMap();
 
     // ===================================================================================
     //                                                                           Condition
     //                                                                           =========
-#set ($targetdb = $tableMap.databaseMap[${tableMap.schema}].instance)
-#set ($dbTable = $targetdb.getTable($table.uncapCamelName))
+#set ($targetdb = $data.dbflute.instance)
+#set ($dbTable = $targetdb.getTable($data.tableName))
 #foreach ($dbColumn in $dbTable.columnList)
 #set ($initCapName = ${manager.initCap($dbColumn.javaName)})
 #set ($fieldName =  ${manager.initUncap($dbColumn.javaName)})
@@ -65,27 +65,27 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ {
         columnOrderBy.put(dbMeta.column${initCapName}(), true);
 
         orderBy = (orderBy == null) ? //
-                Comparator.comparing($!{tableMap.schemaPrefix}${table.capCamelName}::get${initCapName}, Comparator.naturalOrder())
-                : orderBy.thenComparing($!{tableMap.schemaPrefix}${table.capCamelName}::get${initCapName}, Comparator.naturalOrder());
+                Comparator.comparing(${data.dbflute.exEntity.className}::get${initCapName}, Comparator.naturalOrder())
+                : orderBy.thenComparing(${data.dbflute.exEntity.className}::get${initCapName}, Comparator.naturalOrder());
     }
 
     public void addOrderBy_${initCapName}_Desc() {
         columnOrderBy.put(dbMeta.column${initCapName}(), false);
 
         orderBy = (orderBy == null) ? //
-                Comparator.comparing($!{tableMap.schemaPrefix}${table.capCamelName}::get${initCapName}, Comparator.reverseOrder())
-                : orderBy.thenComparing($!{tableMap.schemaPrefix}${table.capCamelName}::get${initCapName}, Comparator.reverseOrder());
+                Comparator.comparing(${data.dbflute.exEntity.className}::get${initCapName}, Comparator.reverseOrder())
+                : orderBy.thenComparing(${data.dbflute.exEntity.className}::get${initCapName}, Comparator.reverseOrder());
     }
 
 #end
     // ===================================================================================
     //                                                                        Assist Logic
     //                                                                        ============
-    public Comparator<$!{tableMap.schemaPrefix}${table.camelizedName}> getOrderByComparator() {
+    public Comparator<${data.dbflute.exEntity.className}> getOrderByComparator() {
         return orderBy;
     }
 
-    public Predicate<$!{tableMap.schemaPrefix}${table.camelizedName}> getWherePredicate() {
+    public Predicate<${data.dbflute.exEntity.className}> getWherePredicate() {
         return entity -> {
             for (Entry<ColumnInfo, Object> entry : columnEqualValue.entrySet()) {
                 Object value = entry.getKey().read(entity);

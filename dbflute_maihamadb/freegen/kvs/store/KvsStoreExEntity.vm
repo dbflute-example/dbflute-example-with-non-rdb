@@ -13,15 +13,15 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.exentity;
+${manager.allClassCopyright}package ${data.package};
 
-import ${request.package}.${tableMap.schema}.bsentity.Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName};
+import ${data.bs.package}.${data.bs.className};
 
 /**
- * The entity of (${table.comment})${table.capCamelName}.
+ * The entity of (${data.comment})${data.tableName}.
  * @author FreeGen
  */
-public class Kvs$!{tableMap.schemaPrefix}${table.camelizedName} extends Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName} {
+public class ${data.className} extends ${data.bs.className} {
 
     /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;

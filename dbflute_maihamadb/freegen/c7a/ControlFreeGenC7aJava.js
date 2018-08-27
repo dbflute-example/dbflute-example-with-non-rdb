@@ -1,9 +1,13 @@
+var genC7aCore = false;
+
 /**
  * process.
  * @param {Request} request - request (NotNull)
  */
 function process(request) {
     try {
+	    request.enableOutputDirectory();
+	    manager.makeDirectory(request.generateDirPath);
         processC7aCore(request);
         processC7a(request);
     } catch (e) {
@@ -25,6 +29,10 @@ function process(request) {
  * @param {Request} request - request (NotNull)
  */
 function processC7aCore(request) {
+    if (genC7aCore) {
+        return;
+    }
+    genC7aCore = true;
     generate('./c7a/allcommon/c7a/C7aPool.vm', 'org/dbflute/c7a/C7aPool.java', null, true);
     generate('./c7a/allcommon/c7a/bhv/AbstractC7aBehaviorWritable.vm', 'org/dbflute/c7a/bhv/AbstractC7aBehaviorWritable.java', null, true);
     generate('./c7a/allcommon/c7a/entity/C7aEntity.vm', 'org/dbflute/c7a/entity/C7aEntity.java', null, true);
@@ -44,8 +52,6 @@ function processC7aCore(request) {
  */
 function processC7a(request) {
     var optionMap = request.optionMap;
-    request.enableOutputDirectory();
-    manager.makeDirectory(request.generateDirPath);
 
     scriptEngine.eval('load("./freegen/c7a/C7aRule.js");');
     if (optionMap.ruleJsPath && optionMap.ruleJsPath != '') {
@@ -58,8 +64,8 @@ function processC7a(request) {
     manager.info('...Generating c7a: ' + request.requestName);
 
     var c7a = new java.util.LinkedHashMap();
-    c7a.schema = scriptEngine.invokeMethod(rule, 'schema');
-    c7a.schemaShort = scriptEngine.invokeMethod(rule, 'schemaShort', c7a.schema);
+    c7a.schema = scriptEngine.invokeMethod(rule, 'schema', request);
+    c7a.schemaShort = scriptEngine.invokeMethod(rule, 'schemaShort', request);
     c7a.schemaPackage = scriptEngine.invokeMethod(rule, 'schemaPackage', c7a.schema);
     c7a.package = request.package + '.' + c7a.schemaPackage;
     c7a.optimisticLock = scriptEngine.invokeMethod(rule, 'optimisticLock');
@@ -259,20 +265,6 @@ function analyzeProperties(rule, base) {
     }
 }
 
-function processVm(rule, exList, bsVm, exVm) {
-    for each (var ex in exList) {
-        var bs = ex.bs;
-        if (bsVm != null) {
-	        var path = bs.package.replace(/\./g, '/') + '/' + bs.className + '.java';
-	        generate(bsVm, path, bs, true);
-	    }
-	    if (exVm != null) {
-	        var path = ex.package.replace(/\./g, '/') + '/' + ex.className + '.java';
-	        generate(exVm, path, ex, bsVm == null);
-	    }
-    }
-}
-
 /**
  * Process doc.
  * @param {Rule} rule - rule. (NotNull)
@@ -324,4 +316,18 @@ function generate(src, dest, data, overwite) {
         return generator.parse(src, dest, 'data', data);
     }
     return '';
+}
+
+function processVm(rule, exList, bsVm, exVm) {
+    for each (var ex in exList) {
+        var bs = ex.bs;
+        if (bsVm != null) {
+	        var path = bs.package.replace(/\./g, '/') + '/' + bs.className + '.java';
+	        generate(bsVm, path, bs, true);
+	    }
+	    if (exVm != null) {
+	        var path = ex.package.replace(/\./g, '/') + '/' + ex.className + '.java';
+	        generate(exVm, path, ex, bsVm == null);
+	    }
+    }
 }

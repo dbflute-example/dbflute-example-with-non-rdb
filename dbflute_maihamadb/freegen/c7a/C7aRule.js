@@ -15,12 +15,12 @@ var baseRule = {
     // ===================================================================================
     //                                                                               Base
     //                                                                              ======
-    schema: function() {
-        throw new Error('override schema()');
+    schema: function(request) {
+        return manager.initUncap(request.requestName.replace(/^C7a/g, ''));
     },
 
-    schemaShort: function(schema) {
-        return schema;
+    schemaShort: function(request) {
+        return this.schema(request);
     },
 
     schemaPackage: function(schema) {

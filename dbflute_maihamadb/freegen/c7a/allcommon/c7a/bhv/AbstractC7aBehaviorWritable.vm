@@ -160,7 +160,6 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
                 list.add(entity);
                 remaining--;
             }
-            // TODO set allRecordCount、pageSize、currentPageNumber by p1us2er0 (2018/08/01)
             C7aPagingResultBean<ENTITY> bean = new C7aPagingResultBean<ENTITY>();
             bean.setSelectedList(list);
             if (nextPage != null) {
@@ -172,8 +171,12 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         pagingResultBean.setTableDbName(cb.asTableDbName());
         pagingResultBean.setPageSize(cb.getFetchSize());
         if (cb.canPagingCount()) {
-            int allRecordCount = selectCount(cbLambda);
-            pagingResultBean.setAllRecordCount(allRecordCount);
+            if (cb.getPagingState() == null && pagingResultBean.size() < cb.getFetchSize()) {
+                pagingResultBean.setAllRecordCount(pagingResultBean.size());
+            } else {
+                int allRecordCount = selectCount(cbLambda);
+                pagingResultBean.setAllRecordCount(allRecordCount);
+            }
         }
 
         return pagingResultBean;

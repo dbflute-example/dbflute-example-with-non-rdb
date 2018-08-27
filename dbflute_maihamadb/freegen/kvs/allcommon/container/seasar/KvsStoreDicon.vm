@@ -16,8 +16,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.4//EN"
     "http://www.seasar.org/dtd/components24.dtd">
-<components namespace="kvs_store-${tableMap.schema}">
-    <include path="${tableMap.kvsPoolDiFile}"/>
+<components namespace="kvs_store-${data.kvs.schema}">
+    <include path="${data.kvsPoolDiFile}"/>
 
     <component name="kvsStoreManager" class="org.dbflute.kvs.store.KvsStoreManagerImpl" />
 
@@ -27,12 +27,12 @@
                 : new org.dbflute.kvs.store.delegator.KvsStoreRedisDelegator()
     </component>
 
-    <component name="${tableMap.schema}KvsStoreFacade" class="${request.package}.${tableMap.schema}.facade.${manager.initCap($tableMap.schema)}KvsStoreFacade" />
-#if ($tableMap.suppressBehaviorGen != 'true')
+    <component name="${manager.initUncap($data.kvs.kvsStoreFacadeImpl.className)}" class="${data.kvs.kvsStoreFacadeImpl.package}.${data.kvs.kvsStoreFacadeImpl.className}" />
+#if (!$tableMap.suppressBehaviorGen)
 
     <!-- The components of Behavior. -->
-#foreach ($table in $request.tableList)
-    <component name="${table.uncapCamelName}Bhv" class="${request.package}.${tableMap.schema}.exbhv.${table.camelizedName}Bhv"/>
+#foreach ($exBehavior in $data.exBehaviorList)
+    <component name="${manager.initUncap($exBehavior.className)}" class="${exBehavior.package}.${exBehavior.className}"/>
 #end
 #end
 </components>

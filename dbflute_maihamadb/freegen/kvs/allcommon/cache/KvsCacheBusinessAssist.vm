@@ -39,14 +39,14 @@ import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.exception.EntityDuplicatedException;
 import org.dbflute.optional.OptionalEntity;
-#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+#if ($manager.isTargetContainerSeasar())
 import org.dbflute.saflute.core.magic.ThreadCacheContext;
 import org.dbflute.saflute.core.magic.async.AsyncManager;
 import org.dbflute.saflute.core.time.TimeManager;
 #end
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
-#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+#if ($manager.isTargetContainerLastaDi())
 import org.lastaflute.core.magic.ThreadCacheContext;
 import org.lastaflute.core.magic.async.AsyncManager;
 import org.lastaflute.core.time.TimeManager;
@@ -575,10 +575,10 @@ public class KvsCacheBusinessAssist {
         if (ttl == null) {
             return null;
         }
-#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+#if ($manager.isTargetContainerSeasar())
         return timeManager.getCurrentLocalDateTime().plusSeconds(ttl);
 #end
-#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+#if ($manager.isTargetContainerLastaDi())
         return timeManager.currentDateTime().plusSeconds(ttl);
 #end
     }

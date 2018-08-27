@@ -108,7 +108,7 @@ public abstract class AbstractC7aConditionBean implements C7aConditionBean {
         }
         fetchFirst(pageSize);
         if (pagingState != null) {
-            xfetchPage(pagingState);
+            xPagingState(pagingState);
         }
         _paging = true;
         enablePagingCount();
@@ -138,8 +138,13 @@ public abstract class AbstractC7aConditionBean implements C7aConditionBean {
         return _fetchSize;
     }
 
-    protected void xfetchPage(String pagingState) {
+    protected void xPagingState(String pagingState) {
         _pagingState = pagingState;
+    }
+
+    @Override
+    public String getPagingState() {
+        return _pagingState;
     }
 
     public void setConsistencyLevel(ConsistencyLevel consistencyLevel) {

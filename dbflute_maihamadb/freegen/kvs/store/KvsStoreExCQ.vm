@@ -13,13 +13,13 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.cbean.cq;
+${manager.allClassCopyright}package ${data.package};
 
-import ${request.package}.${tableMap.schema}.cbean.cq.bs.Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ;
+import ${data.bs.package}.${data.bs.className};
 
 /**
- * The base condition-query of (${table.comment})${table.capCamelName}.
+ * The base condition-query of (${data.comment})${data.tableName}.
  * @author FreeGen
  */
-public class Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CQ extends Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ {
+public class ${data.className} extends ${data.bs.className} {
 }

@@ -16,11 +16,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.4//EN"
     "http://www.seasar.org/dtd/components24.dtd">
-<components namespace="kvs-${table.uncapCamelName}">
+<components namespace="kvs-${manager.initUncap($data.name)}">
     <include path="saflute_assist.dicon"/>
     <include path="saflute_core.dicon"/>
 
     <component name="kvsRedisPool" class="org.dbflute.kvs.core.delegator.KvsRedisPool">
-        @${request.package}.KvsRedisPoolFactory@create${table.camelizedName}()
+        @${data.package}.KvsRedisPoolFactory@create${manager.initCap($data.name)}()
     </component>
 </components>

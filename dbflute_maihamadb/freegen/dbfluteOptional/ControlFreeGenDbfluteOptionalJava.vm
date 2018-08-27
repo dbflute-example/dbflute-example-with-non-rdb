@@ -13,7 +13,6 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-$manager.info("requestList: ${requestList.size()}")
 #set ($genCachedThreadEntity = false)
 #foreach ($request in $requestList)
 #set ($tableMap = $request.tableMap)
@@ -29,7 +28,6 @@ $manager.makeDirectory($request.generateDirPath)
       $manager.makeDirectory($path)
       $request.info("parse('${path}')")
       $generator.parse("./dbfluteOptional/CachedThreadEntity.vm", $path, "", "")
-
     #end
   #end
 #end

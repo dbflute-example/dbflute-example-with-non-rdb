@@ -38,11 +38,11 @@ import org.dbflute.kvs.cache.KvsCacheBusinessAssist;
 import org.dbflute.kvs.cache.KvsCacheManager;
 import org.dbflute.kvs.core.exception.KvsException;
 import org.dbflute.optional.OptionalEntity;
-#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+#if ($manager.isTargetContainerSeasar())
 import org.dbflute.saflute.core.magic.ThreadCacheContext;
 #end
 import org.dbflute.util.DfCollectionUtil;
-#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+#if ($manager.isTargetContainerLastaDi())
 import org.lastaflute.core.magic.ThreadCacheContext;
 #end
 

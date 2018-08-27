@@ -16,9 +16,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE components PUBLIC "-//DBFLUTE//DTD LastaDi 1.0//EN"
     "http://dbflute.org/meta/lastadi10.dtd">
-<components namespace="kvs_store-${tableMap.schema}">
+<components namespace="kvs_store-${data.kvs.schema}">
     <include condition="#exists('#path')" path="my_included_kvs-store.xml"/>
-    <include path="${tableMap.kvsPoolDiFile}"/>
+    <include path="${data.kvsPoolDiFile}"/>
 
     <component name="kvsStoreManager" class="org.dbflute.kvs.store.KvsStoreManagerImpl" />
 
@@ -29,12 +29,12 @@
         <property name="kvsRedisPool">kvsRedisPool</property>
     </component>
 
-    <component name="${tableMap.schema}KvsStoreFacade" class="${request.package}.${tableMap.schema}.facade.${manager.initCap($tableMap.schema)}KvsStoreFacade" />
-#if ($tableMap.suppressBehaviorGen != 'true')
+    <component name="${manager.initUncap($data.kvs.kvsStoreFacadeImpl.className)}" class="${data.kvs.kvsStoreFacadeImpl.package}.${data.kvs.kvsStoreFacadeImpl.className}" />
+#if (!$data.kvs.suppressBehaviorGen)
 
     <!-- The components of Behavior. -->
-#foreach ($table in $request.tableList)
-    <component name="kvs$!{tableMap.schemaPrefix}${table.camelizedName}Bhv" class="${request.package}.${tableMap.schema}.exbhv.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Bhv"/>
+#foreach ($exBehavior in $data.exBehaviorList)
+    <component name="${manager.initUncap($exBehavior.className)}" class="${exBehavior.package}.${exBehavior.className}"/>
 #end
 #end
 </components>

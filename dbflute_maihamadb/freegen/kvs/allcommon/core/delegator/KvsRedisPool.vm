@@ -17,11 +17,11 @@ ${manager.allClassCopyright}package org.dbflute.kvs.core.delegator;
 
 import java.io.Closeable;
 
-#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+#if ($manager.isTargetContainerLastaDi())
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 #end
-#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+#if ($manager.isTargetContainerSeasar())
 import org.seasar.framework.container.annotation.tiger.DestroyMethod;
 import org.seasar.framework.container.annotation.tiger.InitMethod;
 #end
@@ -52,10 +52,10 @@ public class KvsRedisPool implements Closeable {
     // ===================================================================================
     //                                                                     Pool Management
     //                                                                     ===============
-#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+#if ($manager.isTargetContainerLastaDi())
     @PostConstruct
 #end
-#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+#if ($manager.isTargetContainerSeasar())
     @InitMethod
 #end
     public void init() {
@@ -76,10 +76,10 @@ public class KvsRedisPool implements Closeable {
         jedisPool.close();
     }
 
-#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+#if ($manager.isTargetContainerLastaDi())
     @PreDestroy
 #end
-#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+#if ($manager.isTargetContainerSeasar())
     @DestroyMethod
 #end
     public void destroy() {

@@ -14,12 +14,12 @@
 ## governing permissions and limitations under the License.
 ##
 #set ($kvsKeyCount = 0)
-#foreach ($column in $table.columnList)
+#foreach ($column in $data.columnList)
 #if ($column.kvsKey)
 #set ($kvsKeyCount = $kvsKeyCount + 1)
 #end
 #end
-${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.cbean.cq.bs;
+${manager.allClassCopyright}package ${data.package};
 
 #if ($kvsKeyCount == 1)
 import java.util.Collection;
@@ -28,15 +28,15 @@ import java.util.Collection;
 import org.dbflute.kvs.core.assertion.KvsAssertion;
 
 /**
- * The base condition-query of (${table.comment})${table.capCamelName}.
+ * The base condition-query of (${data.comment})${data.tableName}.
  * @author FreeGen
  */
-public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ {
+public abstract class ${data.className} {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-#foreach ($column in $table.columnList)
+#foreach ($column in $data.columnList)
 #if ($column.kvsKey)
 #if ($column.isNormalColumn)
 #set ($javaNative = ${column.type})
@@ -59,7 +59,7 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-#foreach ($column in $table.columnList)
+#foreach ($column in $data.columnList)
 #if ($column.kvsKey)
 #if ($column.isNormalColumn)
 #set ($javaNative = ${column.type})
@@ -94,7 +94,7 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ {
 #end
 #end
 #if ($kvsKeyCount == 1)
-#foreach ($column in $table.columnList)
+#foreach ($column in $data.columnList)
 #if ($column.kvsKey)
     public Collection<${column.type}> xdfget${column.camelizedName}List() {
         return _${column.uncapCamelName}List;
@@ -113,7 +113,7 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ {
     public String toString() {
         String delimiter = ", ";
         StringBuilder sb = new StringBuilder();
-#foreach ($column in $table.columnList)
+#foreach ($column in $data.columnList)
 #if ($column.kvsKey)
         sb.append(delimiter).append(_${column.uncapCamelName});
 #end

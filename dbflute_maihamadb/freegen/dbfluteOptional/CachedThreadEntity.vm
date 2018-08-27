@@ -23,10 +23,10 @@ import org.dbflute.bhv.BehaviorReadable;
 import org.dbflute.bhv.BehaviorSelector;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbmeta.DBMeta;
-#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+#if ($manager.isTargetContainerSeasar())
 import org.dbflute.saflute.core.magic.ThreadCacheContext;
 #end
-#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+#if ($manager.isTargetContainerLastaDi())
 import org.lastaflute.core.magic.ThreadCacheContext;
 #end
 

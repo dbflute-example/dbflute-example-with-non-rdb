@@ -25,12 +25,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.dbflute.kvs.core.exception.KvsException;
-#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+#if ($manager.isTargetContainerSeasar())
 import org.dbflute.saflute.core.time.TimeManager;
 import org.dbflute.saflute.core.util.ContainerUtil;
 #end
 import org.dbflute.util.DfCollectionUtil;
-#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+#if ($manager.isTargetContainerLastaDi())
 import org.lastaflute.core.time.TimeManager;
 import org.lastaflute.core.util.ContainerUtil;
 #end
@@ -261,10 +261,10 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     //                                                                        ============
     protected Object getInExpireDateTime(String key) {
         LocalDateTime expireDateTime = KEY_EXPIRE_DATE_TIME_MAP.get(key);
-#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+#if ($manager.isTargetContainerSeasar())
         LocalDateTime currentDateTime = getTimeManager().getCurrentLocalDateTime();
 #end
-#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+#if ($manager.isTargetContainerLastaDi())
         LocalDateTime currentDateTime = getTimeManager().currentDateTime();
 #end
         if (expireDateTime == null || expireDateTime.compareTo(currentDateTime) >= 0) {

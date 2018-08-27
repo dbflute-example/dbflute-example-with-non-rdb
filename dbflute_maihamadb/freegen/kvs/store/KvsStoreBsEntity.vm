@@ -13,23 +13,20 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.bsentity;
+${manager.allClassCopyright}package ${data.package};
 
 import java.io.Serializable;
 
 import org.dbflute.kvs.store.entity.KvsStoreEntity;
 import org.dbflute.kvs.store.entity.dbmeta.KvsStoreDBMeta;
 
-import ${request.package}.${tableMap.schema}.bsentity.dbmeta.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm;
-#if ($table.hasRefColumn)
-import ${request.package}.${tableMap.schema}.entity.ex.*;
-#end
+import ${data.dbMeta.package}.${data.dbMeta.className};
 
 /**
- * The entity of (${table.comment})${table.capCamelName}.
+ * The entity of (${data.comment})${data.tableName}.
  * @author FreeGen
  */
-public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName} implements KvsStoreEntity, Serializable {
+public abstract class ${data.className} implements KvsStoreEntity, Serializable {
 
     /** The serial version UID for object serialization. (Default) */
     private static final long serialVersionUID = 1L;
@@ -37,7 +34,7 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName} imple
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-#foreach ($column in $table.columnList)
+#foreach ($column in $data.columnList)
 #if ($column.isNormalColumn)
 #set ($javaNative = ${column.type})
 #elseif ($column.isRefColumn)
@@ -52,14 +49,14 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName} imple
 
 #end
     // [Referrers] *comment only
-#foreach ($referrer in $table.referrerList)
+#foreach ($referrer in $data.referrerList)
     // o ${referrer.name}
 #end
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-#foreach ($column in $table.columnList)
+#foreach ($column in $data.columnList)
 #if ($column.isNormalColumn)
 #set ($javaNative = ${column.type})
 #elseif ($column.isRefColumn)
@@ -89,14 +86,14 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName} imple
 #end
     @Override
     public KvsStoreDBMeta asDBMeta() {
-        return Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm.getInstance();
+        return ${data.dbMeta.className}.getInstance();
     }
 
     @Override
     public String toString() {
         String delimiter = ", ";
         StringBuilder sb = new StringBuilder();
-#foreach ($column in $table.columnList)
+#foreach ($column in $data.columnList)
         sb.append(delimiter).append(get${column.capCamelName}());
 #end
         if (sb.length() > delimiter.length()) {

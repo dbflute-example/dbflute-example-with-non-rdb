@@ -13,13 +13,13 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
+#set ($scriptEngine = $manager.createJavaScriptEngine())
+$scriptEngine.put('scriptEngine', $scriptEngine)
+$scriptEngine.put('generator', $generator)
+$scriptEngine.put('manager', $manager)
+$scriptEngine.eval('load("./freegen/c7a/ControlFreeGenC7aJava.js");')
 #foreach($request in $requestList)
     #if ($request.isResourceTypeJsonGeneral() && $request.requestName.startsWith("C7a"))
-        #set ($scriptEngine = $manager.createJavaScriptEngine())
-        $scriptEngine.put('scriptEngine', $scriptEngine)
-        $scriptEngine.put('generator', $generator)
-        $scriptEngine.put('manager', $manager)
-        $scriptEngine.eval('load("./freegen/c7a/ControlFreeGenC7aJava.js");')
         $scriptEngine.invokeFunction('process', $request)
     #end
 #end
