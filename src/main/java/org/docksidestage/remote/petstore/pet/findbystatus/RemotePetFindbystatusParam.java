@@ -15,8 +15,9 @@
  */
 package org.docksidestage.remote.petstore.pet.findbystatus;
 
+import javax.validation.constraints.NotNull;
+
 import org.lastaflute.core.util.Lato;
-import org.lastaflute.web.validation.Required;
 
 /**
  * The bean class as param for remote API of GET /pet/findByStatus.
@@ -25,7 +26,7 @@ import org.lastaflute.web.validation.Required;
 public class RemotePetFindbystatusParam {
 
     /** The property of status. (enumValue=[available, pending, sold]) (Status values that need to be considered for filter) */
-    @Required
+    @NotNull
     public java.util.List<String> status;
 
     @Override

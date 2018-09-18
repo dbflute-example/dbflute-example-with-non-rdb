@@ -15,6 +15,7 @@
  */
 package org.docksidestage.remote.petstore.pet.index;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 
 import org.lastaflute.core.util.Lato;
@@ -57,7 +58,7 @@ public class RemotePetPutParam {
 
     /** The property of photoUrls. */
     @XmlElement(name = "photoUrls")
-    @Required
+    @NotNull
     public java.util.List<String> photoUrls;
 
     /** The property of tags. (NullAllowed) */

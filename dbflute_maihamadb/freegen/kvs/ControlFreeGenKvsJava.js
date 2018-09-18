@@ -423,7 +423,7 @@ function processKvsStoreDoc(rule, doc) {
         if (!lastaDocHtml.contains(naviLinkDestinationHtml)) {
             kvsStoreDocHtml = naviLinkDestinationHtml + kvsStoreDocHtml;
         }
-        java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, kvsStoreDocHtml + '\n' + markBody).getBytes());
+        java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, kvsStoreDocHtml + '\n' + markBody).getBytes('UTF-8'));
     }
 }
 

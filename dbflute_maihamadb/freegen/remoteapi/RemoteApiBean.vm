@@ -27,7 +27,11 @@ ${manager.allClassCopyright}package ${data.package};
 #foreach($propertyEntry in $data.properties.entrySet())
 #set ($property = $propertyEntry.value)
 #if (${property.required})
+#if ($property.type == 'array')
+#set($added = $importList.add('javax.validation.constraints.NotNull'))
+#else
 #set($added = $importList.add('org.lastaflute.web.validation.Required'))
+#end
 #end
 #if ($property.items && $property.items['$ref'])
 #set ($nestType = $property.items['$ref'].replace('#/definitions/', ''))
@@ -39,7 +43,11 @@ ${manager.allClassCopyright}package ${data.package};
 #set ($nestPropertyEntry.value.required =  $definitionMap[$nestType].required.contains($nestPropertyEntry.key))
 #set ($nestProperty = $nestPropertyEntry.value)
 #if (${nestProperty.required})
+#if ($nestProperty.type == 'array')
+#set($added = $importList.add('javax.validation.constraints.NotNull'))
+#else
 #set($added = $importList.add('org.lastaflute.web.validation.Required'))
+#end
 #end
 #end
 #set ($nestType = '')
@@ -94,7 +102,11 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
 #generateIndent($nestList.size())@XmlElement(name = "$propertyEntry.key")
 #end
 #if (${property.required})
+#if ($property.type == 'array')
+#generateIndent($nestList.size())@NotNull
+#else
 #generateIndent($nestList.size())@Required
+#end
 #end
 #if ($property.type == 'array')
 #if ($scriptEngine.invokeMethod($rule, 'beanPropertyManualMappingClass', $data.api, $class, $property))
