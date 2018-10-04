@@ -22,7 +22,6 @@ ${manager.allClassCopyright}package ${data.package};
 #set($added = $importList.add('org.dbflute.c7a.bhv.AbstractC7aBehaviorWritable'))
 #set($added = $importList.add('org.dbflute.c7a.cbean.C7aConditionBean'))
 #set($added = $importList.add('org.dbflute.c7a.entity.C7aEntity'))
-#set($added = $importList.add('com.datastax.driver.core.Session'))
 #set($added = $importList.add('com.datastax.driver.mapping.Mapper'))
 #set($added = $importList.add('com.datastax.driver.mapping.MappingManager'))
 #generateImports($importList, $data.package, $scriptEngine.invokeMethod($rule, 'importOrderList'))
@@ -39,10 +38,9 @@ public abstract class ${data.className}<ENTITY extends C7aEntity, CB extends C7a
 
     @Override
     protected <R> R execute(Function<Mapper<ENTITY>, R> mapperLambda) {
-        try (Session session = c7a${manager.initCap($data.c7a.schema)}Pool.getResource(getKeyspace())) {
-            Mapper<ENTITY> mapper = new MappingManager(session).mapper(typeOfSelectedEntity());
-            return mapperLambda.apply(mapper);
-        }
+        MappingManager mappingManager = c7a${manager.initCap($data.c7a.schema)}Pool.getResource(getKeyspace());
+        Mapper<ENTITY> mapper = mappingManager.mapper(typeOfSelectedEntity());
+        return mapperLambda.apply(mapper);
     }
 
     @Override

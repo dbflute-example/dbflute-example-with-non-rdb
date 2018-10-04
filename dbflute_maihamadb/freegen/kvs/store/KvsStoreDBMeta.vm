@@ -13,22 +13,31 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${manager.allClassCopyright}package ${data.package};
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.dbflute.kvs.store.cbean.KvsStoreConditionBean;
-import org.dbflute.kvs.store.entity.KvsStoreEntity;
-import org.dbflute.kvs.store.entity.dbmeta.AbstractKvsStoreDBMeta;
-import org.dbflute.util.DfAssertUtil;
-
-#if (!$data.kvs.suppressBehaviorGen)
-import ${data.exConditionBean.package}.${data.exConditionBean.className};
+#set ($rule = $scriptEngine.get('kvsRule'))
+#set ($kvsKeyCount = 0)
+#foreach ($column in $data.columnList)
+#if ($column.kvsKey)
+#set ($kvsKeyCount = $kvsKeyCount + 1)
 #end
-import ${data.exEntity.package}.${data.exEntity.className};
+#end
+#set ($importList = [])
+#set($added = $importList.add('java.util.ArrayList'))
+#set($added = $importList.add('java.util.LinkedHashMap'))
+#set($added = $importList.add('java.util.List'))
+#set($added = $importList.add('java.util.Map'))
+#set($added = $importList.add('org.dbflute.kvs.store.cbean.KvsStoreConditionBean'))
+#set($added = $importList.add('org.dbflute.kvs.store.entity.KvsStoreEntity'))
+#set($added = $importList.add('org.dbflute.kvs.store.entity.dbmeta.AbstractKvsStoreDBMeta'))
+#set($added = $importList.add('org.dbflute.util.DfAssertUtil'))
+#if (!$data.kvs.suppressBehaviorGen)
+#set($added = $importList.add("${data.exConditionBean.package}.${data.exConditionBean.className}"))
+#end
+#set($added = $importList.add("${data.exEntity.package}.${data.exEntity.className}"))
+#if ($kvsKeyCount != 1)
+#set($added = $importList.add("${data.exConditionQuery.bs.package}.${data.exConditionQuery.bs.className}.${data.exConditionQuery.bs.compoundKey.className}"))
+#end
+${manager.allClassCopyright}package ${data.package};
+#generateImports($importList, $data.package, $scriptEngine.invokeMethod($rule, 'importOrderList'))
 
 /**
  * The DB meta of (${data.comment})${data.tableName}. (Singleton)
@@ -152,6 +161,18 @@ public class ${data.className} extends AbstractKvsStoreDBMeta {
         return keyList;
     }
 
+#if ($kvsKeyCount != 1)
+    public List<Object> extractKeyList(${data.exConditionQuery.bs.compoundKey.className} compoundKey) {
+        List<Object> keyList = new ArrayList<Object>();
+#foreach ($column in $data.columnList)
+#if ($column.kvsKey)
+        keyList.add(compoundKey.get${column.capCamelName}());
+#end
+#end
+        return keyList;
+    }
+
+#end
     @Override
     public Map<String, Object> extractAllColumnMap(KvsStoreEntity entity) {
         ${data.exEntity.className} ${manager.initUncap($data.tableName)} = (${data.exEntity.className}) entity;

@@ -19,6 +19,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -26,11 +28,12 @@ import javax.annotation.PreDestroy;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.HostDistance;
 import com.datastax.driver.core.PoolingOptions;
-import com.datastax.driver.core.Session;
 import com.datastax.driver.core.TypeCodec;
+import com.datastax.driver.core.policies.RoundRobinPolicy;
 import com.datastax.driver.extras.codecs.MappingCodec;
 import com.datastax.driver.extras.codecs.jdk8.LocalDateCodec;
 import com.datastax.driver.extras.codecs.jdk8.LocalTimeCodec;
+import com.datastax.driver.mapping.MappingManager;
 
 /**
  * C7aPool.
@@ -43,11 +46,22 @@ public class C7aPool {
     //                                                                           =========
     protected Cluster cluster;
 
-    protected Session session;
+    protected Map<String, MappingManager> mappingManagers;
 
     private String host;
 
     private Integer port;
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final int MAX_CONNECTIONS_PER_HOST_LOCAL = 1;
+    private static final int CORE_CONNECTIONS_PER_HOST_LOCAL = 1;
+    private static final int MAX_CONNECTIONS_PER_HOST_REMOTE = 1;
+    private static final int CORE_CONNECTIONS_PER_HOST_REMOTE = 1;
+    private static final int HEARTBEAT_INTERVAL_SECONDS = 800;
+    private static final int MAX_REQUEST_PER_CONNECTION_LOCAL = 32768;
+    private static final int MAX_REQUEST_PER_CONNECTION_REMOTE = 2000;
 
     // ===================================================================================
     //                                                                     Pool Management
@@ -55,21 +69,37 @@ public class C7aPool {
     @PostConstruct
     public void init() {
         // TODO #c7a pri.C Cassandra接続設定を整理する。 by p1us2er0 (2018/06/13)
-        // https://docs.datastax.com/en/developer/java-driver/3.2/manual/pooling/
+        PoolingOptions poolingOptions = new PoolingOptions() //
+                // ConnectionsPerHost はデフォルトのままでよさそう
+                // https://docs.datastax.com/en/developer/java-driver/3.5/manual/pooling/
+                .setConnectionsPerHost(HostDistance.LOCAL, CORE_CONNECTIONS_PER_HOST_LOCAL, MAX_CONNECTIONS_PER_HOST_LOCAL)
+                .setConnectionsPerHost(HostDistance.REMOTE, CORE_CONNECTIONS_PER_HOST_REMOTE, MAX_CONNECTIONS_PER_HOST_REMOTE)
+                .setHeartbeatIntervalSeconds(HEARTBEAT_INTERVAL_SECONDS) // default : 30 seconds
+                .setMaxRequestsPerConnection(HostDistance.LOCAL, MAX_REQUEST_PER_CONNECTION_LOCAL)
+                .setMaxRequestsPerConnection(HostDistance.REMOTE, MAX_REQUEST_PER_CONNECTION_REMOTE);
+
         cluster = Cluster.builder()
-                .addContactPoint(host)
+                .addContactPoints(host.split(","))
                 .withPort(port)
-                .withPoolingOptions(new PoolingOptions().setCoreConnectionsPerHost(HostDistance.LOCAL, 4)
-                        .setMaxConnectionsPerHost(HostDistance.LOCAL, 10)
-                        .setCoreConnectionsPerHost(HostDistance.REMOTE, 2)
-                        .setMaxConnectionsPerHost(HostDistance.REMOTE, 4)
-                        .setHeartbeatIntervalSeconds(60)
-                        .setMaxRequestsPerConnection(HostDistance.LOCAL, 32768)
-                        .setMaxRequestsPerConnection(HostDistance.REMOTE, 2000))
+                .withPoolingOptions(poolingOptions)
+                // TODO DC に合わせて変更する (2018/07/25)
+                // RoundRobinPolicy : This works well for simple deployments. If you have multiple datacenters, it will be inefficient and you probably want to switch to a DC-aware policy.
+                // https://docs.datastax.com/en/developer/java-driver/3.5/manual/load_balancing/
+                .withLoadBalancingPolicy(new RoundRobinPolicy())
                 .build();
+
         cluster.getConfiguration().getCodecRegistry().register(LocalDateCodec.instance);
         cluster.getConfiguration().getCodecRegistry().register(LocalTimeCodec.instance);
         cluster.getConfiguration().getCodecRegistry().register(LocalDateTimeCodec.instance);
+
+        mappingManagers = new ConcurrentHashMap<String, MappingManager>();
+        // 整合性レベルの設定
+        // https://docs.datastax.com/ja/cassandra-jajp/3.0/cassandra/dml/dmlConfigConsistency.html
+        // TODO テーブル, read, write ごとに設定したい (2018/07/24)
+        // http://oranie.hatenablog.com/entry/20130723/1374555729
+        //        cluster.getConfiguration().getQueryOptions().setConsistencyLevel(ConsistencyLevel.QUORUM);
+
+        // TODO tomcat 起動後の最初の (Connection が張られる前の) DB access が遅いので、tomcat 起動時に1回 select するなどしたほうがよいかも (2018/07/26)
     }
 
     private static class LocalDateTimeCodec extends MappingCodec<LocalDateTime, Date> {
@@ -97,8 +127,10 @@ public class C7aPool {
         }
     }
 
-    public Session getResource(String keyspace) {
-        return cluster.connect(keyspace);
+    public MappingManager getResource(String keyspace) {
+        return mappingManagers.computeIfAbsent(keyspace, noKeyspaceCache -> {
+            return new MappingManager(cluster.connect(noKeyspaceCache));
+        });
     }
 
     @PreDestroy

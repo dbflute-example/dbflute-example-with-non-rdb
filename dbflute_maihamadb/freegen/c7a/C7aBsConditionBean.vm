@@ -81,6 +81,20 @@ public abstract class ${data.className}#if ($data.extendsClass && $data.extendsC
         return _conditionQuery;
     }
 
+    public void paging(int pageSize, String pagingState) {
+        if (pageSize <= 0) {
+            throw new IllegalArgumentException("Page size for paging should not be minus or zero.");
+        }
+        fetchFirst(pageSize);
+        if (pagingState != null) {
+            xPagingState(pagingState);
+        }
+        _paging = true;
+#if(${data.enablePagingCount})
+        enablePagingCount();
+#end
+    }
+
 #set ($partitionKeyArgsString = '')
 #foreach($partitionKey in $data.exConditionQuery.bs.partitionKeyList)
 #set ($primaryKeyVelocityHasNext = $velocityHasNext)

@@ -186,6 +186,10 @@ var baseRule = {
         return null;
     },
 
+    enablePagingCount: function(c7a, tableMeta) {
+        return false;
+    },
+
     // ===================================================================================
     //                                                                            Behavior
     //                                                                            ========

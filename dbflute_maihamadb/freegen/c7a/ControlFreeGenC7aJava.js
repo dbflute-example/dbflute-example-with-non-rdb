@@ -168,6 +168,7 @@ function processC7a(request) {
             exConditionBean.bs.className = scriptEngine.invokeMethod(rule, 'bsConditionBeanClassName', c7a, tableMeta);
             exConditionBean.bs.extendsClass = scriptEngine.invokeMethod(rule, 'bsConditionBeanExtendsClass', c7a, tableMeta);
             exConditionBean.bs.implementsClasses = scriptEngine.invokeMethod(rule, 'bsConditionBeanImplementsClasses', c7a, tableMeta);
+            exConditionBean.bs.enablePagingCount = scriptEngine.invokeMethod(rule, 'enablePagingCount', c7a, tableMeta);
             exConditionBean.bs.exConditionQuery = exConditionQuery;
             exConditionBeanList.push(exConditionBean);
 

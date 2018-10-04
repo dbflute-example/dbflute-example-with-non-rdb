@@ -41,10 +41,10 @@
 #if (!$data.many)
 #set($added = $importList.add('org.dbflute.optional.OptionalEntity'))
 #end
-#if ($kvsKeyCount == 1)
 #set($added = $importList.add('java.util.List'))
 #if (!$data.many)
 #set($added = $importList.add('java.util.stream.Collectors'))
+#if ($kvsKeyCount == 1)
 #set($added = $importList.add('org.dbflute.util.DfCollectionUtil'))
 #end
 #end
@@ -112,14 +112,13 @@ public abstract class ${data.className} {
         return ${manager.initUncap($data.kvs.kvsStoreFacadeImpl.className)}.findEntity(dbMeta, dbMeta.extractKeyList(cb));
     }
 
-## TODO kvskey が1つの時だけ使えるようにした複数考慮してない
 #foreach ($column in $data.columnList)
 #if ($kvsKeyCount == 1 && $column.kvsKey)
     /**
      * Select the entity List by the condition-bean.
      * <pre>
      * List&lt;${data.exEntity.className}&gt; ${manager.initUncap($data.exEntity.className)}List = <span style="color: #0000C0">${manager.initUncap($data.subClassName)}</span>.<span style="color: #CC4747">selectList</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
-     *     <span style="color: #553000">cb</span>.query().set${column.capCamelName}_inScope(<span style="color: #553000">keyList</span>);
+     *     <span style="color: #553000">cb</span>.query().set${column.capCamelName}_InScope(<span style="color: #553000">keyList</span>);
      * });
      * ${manager.initUncap($data.exEntity.className)}List.forEach(<span style="color: #553000">${manager.initUncap($data.tableName)}</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     ... = <span style="color: #553000">${manager.initUncap($data.tableName)}</span>.get...;
@@ -149,7 +148,35 @@ public abstract class ${data.className} {
 #end
 #end
 #if ($kvsKeyCount != 1)
-    /** KVSキーが複数存在するため、現在の仕様では selectList は作成されません。 */
+    /**
+     * Select the entity List by the condition-bean.
+     * <pre>
+     * List&lt;${data.exEntity.className}&gt; ${manager.initUncap($data.exEntity.className)}List = <span style="color: #0000C0">${manager.initUncap($data.subClassName)}</span>.<span style="color: #CC4747">selectList</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.query().setCompoundKey_InScope(<span style="color: #553000">keyList</span>);
+     * });
+     * ${manager.initUncap($data.exEntity.className)}List.forEach(<span style="color: #553000">${manager.initUncap($data.tableName)}</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     ... = <span style="color: #553000">${manager.initUncap($data.tableName)}</span>.get...;
+     * });
+     * </pre>
+     * @param cbLambda The callback for condition-bean of ${data.exEntity.className} (NotNull)
+     * @return The List of entities selected by the condition (NotNull: if no data, empty list)
+     */
+    public List<${data.exEntity.className}> selectList(Consumer<${data.exConditionBean.className}> cbLambda) {
+        ${data.exConditionBean.className} cb = new ${data.exConditionBean.className}();
+        cbLambda.accept(cb);
+
+        ${data.dbMeta.className} dbMeta = asDBMeta();
+
+        List<List<Object>> keyListList = cb.query().xdfgetCompoundKeyList().stream().map(value -> {
+            return dbMeta.extractKeyList(value);
+        }).collect(Collectors.toList());
+
+        return ${manager.initUncap($data.kvs.kvsStoreFacadeImpl.className)}.findEntityMap(dbMeta, keyListList)
+                .entrySet()
+                .stream()
+                .map(entry -> (${data.exEntity.className}) entry.getValue())
+                .collect(Collectors.toList());
+    }
 
 #end
     /**

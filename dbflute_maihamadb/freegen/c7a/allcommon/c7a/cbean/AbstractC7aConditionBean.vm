@@ -102,18 +102,6 @@ public abstract class AbstractC7aConditionBean implements C7aConditionBean {
         return select;
     }
 
-    public void paging(int pageSize, String pagingState) {
-        if (pageSize <= 0) {
-            throw new IllegalArgumentException("Page size for paging should not be minus or zero.");
-        }
-        fetchFirst(pageSize);
-        if (pagingState != null) {
-            xPagingState(pagingState);
-        }
-        _paging = true;
-        enablePagingCount();
-    }
-
     @Override
     public void enablePagingCount() {
         _pagingCountEnabled = true;
