@@ -33,8 +33,8 @@ import org.dbflute.optional.OptionalEntity;
 public interface KvsCacheFacade {
 
     // ===================================================================================
-    //                                                                                Find
-    //                                                                                ====
+    //                                                                Find (For KVS Cache)
+    //                                                                ====================
     /**
      * Retrieve an entity corresponding to the assigned search key-list,
      * or one stored in RDB retrieved with the search condition that CB specifies
@@ -57,26 +57,6 @@ public interface KvsCacheFacade {
      * @return The entity associated with the assigned search key-list (NotNull)
      */
     <ENTITY extends Entity> OptionalEntity<ENTITY> findEntity(List<Object> searchKeyList, ConditionBean cb,
-            Function<ENTITY, LocalDateTime> expireDateTimeLambda);
-
-    /**
-     * Retrieve an entity associated with the specified ID from DBmeta of the argument.
-     * @param id An ID as the primary key (NotNull)
-     * @param dbmeta A DBmeta of the corresponding table (NotNull)
-     * @param specifiedColumnInfoSet A set of column information for column(s) to be selected (NotNull)
-     * @return The entity retrieved by the specified ID (NotNull)
-     */
-    <ENTITY extends Entity> OptionalEntity<ENTITY> findEntityById(Object id, DBMeta dbmeta, Set<ColumnInfo> specifiedColumnInfoSet);
-
-    /**
-     * Retrieve an entity associated with the specified ID from DBmeta of the argument.
-     * @param id An ID as the primary key (NotNull)
-     * @param dbmeta A DBmeta of the corresponding table (NotNull)
-     * @param specifiedColumnInfoSet A set of column information for column(s) to be selected (NotNull)
-     * @param expireDateTimeLambda The callback for Time To Live (NotNull, MayReturnNull: then use server-config)
-     * @return The entity retrieved by the specified ID (NotNull)
-     */
-    <ENTITY extends Entity> OptionalEntity<ENTITY> findEntityById(Object id, DBMeta dbmeta, Set<ColumnInfo> specifiedColumnInfoSet,
             Function<ENTITY, LocalDateTime> expireDateTimeLambda);
 
     /**
@@ -103,18 +83,9 @@ public interface KvsCacheFacade {
     <ENTITY extends Entity> List<ENTITY> findList(List<Object> searchKeyList, ConditionBean cb,
             Function<List<ENTITY>, LocalDateTime> expireDateTimeLambda);
 
-    /**
-     * Retrieve a list of entities associated with the List of specified IDs from DBmeta of the argument,
-     * and load it to thread cache and KVS.
-     * @param idList A list of IDs as the primary keys (NotNull)
-     * @param dbmeta A DBmeta of the corresponding table (NotNull)
-     * @param specifiedColumnInfoSet A set of column information for column(s) to be selected (NotNull)
-     */
-    void loadThreadCacheByIds(List<Object> idList, DBMeta dbmeta, Set<ColumnInfo> specifiedColumnInfoSet);
-
     // ===================================================================================
-    //                                                                    Insert OR Update
-    //                                                                   =================
+    //                                                    Insert OR Update (For KVS Cache)
+    //                                                    ================================
     /**
      * Insert/update a specified entity in(into) RDB,
      * and flush caches associated with specified search key-list.
@@ -125,8 +96,8 @@ public interface KvsCacheFacade {
     <ENTITY extends Entity> void insertOrUpdate(List<Object> searchKeyList, ENTITY entity);
 
     // ===================================================================================
-    //                                                                              Delete
-    //                                                                              ======
+    //                                                              Delete (For KVS Cache)
+    //                                                              ======================
     /**
      * Delete a specified entity from RDB,
      * and flush caches associated with specified search key-list.
@@ -147,8 +118,41 @@ public interface KvsCacheFacade {
     int queryDelete(List<Object> searchKeyList, ConditionBean cb);
 
     // ===================================================================================
-    //                                                                          ClearCache
-    //                                                                          ==========
+    //                                                        Find (For CB-Embedded Cache)
+    //                                                        ============================
+    /**
+     * Retrieve an entity associated with the specified ID from DBmeta of the argument.
+     * @param id An ID as the primary key (NotNull)
+     * @param dbmeta A DBmeta of the corresponding table (NotNull)
+     * @param specifiedColumnInfoSet A set of column information for column(s) to be selected (NotNull)
+     * @return The entity retrieved by the specified ID (NotNull)
+     */
+    <ENTITY extends Entity> OptionalEntity<ENTITY> findEntityById(Object id, DBMeta dbmeta, Set<ColumnInfo> specifiedColumnInfoSet);
+
+    /**
+     * Retrieve an entity associated with the specified ID from DBmeta of the argument.
+     * @param id An ID as the primary key (NotNull)
+     * @param dbmeta A DBmeta of the corresponding table (NotNull)
+     * @param specifiedColumnInfoSet A set of column information for column(s) to be selected (NotNull)
+     * @param expireDateTimeLambda The callback for Time To Live (NotNull, MayReturnNull: then use server-config)
+     * @return The entity retrieved by the specified ID (NotNull)
+     */
+    <ENTITY extends Entity> OptionalEntity<ENTITY> findEntityById(Object id, DBMeta dbmeta, Set<ColumnInfo> specifiedColumnInfoSet,
+            Function<ENTITY, LocalDateTime> expireDateTimeLambda);
+
+    /**
+     * Retrieve a list of entities associated with the List of specified IDs from DBmeta of the argument,
+     * and load it to thread cache and KVS.
+     * @param idList A list of IDs as the primary keys (NotNull)
+     * @param dbmeta A DBmeta of the corresponding table (NotNull)
+     * @param specifiedColumnInfoSet A set of column information for column(s) to be selected (NotNull)
+     */
+    void loadThreadCacheByIds(List<Object> idList, DBMeta dbmeta, Set<ColumnInfo> specifiedColumnInfoSet);
+
+    // ===================================================================================
+    //                                                  ClearCache (For CB-Embedded Cache)
+    //                                                  ==================================
+    // unused
     /**
      * Flush caches in KVS associated with specified search key-list, but do nothing to RDB.
      * @param searchKeyList A list of keys for search (NotNull)
@@ -164,8 +168,8 @@ public interface KvsCacheFacade {
     <ENTITY extends Entity> void clearCache(ENTITY entity);
 
     // ===================================================================================
-    //                                                                               Other
-    //                                                                               =====
+    //                                                                                 TTL
+    //                                                                                 ===
     /**
      * Get the ttl associated with the assigned search key-list.
      * @param searchKeyList A list containing keys for search (NotNull)
@@ -175,19 +179,11 @@ public interface KvsCacheFacade {
     OptionalEntity<Long> ttl(List<Object> searchKeyList, ConditionBean cb);
 
     /**
-     * Get the number of active connections in connection pool.
-     * @return The number of active connections in connection pool
+     * Get a LocalDateTime as the result of addition that adds ttl to current datetime.
+     * @param ttl Time To Live (sec) (NullAllowed)
+     * @return Current datetime + ttl (NullAllowed: return null if ttl is null)
      */
-    int getNumActive();
-
-    // ===================================================================================
-    //                                                                             DB Info
-    //                                                                             =======
-    /**
-     * Get the behavior selector.
-     * @return behavior selector (NotNull)
-     */
-    BehaviorSelector mySelector();
+    LocalDateTime calcExpireDateTime(Long ttl);
 
     /**
      * Get the cache ttl.
@@ -196,12 +192,17 @@ public interface KvsCacheFacade {
     Long cacheTtl();
 
     // ===================================================================================
-    //                                                                        Small Helper
-    //                                                                        ============
+    //                                                                               Other
+    //                                                                               =====
     /**
-     * Get a LocalDateTime as the result of addition that adds ttl to current datetime.
-     * @param ttl Time To Live (sec) (NullAllowed)
-     * @return Current datetime + ttl (NullAllowed: return null if ttl is null)
+     * Get the number of active connections in connection pool.
+     * @return The number of active connections in connection pool
      */
-    LocalDateTime calcExpireDateTime(Long ttl);
+    int getNumActive();
+
+    /**
+     * Get the behavior selector.
+     * @return behavior selector (NotNull)
+     */
+    BehaviorSelector mySelector();
 }

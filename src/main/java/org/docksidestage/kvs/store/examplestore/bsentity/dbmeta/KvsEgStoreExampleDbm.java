@@ -24,7 +24,6 @@ import org.dbflute.kvs.store.cbean.KvsStoreConditionBean;
 import org.dbflute.kvs.store.entity.KvsStoreEntity;
 import org.dbflute.kvs.store.entity.dbmeta.AbstractKvsStoreDBMeta;
 import org.dbflute.util.DfAssertUtil;
-
 import org.docksidestage.kvs.store.examplestore.cbean.KvsEgStoreExampleCB;
 import org.docksidestage.kvs.store.examplestore.exentity.KvsEgStoreExample;
 
