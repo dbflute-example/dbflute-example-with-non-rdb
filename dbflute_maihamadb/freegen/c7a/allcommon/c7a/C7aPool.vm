@@ -68,9 +68,9 @@ public class C7aPool {
     //                                                                     ===============
     @PostConstruct
     public void init() {
-        // TODO #c7a pri.C Cassandra接続設定を整理する。 by p1us2er0 (2018/06/13)
+        // #hope #c7a pri.C p1us2er0 organize Cassandra connection settings. (2018/06/13)
         PoolingOptions poolingOptions = new PoolingOptions() //
-                // ConnectionsPerHost はデフォルトのままでよさそう
+                // connectionsPerHost looks good at default.
                 // https://docs.datastax.com/en/developer/java-driver/3.5/manual/pooling/
                 .setConnectionsPerHost(HostDistance.LOCAL, CORE_CONNECTIONS_PER_HOST_LOCAL, MAX_CONNECTIONS_PER_HOST_LOCAL)
                 .setConnectionsPerHost(HostDistance.REMOTE, CORE_CONNECTIONS_PER_HOST_REMOTE, MAX_CONNECTIONS_PER_HOST_REMOTE)
@@ -82,7 +82,7 @@ public class C7aPool {
                 .addContactPoints(host.split(","))
                 .withPort(port)
                 .withPoolingOptions(poolingOptions)
-                // TODO DC に合わせて変更する (2018/07/25)
+                // #hope #c7a pri.C p1us2er0 change according to DC. (2018/07/25)
                 // RoundRobinPolicy : This works well for simple deployments. If you have multiple datacenters, it will be inefficient and you probably want to switch to a DC-aware policy.
                 // https://docs.datastax.com/en/developer/java-driver/3.5/manual/load_balancing/
                 .withLoadBalancingPolicy(new RoundRobinPolicy())
@@ -93,13 +93,13 @@ public class C7aPool {
         cluster.getConfiguration().getCodecRegistry().register(LocalDateTimeCodec.instance);
 
         mappingManagers = new ConcurrentHashMap<String, MappingManager>();
-        // 整合性レベルの設定
+        // setting the consistency level.
         // https://docs.datastax.com/ja/cassandra-jajp/3.0/cassandra/dml/dmlConfigConsistency.html
-        // TODO テーブル, read, write ごとに設定したい (2018/07/24)
+        // #hope #c7a pri.C p1us2er0 want to set for each table, read, write. (2018/07/24)
         // http://oranie.hatenablog.com/entry/20130723/1374555729
-        //        cluster.getConfiguration().getQueryOptions().setConsistencyLevel(ConsistencyLevel.QUORUM);
+        // cluster.getConfiguration().getQueryOptions().setConsistencyLevel(ConsistencyLevel.QUORUM);
 
-        // TODO tomcat 起動後の最初の (Connection が張られる前の) DB access が遅いので、tomcat 起動時に1回 select するなどしたほうがよいかも (2018/07/26)
+        // #hope #c7a pri.C p1us2er0 the first DB access (before Connection is established) after tomcat start is slow, so it may be better to select once at tomcat startup (2018/07/26)
     }
 
     private static class LocalDateTimeCodec extends MappingCodec<LocalDateTime, Date> {

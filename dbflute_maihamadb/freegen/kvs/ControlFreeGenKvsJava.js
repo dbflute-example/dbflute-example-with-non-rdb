@@ -152,14 +152,14 @@ function processKvsCache(rule, request) {
             base.bs.comment = table.comment;
             base.bs.kvs = kvs;
             base.bs.dbflute = new java.util.LinkedHashMap();
-            base.bs.dbflute.dbMeta = new java.util.LinkedHashMap(); 
+            base.bs.dbflute.dbMeta = new java.util.LinkedHashMap();
             base.bs.dbflute.dbMeta.package = tableMap.dbflutePackage + '.bsentity.dbmeta';
             base.bs.dbflute.dbMeta.className = kvs.schemaShort + table.camelizedName + 'Dbm';
             base.bs.dbflute.exConditionBean = new java.util.LinkedHashMap();
             base.bs.dbflute.exConditionBean.package = tableMap.dbflutePackage + '.cbean';
             base.bs.dbflute.exConditionBean.className = kvs.schemaShort + table.camelizedName + 'CB';
             base.bs.dbflute.exEntity = new java.util.LinkedHashMap();
-            base.bs.dbflute.exEntity.package = tableMap.dbflutePackage + '.exentity'; 
+            base.bs.dbflute.exEntity.package = tableMap.dbflutePackage + '.exentity';
             base.bs.dbflute.exEntity.className = kvs.schemaShort + table.camelizedName;
             base.bs.dbflute.instance = tableMap.databaseMap[kvs.schema].instance;
 
@@ -214,7 +214,7 @@ function processKvsCache(rule, request) {
     var di = new java.util.LinkedHashMap(base);
     di.kvs = kvs;
     di.kvsPoolDiFile = tableMap.kvsPoolDiFile;
-    di.dbfluteDiFile = tableMap.dbfluteDiFile; 
+    di.dbfluteDiFile = tableMap.dbfluteDiFile;
     di.exBehaviorList = exBehaviorList;
     if (manager.isTargetContainerSeasar()) {
         generate('./kvs/allcommon/container/seasar/KvsCacheDicon.vm', '../resources/kvs/di/kvs-cache-' + tableMap.schema + '.dicon', di, true);
@@ -347,7 +347,7 @@ function processKvsStore(rule, request) {
         exBehavior.bs.many = table.many;
         exBehavior.bs.ttl = table.ttl;
         exBehaviorList.push(exBehavior);
-        
+
         dbMeta.exEntity = exEntity;
         dbMeta.exConditionBean = exConditionBean;
     }
@@ -362,7 +362,7 @@ function processKvsStore(rule, request) {
         doc.exBehaviorList = exBehaviorList;
         processKvsStoreDoc(rule, doc);
     }
-    
+
     var di = new java.util.LinkedHashMap(base);
     di.kvs = kvs;
     di.kvsPoolDiFile = tableMap.kvsPoolDiFile;

@@ -125,7 +125,7 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
     // ===================================================================================
     //                                                                         List Select
     //                                                                         ===========
-    // TODO #c7a pri.C selectList、selectPageのときにpage系の設定のアサートをする。 by p1us2er0 (2018/06/14)
+    // #hope #c7a pri.C p1us2er0 selectList, selectPage asserts the setting of page type. (2018/06/14)
     public List<ENTITY> selectList(Consumer<CB> cbLambda) {
         CB cb = newConditionBean();
         cbLambda.accept(cb);

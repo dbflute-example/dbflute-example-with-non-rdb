@@ -45,8 +45,8 @@ var baseRule = {
     },
 
     /**
-     * Return java import order list.
-     * @return java import order list. (NotNull)
+     * Return converter handler.
+     * @return converter handler. (NotNull)
      */
     converterHandler: function() {
         // MapListString Instantiate everytime because of the statefulness of...
