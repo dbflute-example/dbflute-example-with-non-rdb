@@ -79,6 +79,13 @@ public interface KvsDelegator {
     /**
      * 指定されたキーに対応するハッシュを返す。
      * @param key キー (NotNull)
+     * @return 指定されたキーに対応するハッシュ (NullAllowed)
+     */
+    Map<String, String> findHash(String key);
+
+    /**
+     * 指定されたキーに対応するハッシュを返す。
+     * @param key キー (NotNull)
      * @param fieldList フィールドリスト (NotNull)
      * @return 指定されたキーに対応するハッシュ (NullAllowed)
      */
@@ -192,20 +199,39 @@ public interface KvsDelegator {
     //                                                                              Delete
     //                                                                              ======
     /**
-     * Delete an entry? associated with the assigned key.
-     * @param key Key associated with the value to delete (NotNull)
+     * Remove the specified key.
+     * @param key Key to delete (NotNull)
      */
     void delete(String key);
 
     /**
-     * Delete all entries? associated with each of the assigned keys.
-     * @param keys keys for entries to delete (NotNull)
+     * Remove the specified keys.
+     * @param keys Keys to delete (NotNull)
      */
     void delete(String... keys);
 
+    // -----------------------------------------------------
+    //                                                  Hash
+    //                                                  ----
+    /**
+     * Remove the specified field from an hash stored at key.
+     * @param key Key to delete (NotNull)
+     * @param fieldList field list to delete (NotNull)
+     */
+    void deleteHash(String key, Set<String> fieldList);
+
     // ===================================================================================
-    //                                                                               Other
-    //                                                                               =====
+    //                                                                              Exists
+    //                                                                              ======
+    /**
+     * Test if the specified key exists.
+     * @param key Key (NotNull)
+     */
+    boolean exists(String key);
+
+    // ===================================================================================
+    //                                                                                 TTL
+    //                                                                                 ===
     /**
      * Return the ttl.
      * @param key Key (NotNull)
@@ -213,6 +239,16 @@ public interface KvsDelegator {
      */
     Long ttl(String key);
 
+    /**
+     * set expireAt.
+     * @param key Key (NotNull)
+     * @param expireDateTime expire date time (NotNull)
+     */
+    void expireAt(String key, LocalDateTime expireDateTime);
+
+    // ===================================================================================
+    //                                                                               Other
+    //                                                                               =====
     /**
      * Get the number of active connections in connection pool.
      * @return The number of active connections in connection pool

@@ -103,6 +103,13 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
     //                                                  Hash
     //                                                  ----
     @Override
+    public Map<String, String> findHash(String key) {
+        try (Jedis jedis = kvsRedisPool.getResource()) {
+            return jedis.hgetAll(key);
+        }
+    }
+
+    @Override
     public List<String> findHash(String key, Set<String> fieldList) {
         try (Jedis jedis = kvsRedisPool.getResource()) {
             List<String> list = jedis.hmget(key, fieldList.toArray(new String[] {}));
@@ -281,18 +288,6 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
         }
     }
 
-    /**
-     * Set Time To Live to a value in KVS that is specified by the assigned key.
-     * @param pipeline Pipeline (NotNull)
-     * @param key Key for a value in KVS (NotNull)
-     * @param expireDateTime Time To Live (NullAllowed: do not set ttl if null)
-     */
-    protected void expireAt(Pipeline pipeline, String key, LocalDateTime expireDateTime) {
-        if (expireDateTime != null) {
-            pipeline.expireAt(key, TimeUnit.MILLISECONDS.toSeconds(new HandyDate(expireDateTime).getDate().getTime()));
-        }
-    }
-
     // ===================================================================================
     //                                                                              Delete
     //                                                                              ======
@@ -313,9 +308,26 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
         }
     }
 
+    @Override
+    public void deleteHash(String key, Set<String> fieldList) {
+        try (Jedis jedis = kvsRedisPool.getResource()) {
+            jedis.hdel(key, fieldList.toArray(new String[fieldList.size()]));
+        }
+    }
+
     // ===================================================================================
-    //                                                                               Other
-    //                                                                               =====
+    //                                                                              Exists
+    //                                                                              ======
+    @Override
+    public boolean exists(String key) {
+        try (Jedis jedis = kvsRedisPool.getResource()) {
+            return jedis.exists(key);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                                 TTL
+    //                                                                                 ===
     @Override
     public Long ttl(String key) {
         try (Jedis jedis = kvsRedisPool.getResource()) {
@@ -323,6 +335,30 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
         }
     }
 
+    @Override
+    public void expireAt(String key, LocalDateTime expireDateTime) {
+        try (Jedis jedis = kvsRedisPool.getResource(); Pipeline pipeline = jedis.pipelined()) {
+            expireAt(pipeline, key, expireDateTime);
+        } catch (final IOException e) {
+            throw new KvsException("kvs error.", e);
+        }
+    }
+
+    /**
+     * Set Time To Live to a value in KVS that is specified by the assigned key.
+     * @param pipeline Pipeline (NotNull)
+     * @param key Key for a value in KVS (NotNull)
+     * @param expireDateTime Time To Live (NullAllowed: do not set ttl if null)
+     */
+    protected void expireAt(Pipeline pipeline, String key, LocalDateTime expireDateTime) {
+        if (expireDateTime != null) {
+            pipeline.expireAt(key, TimeUnit.MILLISECONDS.toSeconds(new HandyDate(expireDateTime).getDate().getTime()));
+        }
+    }
+
+    // ===================================================================================
+    //                                                                               Other
+    //                                                                               =====
     @Override
     public int getNumActive() {
         return kvsRedisPool.getNumActive();

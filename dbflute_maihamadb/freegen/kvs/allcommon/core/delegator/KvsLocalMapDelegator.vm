@@ -16,6 +16,7 @@
 ${manager.allClassCopyright}package org.dbflute.kvs.core.delegator;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -106,6 +107,22 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     // -----------------------------------------------------
     //                                                  Hash
     //                                                  ----
+    @Override
+    public Map<String, String> findHash(String key) {
+        Object value = getInExpireDateTime(key);
+        if (value == null) {
+            value = DfCollectionUtil.newLinkedHashMap();
+        }
+        if (value instanceof Map<?, ?>) {
+            @SuppressWarnings("unchecked")
+            Map<String, String> map = (Map<String, String>) value;
+            return map;
+        } else {
+            String msg = "The type of the return value is invalid. expected=%s, actual=%s";
+            throw new KvsException(String.format(msg, Map.class, value.getClass()));
+        }
+    }
+
     @Override
     public List<String> findHash(String key, Set<String> fieldList) {
         Object value = getInExpireDateTime(key);
@@ -243,14 +260,60 @@ public class KvsLocalMapDelegator implements KvsDelegator {
         });
     }
 
+    // -----------------------------------------------------
+    //                                                  Hash
+    //                                                  ----
+    @Override
+    public void deleteHash(String key, Set<String> fieldList) {
+        Object value = getInExpireDateTime(key);
+        if (value == null) {
+            return;
+        }
+
+        if (value instanceof Map<?, ?>) {
+            @SuppressWarnings("unchecked")
+            Map<String, String> map = (Map<String, String>) value;
+            fieldList.stream().forEach(field -> map.remove(field));
+        } else {
+            String msg = "The type of the return value is invalid. expected=%s, actual=%s";
+            throw new KvsException(String.format(msg, Map.class, value.getClass()));
+        }
+    }
+
+    // ===================================================================================
+    //                                                                              Exists
+    //                                                                              ======
+    @Override
+    public boolean exists(String key) {
+        return (getInExpireDateTime(key) != null);
+    }
+
+    // ===================================================================================
+    //                                                                                 TTL
+    //                                                                                 ===
+    @Override
+    public Long ttl(String key) {
+        if (!KEY_EXPIRE_DATE_TIME_MAP.containsKey(key)) {
+            return -1L;
+        }
+
+        final LocalDateTime current = LocalDateTime.now();
+        final LocalDateTime expire = KEY_EXPIRE_DATE_TIME_MAP.get(key);
+        return ChronoUnit.SECONDS.between(current, expire);
+    }
+
+    @Override
+    public void expireAt(String key, LocalDateTime expireDateTime) {
+        if (!KEY_VALUE_MAP.containsKey(key)) {
+            String msg = "Key don't exist. Key=%s";
+            throw new KvsException(String.format(msg, key));
+        }
+        KEY_EXPIRE_DATE_TIME_MAP.put(key, expireDateTime);
+    }
+
     // ===================================================================================
     //                                                                               Other
     //                                                                               =====
-    @Override
-    public Long ttl(String key) {
-        return 1L;
-    }
-
     @Override
     public int getNumActive() {
         return 1;

@@ -68,6 +68,11 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     //                                                  Hash
     //                                                  ----
     @Override
+    public Map<String, String> findHash(String key) {
+        return kvsStoreDelegator.findHash(key);
+    }
+
+    @Override
     public List<String> findHash(String key, Set<String> fieldList) {
         return kvsStoreDelegator.findHash(key, fieldList);
     }
@@ -160,6 +165,27 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     @Override
     public void delete(String... keys) {
         kvsStoreDelegator.delete(keys);
+    }
+
+    @Override
+    public void deleteHash(String key, Set<String> fieldList) {
+        kvsStoreDelegator.deleteHash(key, fieldList);
+    }
+
+    // ===================================================================================
+    //                                                                              Exists
+    //                                                                              ======
+    @Override
+    public boolean exists(String key) {
+        return kvsStoreDelegator.exists(key);
+    }
+
+    // ===================================================================================
+    //                                                                            expireAt
+    //                                                                            ========
+    @Override
+    public void expireAt(String key, LocalDateTime expireDateTime) {
+        kvsStoreDelegator.expireAt(key, expireDateTime);
     }
 
     // ===================================================================================

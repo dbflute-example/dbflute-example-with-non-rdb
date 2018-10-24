@@ -60,6 +60,8 @@ public interface KvsStoreManager {
     // -----------------------------------------------------
     //                                                  Hash
     //                                                  ----
+    Map<String, String> findHash(String key);
+
     List<String> findHash(String key, Set<String> fieldList);
 
     List<List<String>> findMultiHash(List<String> keyList, Set<String> fieldList);
@@ -144,16 +146,45 @@ public interface KvsStoreManager {
     //                                                                              Delete
     //                                                                              ======
     /**
-     * 指定されたキーのエントリを削除する。
-     * @param key 削除対象のキー (NotNull)
+     * Remove the specified key.
+     * @param key Key to delete (NotNull)
      */
     void delete(String key);
 
     /**
-     * 指定されたキーのエントリを削除する。
-     * @param keys 削除対象のキー (NotNull)
+     * Remove the specified keys.
+     * @param keys Keys to delete (NotNull)
      */
     void delete(String... keys);
+
+    // -----------------------------------------------------
+    //                                                  Hash
+    //                                                  ----
+    /**
+     * Remove the specified field from an hash stored at key.
+     * @param key Key to delete (NotNull)
+     * @param fieldList field list to delete (NotNull)
+     */
+    void deleteHash(String key, Set<String> fieldList);
+
+   // ===================================================================================
+    //                                                                              Exists
+    //                                                                              ======
+    /**
+     * Test if the specified key exists.
+     * @param key Key (NotNull)
+     */
+    boolean exists(String key);
+
+    // ===================================================================================
+    //                                                                                 TTL
+    //                                                                                 ===
+    /**
+     * set expireAt.
+     * @param key Key (NotNull)
+     * @param expireDateTime expire date time (NotNull)
+     */
+    void expireAt(String key, LocalDateTime expireDateTime);
 
     // ===================================================================================
     //                                                                               Other
