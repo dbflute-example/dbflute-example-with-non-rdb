@@ -24,7 +24,7 @@
         <th>Name</th>
         <th>Type</th>
         <th>TableComment</th>
-        <th>KeyspaceName</th>        
+        <th>KeyspaceName</th>
         <th>EntityName</th>
     </tr>
     </thead>

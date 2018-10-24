@@ -182,6 +182,9 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         return pagingResultBean;
     }
 
+    // ===================================================================================
+    //                                                                              Insert
+    //                                                                              ======
     public void insert(ENTITY entity) {
         varyingInsert(entity, op -> {});
     }
@@ -211,7 +214,7 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         option.getTtl().ifPresent(ttl -> insert.using(QueryBuilder.ttl(ttl)));
         option.getTimestamp().ifPresent(timestamp -> insert.using(QueryBuilder.timestamp(timestamp)));
         option.getConsistencyLevel().ifPresent(consistencyLevel -> insert.setConsistencyLevel(consistencyLevel));
-        logger.debug("#c7a cql={}", insert.getQueryString());
+        logger.debug("#c7a cql={}", insert.toString());
         ResultSet resultSet = execute(mapper -> mapper.getManager().getSession().execute(insert));
         Row one = resultSet.one();
         if (one != null && !one.getBool(0)) {
@@ -219,6 +222,9 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         }
     }
 
+    // ===================================================================================
+    //                                                                              Update
+    //                                                                              ======
     public void update(ENTITY entity) {
         varyingUpdate(entity, op -> {});
     }
@@ -271,7 +277,7 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         option.getTtl().ifPresent(ttl -> update.using(QueryBuilder.ttl(ttl)));
         option.getTimestamp().ifPresent(timestamp -> update.using(QueryBuilder.timestamp(timestamp)));
         option.getConsistencyLevel().ifPresent(consistencyLevel -> update.setConsistencyLevel(consistencyLevel));
-        logger.debug("#c7a cql={}", update.getQueryString());
+        logger.debug("#c7a cql={}", update.toString());
         ResultSet resultSet = execute(mapper -> mapper.getManager().getSession().execute(update));
         Row one = resultSet.one();
         if (one != null && !one.getBool(0)) {
@@ -279,6 +285,9 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         }
     }
 
+    // ===================================================================================
+    //                                                                    Insert or Update
+    //                                                                    ================
     public void insertOrUpdate(ENTITY entity) {
         varyingInsertOrUpdate(entity, op -> {});
     }
@@ -307,7 +316,7 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         option.getTtl().ifPresent(ttl -> insert.using(QueryBuilder.ttl(ttl)));
         option.getTimestamp().ifPresent(timestamp -> insert.using(QueryBuilder.timestamp(timestamp)));
         option.getConsistencyLevel().ifPresent(consistencyLevel -> insert.setConsistencyLevel(consistencyLevel));
-        logger.debug("#c7a cql={}", insert.getQueryString());
+        logger.debug("#c7a cql={}", insert.toString());
         ResultSet resultSet = execute(mapper -> mapper.getManager().getSession().execute(insert));
         Row one = resultSet.one();
         if (one != null && !one.getBool(0)) {
@@ -315,6 +324,9 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         }
     }
 
+    // ===================================================================================
+    //                                                                              Delete
+    //                                                                              ======
     public void delete(ENTITY entity) {
         varyingDelete(entity, op -> {});
     }
@@ -362,13 +374,38 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         option.getTimestamp().ifPresent(timestamp -> delete.using(QueryBuilder.timestamp(timestamp)));
         option.getConsistencyLevel().ifPresent(consistencyLevel -> delete.setConsistencyLevel(consistencyLevel));
 
-        logger.debug("#c7a cql={}", delete.getQueryString());
+        logger.debug("#c7a cql={}", delete.toString());
         ResultSet resultSet = execute(mapper -> mapper.getManager().getSession().execute(delete));
         Row one = resultSet.one();
         if (one != null && !one.getBool(0)) {
             //throw new EntityAlreadyDeletedException(one.toString());
             throw new EntityAlreadyUpdatedException(one.toString(), 1);
         }
+    }
+
+    // ===================================================================================
+    //                                                                        Query Delete
+    //                                                                        ============
+    public void queryDelete(Consumer<CB> cbLambda) {
+        doQueryDelete(cbLambda, op -> {});
+    }
+
+    public void varyingQueryDelete(Consumer<CB> cbLambda, Consumer<DeleteOption> op) {
+        doQueryDelete(cbLambda, op);
+    }
+
+    protected void doQueryDelete(Consumer<CB> cbLambda, Consumer<DeleteOption> op) {
+        CB cb = newConditionBean();
+        cbLambda.accept(cb);
+        Delete delete = cb.buildQueryDelete();
+
+        DeleteOption option = new DeleteOption();
+        op.accept(option);
+        option.getTimestamp().ifPresent(timestamp -> delete.using(QueryBuilder.timestamp(timestamp)));
+        option.getConsistencyLevel().ifPresent(consistencyLevel -> delete.setConsistencyLevel(consistencyLevel));
+
+        logger.debug("#c7a cql={}", delete.toString());
+        execute(mapper -> mapper.getManager().getSession().execute(delete));
     }
 
     protected BehaviorExceptionThrower createBehaviorExceptionThrower() {

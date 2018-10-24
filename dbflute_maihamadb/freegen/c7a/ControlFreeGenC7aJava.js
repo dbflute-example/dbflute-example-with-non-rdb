@@ -122,9 +122,10 @@ function processC7a(request) {
             base.bs.clusteringOrderList = tableMeta.clusteringOrderList;
             base.bs.primaryKeyList = tableMeta.primaryKeyList;
             base.bs.materializedViewMetaList = tableMeta.materializedViewMetaList;
+            base.bs.filterTableName = scriptEngine.invokeMethod(rule, 'filterTableName', c7a, tableMeta);
             analyzeProperties(rule, base.bs);
 
-            var exDBMeta = new java.util.LinkedHashMap(base);
+            var exDBMeta = new java.util.LinkedHashMap(base.bs);
             var subPackage = scriptEngine.invokeMethod(rule, 'dbMetaSubPackage', c7a, tableMeta);
             exDBMeta.package = subPackage ? c7a.package + '.' + subPackage : c7a.package;
             exDBMeta.className = scriptEngine.invokeMethod(rule, 'dbMetaClassName', c7a, tableMeta);
@@ -169,6 +170,7 @@ function processC7a(request) {
             exConditionBean.bs.extendsClass = scriptEngine.invokeMethod(rule, 'bsConditionBeanExtendsClass', c7a, tableMeta);
             exConditionBean.bs.implementsClasses = scriptEngine.invokeMethod(rule, 'bsConditionBeanImplementsClasses', c7a, tableMeta);
             exConditionBean.bs.enablePagingCount = scriptEngine.invokeMethod(rule, 'enablePagingCount', c7a, tableMeta);
+            exConditionBean.bs.exDBMeta = exDBMeta;
             exConditionBean.bs.exConditionQuery = exConditionQuery;
             exConditionBeanList.push(exConditionBean);
 

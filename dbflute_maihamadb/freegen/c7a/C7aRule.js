@@ -270,6 +270,14 @@ var baseRule = {
             'varint': 'java.math.BigInteger'
         };
     },
+
+    /**
+     * Return filter Table Name.
+     * @return filter Table Name. (NullAllowed)
+     */
+    filterTableName: function(c7a, tableMeta) {
+        return null;
+    },
 };
 
 var c7aRule = {};
