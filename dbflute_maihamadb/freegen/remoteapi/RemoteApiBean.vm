@@ -34,9 +34,9 @@ ${manager.allClassCopyright}package ${data.package};
 #end
 #end
 #if ($property.items && $property.items['$ref'])
-#set ($nestType = $property.items['$ref'].replace('#/definitions/', ''))
+#set ($nestType = $generator.getClass().forName('java.net.URLDecoder').decode($property.items['$ref'].replace('#/definitions/', ''), 'UTF-8'))
 #elseif ($property['$ref'])
-#set ($nestType = $property['$ref'].replace('#/definitions/', ''))
+#set ($nestType = $generator.getClass().forName('java.net.URLDecoder').decode($property['$ref'].replace('#/definitions/', ''), 'UTF-8'))
 #end
 #if ($nestType && $nestType != '')
 #foreach($nestPropertyEntry in $definitionMap[$nestType].properties.entrySet())
@@ -116,7 +116,7 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
 #elseif (${typeMap[$property.items.type]})
 #set ($fieldClass = "${typeMap[$property.type]}<${typeMap[$property.items.type]}>")
 #else
-#set ($nestType = $property.items['$ref'].replace('#/definitions/', ''))
+#set ($nestType = $generator.getClass().forName('java.net.URLDecoder').decode($property.items['$ref'].replace('#/definitions/', ''), 'UTF-8'))
 #adjustType($nestType)
 #set ($fieldClass = "${typeMap[$property.type]}<$adjustType>")
 #generateIndent($nestList.size())@javax.validation.Valid
@@ -128,7 +128,7 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
 #elseif (${typeMap[$property.type]})
 #set ($fieldClass = ${typeMap[$property.type]})
 #else
-#set ($nestType = $property['$ref'].replace('#/definitions/', ''))
+#set ($nestType = $generator.getClass().forName('java.net.URLDecoder').decode($property['$ref'].replace('#/definitions/', ''), 'UTF-8'))
 #adjustType($nestType)
 #set ($fieldClass = $adjustType)
 #generateIndent($nestList.size())@javax.validation.Valid

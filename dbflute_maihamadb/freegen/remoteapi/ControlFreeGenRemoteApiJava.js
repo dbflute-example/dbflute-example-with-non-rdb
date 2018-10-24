@@ -108,9 +108,9 @@ function processRemoteApi(request) {
             } else if (parameter.in === 'body') {
                 var definitionKey = '';
                 if (parameter.schema.type && parameter.schema.type === 'array') {
-                    definitionKey = parameter.schema.items['$ref'].replace('#/definitions/', '');
+                    definitionKey = java.net.URLDecoder.decode(parameter.schema.items['$ref'].replace('#/definitions/', ''), "UTF-8");
                 } else if (parameter.schema['$ref']) {
-                    definitionKey = parameter.schema['$ref'].replace('#/definitions/', '');
+                    definitionKey = java.net.URLDecoder.decode(parameter.schema['$ref'].replace('#/definitions/', ''), "UTF-8");
                 }
                 bodyProperties = definitionMap[scriptEngine.invokeMethod(rule, 'definitionKey', definitionKey)].properties;
                 for (bodyPropertyKey in bodyProperties) {
@@ -167,7 +167,7 @@ function processRemoteApi(request) {
                     returnBean.className = typeMap[responseSchema.type];
                     returnBean.array = array;
                 } else {
-                    var definitionKey = responseSchema['$ref'].replace('#/definitions/', '');
+                    var definitionKey = java.net.URLDecoder.decode(responseSchema['$ref'].replace('#/definitions/', ''), "UTF-8");
                     var definition = definitionMap[scriptEngine.invokeMethod(rule, 'definitionKey', definitionKey)];
                     if (definition) {
                         var returnProperties = definition.properties;
