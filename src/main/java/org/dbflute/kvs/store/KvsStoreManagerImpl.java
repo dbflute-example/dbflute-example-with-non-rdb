@@ -145,6 +145,16 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     }
 
     @Override
+    public boolean registerHashNx(String key, String field, String value) {
+        return kvsStoreDelegator.registerHashNx(key, field, value);
+    }
+
+    @Override
+    public boolean registerHashNx(String key, String field, String value, LocalDateTime expireDateTime) {
+        return kvsStoreDelegator.registerHashNx(key, field, value, expireDateTime);
+    }
+
+    @Override
     public void registerMultiHash(Map<String, Map<String, String>> keyValueMap) {
         kvsStoreDelegator.registerMultiHash(keyValueMap);
     }

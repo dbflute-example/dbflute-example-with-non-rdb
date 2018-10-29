@@ -138,6 +138,10 @@ public interface KvsStoreManager {
 
     void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime expireDateTime);
 
+    boolean registerHashNx(String key, String field, String value);
+
+    boolean registerHashNx(String key, String field, String value, LocalDateTime expireDateTime);
+
     void registerMultiHash(Map<String, Map<String, String>> keyValueMap);
 
     void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime expireDateTime);

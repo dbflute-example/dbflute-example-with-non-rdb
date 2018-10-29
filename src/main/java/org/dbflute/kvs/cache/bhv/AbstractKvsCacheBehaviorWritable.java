@@ -27,6 +27,9 @@ import org.dbflute.kvs.cache.cbean.KvsCacheConditionBean;
 import org.dbflute.kvs.cache.facade.KvsCacheFacade;
 import org.dbflute.util.DfStringUtil;
 
+/**
+ * @author FreeGen
+ */
 public abstract class AbstractKvsCacheBehaviorWritable<ENTITY extends Entity, CB extends ConditionBean, KVS_CB extends KvsCacheConditionBean> {
 
     protected KVS_CB createCB(Consumer<KVS_CB> cbCall) { // CB from callback

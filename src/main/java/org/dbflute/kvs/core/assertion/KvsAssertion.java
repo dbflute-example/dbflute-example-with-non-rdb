@@ -20,6 +20,11 @@ package org.dbflute.kvs.core.assertion;
  */
 public class KvsAssertion {
 
+    /**
+     * assert null query.
+     * @param property property
+     * @param query query
+     */
     public static void assertNullQuery(String property, Object query) {
         if (property == null) {
             throw new IllegalArgumentException("Please set property name.");
