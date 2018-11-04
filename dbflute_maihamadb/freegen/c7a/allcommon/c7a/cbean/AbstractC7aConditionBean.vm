@@ -26,6 +26,7 @@ import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.PagingState;
 import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.Delete;
+import com.datastax.driver.core.querybuilder.Update;
 import com.datastax.driver.core.querybuilder.Ordering;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
@@ -93,6 +94,16 @@ public abstract class AbstractC7aConditionBean implements C7aConditionBean {
     }
 
     // ===================================================================================
+    //                                                                              Update
+    //                                                                              ======
+    @Override
+    public Update buildQueryUpdate() {
+        Update update = QueryBuilder.update(asTableDbName());
+        buildWhere(update);
+        return update;
+    }
+
+    // ===================================================================================
     //                                                                              Delete
     //                                                                              ======
     @Override
@@ -126,6 +137,8 @@ public abstract class AbstractC7aConditionBean implements C7aConditionBean {
     }
 
     protected abstract void buildWhere(Select select);
+
+    protected abstract void buildWhere(Update update);
 
     protected abstract void buildWhere(Delete delete);
 

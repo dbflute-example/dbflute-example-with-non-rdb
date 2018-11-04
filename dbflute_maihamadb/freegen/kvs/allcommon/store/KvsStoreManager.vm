@@ -32,16 +32,16 @@ public interface KvsStoreManager {
     //                                                String
     //                                                ------
     /**
-     * keyに対応した文字列をKVSから取得する。
-     * @param key 取得したい値のKey値 (NotNull)
-     * @return 指定されたKeyでKVS上に保持されている文字列 (NullAllowed)
+     * Return value for the specified key.
+     * @param key key (NotNull)
+     * @return value for the specified key (NullAllowed)
      */
     String findString(String key);
 
     /**
-     * keyリストに対応した文字列リストをKVSから取得する。
-     * @param keyList 取得したい値のKey値リスト (NotNull)
-     * @return 指定されたKeyでKVS上に保持されている文字列リスト (NotNull)
+     * Return value list for the specified key list.
+     * @param keyList KeyList (NotNull)
+     * @return value list for the specified key list (NotNull)
      */
     List<String> findMultiString(List<String> keyList);
 
@@ -49,21 +49,49 @@ public interface KvsStoreManager {
     //                                                  List
     //                                                  ----
     /**
-     * keyに対応した文字列リストをKVSから取得する。
-     * @param key 取得したい値のKey値 (NotNull)
-     * @return 指定されたKeyでKVS上に保持されている文字列リスト (NotNull)
+     * Return list for the specified key.
+     * <p>
+     * このメソッドは、同一キーの処理においてスレッドセーフではありません。<br>
+     * これは同一キーでの並列処理が業務上発生しない & 影響は軽微ですので、実装の簡易さのため整合性の担保は行わない方針だからです。
+     * (不整合の例:このメソッドはKVSからデータを取得しますが、キャッシュヒットしなかった場合RDBの値でキャッシュをリフレッシュしする実装である場合、
+     * 同じタイミングで別スレッドから読み込みが行われた場合不整合なデータが返却されます)
+     * </p>
+     * @param key key (NotNull)
+     * @return list for the specified key (NotNull)
      */
     List<String> findList(String key);
 
+    /**
+     * Return list for the specified key list.
+     * @param keyList key list (NotNull)
+     * @return list for the specified key list (NotNull)
+     */
     List<List<String>> findMultiList(List<String> keyList);
 
     // -----------------------------------------------------
     //                                                  Hash
     //                                                  ----
+    /**
+     * Return hash for the specified key.
+     * @param key key (NotNull)
+     * @return hash for the specified key (NotNull)
+     */
     Map<String, String> findHash(String key);
 
+    /**
+     * Return hash field value list for the specified key.
+     * @param key key (NotNull)
+     * @param fieldList field list (NotNull)
+     * @return hash field value list for the specified key (NotNull)
+     */
     List<String> findHash(String key, Set<String> fieldList);
 
+    /**
+     * Return hash field value list for the specified key.
+     * @param keyList key list (NotNull)
+     * @param fieldList field list (NotNull)
+     * @return hash field value list for the specified key list (NotNull)
+     */
     List<List<String>> findMultiHash(List<String> keyList, Set<String> fieldList);
 
     // ===================================================================================
@@ -73,85 +101,120 @@ public interface KvsStoreManager {
     //                                                String
     //                                                ------
     /**
-     * 指定したkeyで値をKVSに保存する。
-     * @param key KVSに値を保存するKey (NotNull)
-     * @param value 指定されたkeyでKVS上に保存される値 (NotNull)
+     * Register value for the specified key.
+     * @param key key (NotNull)
+     * @param value value (NotNull)
      */
     void registerString(String key, String value);
 
     /**
-     * 有効期限を設定して指定したkeyで値をKVSに保存する。
-     * @param key KVSへの登録キー (NotNull)
-     * @param value 指定されたkeyでKVS上に保存される値 (NotNull)
-     * @param expireDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     * Register value for the specified key. (Specify expire date time.)
+     * @param key key (NotNull)
+     * @param value value (NotNull)
+     * @param expireDateTime expire date time (NullAllowed: If it is null, it depends on the KVS server setting)
      */
     void registerString(String key, String value, LocalDateTime expireDateTime);
 
     /**
-     * 指定したKeyで値をKVSに保存する。
-     * @param keyValueMap KVSへの登録キー、値のMAP (NotNull)
+     * Register the specified combination of key and value.
+     * @param combinationKeyValueMap combination of key and value (NotNull)
      */
-    void registerMultiString(Map<String, String> keyValueMap);
+    void registerMultiString(Map<String, String> combinationKeyValueMap);
 
     /**
-     * 有効期限を設定して指定したKeyで値をKVSに保存する。
-     * @param keyValueMap KVSへの登録キー、値のMAP (NotNull)
-     * @param expireDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     * Register the specified combination of key and value. (Specify expire date time.)
+     * @param combinationKeyValueMap combination of key and value (NotNull)
+     * @param expireDateTime expire date time (NullAllowed: If it is null, it depends on the KVS server setting)
      */
-    void registerMultiString(Map<String, String> keyValueMap, LocalDateTime expireDateTime);
+    void registerMultiString(Map<String, String> combinationKeyValueMap, LocalDateTime expireDateTime);
 
     // -----------------------------------------------------
     //                                                  List
     //                                                  ----
     /**
-     * 指定したKeyで値をKVSに保存する。
-     * @param key KVSに値を保存するKey (NotNull)
-     * @param value 指定されたkeyでKVS上に保存される値 (NotNull)
+     * Register list for the specified key.
+     * @param key key (NotNull)
+     * @param list list (NotNull)
      */
     void registerList(String key, List<String> value);
 
     /**
-     * 有効期限を設定して指定したKeyで値をKVSに保存する。
-     * @param key KVSへの登録キー (NotNull)
-     * @param value 指定されたkeyでKVS上に保存される値 (NotNull)
-     * @param expireDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     * Register list for the specified key. (Specify expire date time.)
+     * @param key key (NotNull)
+     * @param list list (NotNull)
+     * @param expireDateTime expire date time (NullAllowed: If it is null, it depends on the KVS server setting)
      */
     void registerList(String key, List<String> value, LocalDateTime expireDateTime);
 
     /**
-     * 指定したKeyで文字列リストをKVSに保存する。
-     * @param keyValueMap KVSへの登録キー、値のMAP (NotNull)
+     * Register a combination of the specified key and list.
+     * @param combinationKeyListMap combination of key list map (NotNull)
      */
-    void registerMultiList(Map<String, List<String>> keyValueMap);
+    void registerMultiList(Map<String, List<String>> combinationKeyListMap);
 
     /**
-     * 有効期限を設定して指定したKeyで文字列リストをKVSに保存する。
-     * @param keyValueMap KVSへの登録キー、値のMAP (NotNull)
-     * @param expireDateTime 有効期限 (NullAllowed: nullの場合はKVSサーバーの設定に依存)
+     * Register a combination of the specified key and list. (Specify expire date time.)
+     * @param combinationKeyListMap combination of key list map (NotNull)
+     * @param expireDateTime expire date time (NullAllowed: If it is null, it depends on the KVS server setting)
      */
-    void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime expireDateTime);
+    void registerMultiList(Map<String, List<String>> combinationKeyListMap, LocalDateTime expireDateTime);
 
     // -----------------------------------------------------
     //                                                  Hash
     //                                                  ----
+    /**
+     * Register hash for the specified key.
+     * @param key key (NotNull)
+     * @param hash hash (NotNull)
+     */
     void registerHash(String key, Map<String, String> fieldValueMap);
 
+    /**
+     * Register hash for the specified key. (Specify expire date time.)
+     * @param key key (NotNull)
+     * @param hash hash (NotNull)
+     * @param expireDateTime expire date time (NullAllowed: If it is null, it depends on the KVS server setting)
+     */
     void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime expireDateTime);
 
+    /**
+     * If the specified field does not exist in the hash of the specified key, register the hash of the specified key.
+     * @param key key (NotNull)
+     * @param field field (NotNull)
+     * @param value value (NotNull)
+     * @return If the field already exists, false is returned, otherwise if a new field is created true is returned.
+     */
     boolean registerHashNx(String key, String field, String value);
 
+    /**
+     * If the specified field does not exist in the hash of the specified key, register the hash of the specified key. (Specify expire date time.)
+     * @param key key (NotNull)
+     * @param field field (NotNull)
+     * @param value value (NotNull)
+     * @param expireDateTime expire date time (NullAllowed: If it is null, it depends on the KVS server setting)
+     * @return If the field already exists, false is returned, otherwise if a new field is created true is returned.
+     */
     boolean registerHashNx(String key, String field, String value, LocalDateTime expireDateTime);
 
-    void registerMultiHash(Map<String, Map<String, String>> keyValueMap);
+    /**
+     * Register a combination of the specified key and hash.
+     * @param combinationKeyHashMap combination of key hash map (NotNull)
+     */
+    void registerMultiHash(Map<String, Map<String, String>> combinationKeyHashMap);
 
-    void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime expireDateTime);
+    /**
+     * Register a combination of the specified key and hash. (Specify expire date time.)
+     * @param combinationKeyHashMap combination of key hash map (NotNull)
+     * @param expireDateTime expire date time (NullAllowed: If it is null, it depends on the KVS server setting)
+     */
+    void registerMultiHash(Map<String, Map<String, String>> combinationKeyHashMap, LocalDateTime expireDateTime);
 
     // ===================================================================================
     //                                                                              Delete
     //                                                                              ======
     /**
      * Remove the specified key.
-     * @param key Key to delete (NotNull)
+     * @param key key to delete (NotNull)
      */
     void delete(String key);
 
@@ -171,7 +234,7 @@ public interface KvsStoreManager {
      */
     void deleteHash(String key, Set<String> fieldList);
 
-   // ===================================================================================
+    // ===================================================================================
     //                                                                              Exists
     //                                                                              ======
     /**
@@ -185,7 +248,7 @@ public interface KvsStoreManager {
     //                                                                                 ===
     /**
      * set expireAt.
-     * @param key Key (NotNull)
+     * @param key key (NotNull)
      * @param expireDateTime expire date time (NotNull)
      */
     void expireAt(String key, LocalDateTime expireDateTime);
@@ -194,8 +257,8 @@ public interface KvsStoreManager {
     //                                                                               Other
     //                                                                               =====
     /**
-     * アクティブな数を返す。
-     * @return アクティブな数
+     * Get the number of active connections in connection pool.
+     * @return The number of active connections in connection pool
      */
     int getNumActive();
 }

@@ -14,6 +14,12 @@ function process(request) {
     try {
         request.enableOutputDirectory();
         manager.makeDirectory(request.generateDirPath);
+        var optionMap = request.optionMap;
+        scriptEngine.eval('load("./freegen/kvs/KvsRule.js");');
+        if (optionMap.ruleJsPath && optionMap.ruleJsPath != '') {
+            // load application rule settings if exists
+            scriptEngine.eval('load("' + optionMap.ruleJsPath + '");');
+        }
         processKvsCore(request)
         processKvs(request);
     } catch (e) {
@@ -80,12 +86,6 @@ function processKvsCore(request) {
  * @param {Request} request - request (NotNull)
  */
 function processKvs(request) {
-    var optionMap = request.optionMap;
-    scriptEngine.eval('load("./freegen/kvs/KvsRule.js");');
-    if (optionMap.ruleJsPath && optionMap.ruleJsPath != '') {
-        // load application rule settings if exists
-        scriptEngine.eval('load("' + optionMap.ruleJsPath + '");');
-    }
     var rule = scriptEngine.get('kvsRule');
     processKvsPool(rule, request);
     processKvsCache(rule, request);

@@ -113,8 +113,8 @@ This plugin generates classes for accessing remote api from the swagger specific
 RemotePetGetReturn ret = remotePetstorePetBhv.requestGet(petId);
 
 remotePetstorePetBhv.requestPost(param -> {
-	param.id = 0L;
-	param.name = "name";
+    param.id = 0L;
+    param.name = "name";
 });
 ```
 

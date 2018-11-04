@@ -20,6 +20,7 @@ import org.dbflute.optional.OptionalEntity;
 
 import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.Statement;
+import com.datastax.driver.core.querybuilder.Update;
 import com.datastax.driver.core.querybuilder.Delete;
 
 /**
@@ -56,6 +57,11 @@ public interface C7aConditionBean {
     //                                                                              Select
     //                                                                              ======
     Statement buildSelect();
+
+    // ===================================================================================
+    //                                                                              Update
+    //                                                                              ======
+    Update buildQueryUpdate();
 
     // ===================================================================================
     //                                                                              Delete

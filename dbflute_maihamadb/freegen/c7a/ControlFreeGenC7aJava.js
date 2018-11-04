@@ -6,8 +6,8 @@ var genC7aCore = false;
  */
 function process(request) {
     try {
-	    request.enableOutputDirectory();
-	    manager.makeDirectory(request.generateDirPath);
+        request.enableOutputDirectory();
+        manager.makeDirectory(request.generateDirPath);
         processC7aCore(request);
         processC7a(request);
     } catch (e) {
@@ -325,12 +325,12 @@ function processVm(rule, exList, bsVm, exVm) {
     for each (var ex in exList) {
         var bs = ex.bs;
         if (bsVm != null) {
-	        var path = bs.package.replace(/\./g, '/') + '/' + bs.className + '.java';
-	        generate(bsVm, path, bs, true);
-	    }
-	    if (exVm != null) {
-	        var path = ex.package.replace(/\./g, '/') + '/' + ex.className + '.java';
-	        generate(exVm, path, ex, bsVm == null);
-	    }
+            var path = bs.package.replace(/\./g, '/') + '/' + bs.className + '.java';
+            generate(bsVm, path, bs, true);
+        }
+        if (exVm != null) {
+            var path = ex.package.replace(/\./g, '/') + '/' + ex.className + '.java';
+            generate(exVm, path, ex, bsVm == null);
+        }
     }
 }
