@@ -99,13 +99,13 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     }
 
     @Override
-    public void registerMultiString(Map<String, String> keyValueMap) {
-        kvsStoreDelegator.registerMultiString(keyValueMap);
+    public void registerMultiString(Map<String, String> combinationKeyValueMap) {
+        kvsStoreDelegator.registerMultiString(combinationKeyValueMap);
     }
 
     @Override
-    public void registerMultiString(Map<String, String> keyValueMap, LocalDateTime expireDateTime) {
-        kvsStoreDelegator.registerMultiString(keyValueMap, expireDateTime);
+    public void registerMultiString(Map<String, String> combinationKeyValueMap, LocalDateTime expireDateTime) {
+        kvsStoreDelegator.registerMultiString(combinationKeyValueMap, expireDateTime);
     }
 
     // -----------------------------------------------------
@@ -122,13 +122,13 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     }
 
     @Override
-    public void registerMultiList(Map<String, List<String>> keyValueMap) {
-        kvsStoreDelegator.registerMultiList(keyValueMap);
+    public void registerMultiList(Map<String, List<String>> combinationKeyListMap) {
+        kvsStoreDelegator.registerMultiList(combinationKeyListMap);
     }
 
     @Override
-    public void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime expireDateTime) {
-        kvsStoreDelegator.registerMultiList(keyValueMap, expireDateTime);
+    public void registerMultiList(Map<String, List<String>> combinationKeyListMap, LocalDateTime expireDateTime) {
+        kvsStoreDelegator.registerMultiList(combinationKeyListMap, expireDateTime);
     }
 
     // -----------------------------------------------------
@@ -155,13 +155,13 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     }
 
     @Override
-    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap) {
-        kvsStoreDelegator.registerMultiHash(keyValueMap);
+    public void registerMultiHash(Map<String, Map<String, String>> combinationKeyHashMap) {
+        kvsStoreDelegator.registerMultiHash(combinationKeyHashMap);
     }
 
     @Override
-    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime expireDateTime) {
-        kvsStoreDelegator.registerMultiHash(keyValueMap, expireDateTime);
+    public void registerMultiHash(Map<String, Map<String, String>> combinationKeyHashMap, LocalDateTime expireDateTime) {
+        kvsStoreDelegator.registerMultiHash(combinationKeyHashMap, expireDateTime);
     }
 
     // ===================================================================================

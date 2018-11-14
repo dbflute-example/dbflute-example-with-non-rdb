@@ -32,16 +32,16 @@ public interface KvsCacheManager {
     //                                                String
     //                                                ------
     /**
-     * Retrieve a String value corresponding to specified key.
-     * @param key Key (NotNull)
-     * @return A String value corresponding to key (NullAllowed)
+     * Return value for the specified key.
+     * @param key key (NotNull)
+     * @return value for the specified key (NullAllowed)
      */
     String findString(String key);
 
     /**
-     * Retrieve all String values corresponding to each key of assigned key-list.
-     * @param keyList A list of key (NotNull)
-     * @return String values each of which is corresponding to a key in keyList as a List (NotNull)
+     * Return value list for the specified key list.
+     * @param keyList KeyList (NotNull)
+     * @return value list for the specified key list (NotNull)
      */
     List<String> findMultiString(List<String> keyList);
 
@@ -49,22 +49,22 @@ public interface KvsCacheManager {
     //                                                  List
     //                                                  ----
     /**
-     * Retrieve a list of String value corresponding to the specified key.
+     * Return list for the specified key.
      * <p>
      * このメソッドは、同一キーの処理においてスレッドセーフではありません。<br>
      * これは同一キーでの並列処理が業務上発生しない & 影響は軽微ですので、実装の簡易さのため整合性の担保は行わない方針だからです。
      * (不整合の例:このメソッドはKVSからデータを取得しますが、キャッシュヒットしなかった場合RDBの値でキャッシュをリフレッシュしする実装である場合、
      * 同じタイミングで別スレッドから読み込みが行われた場合不整合なデータが返却されます)
      * </p>
-     * @param key Key (NotNull)
-     * @return A list of String-values corresponding to specified key (NullAllowd)
+     * @param key key (NotNull)
+     * @return list for the specified key (NotNull)
      */
     List<String> findList(String key);
 
     /**
-     * Retrieve all lists of String values corresponding to each key of assigned keys.
-     * @param keyList A list of key (NotNull)
-     * @return Lists of String values corresponding to each key of keys in keyList (NotNull)
+     * Return list for the specified key list.
+     * @param keyList key list (NotNull)
+     * @return list for the specified key list (NotNull)
      */
     List<List<String>> findMultiList(List<String> keyList);
 
@@ -72,18 +72,18 @@ public interface KvsCacheManager {
     //                                                  Hash
     //                                                  ----
     /**
-     * Retrieve a hashmap corresponding to the assigned key and return it as List<String>.
-     * @param key Key (NotNull)
-     * @param fieldList A set of field(s)  (NotNull)
-     * @return A hashmap represented by List of String associated with the assigned key (NullAllowed)
+     * Return hash field value list for the specified key.
+     * @param key key (NotNull)
+     * @param fieldList field list (NotNull)
+     * @return hash field value list for the specified key (NotNull)
      */
     List<String> findHash(String key, Set<String> fieldList);
 
     /**
-     * Retrieve all hashmaps corresponding to the assigned keys and return them as List<String>.
-     * @param keyList A list of keys (NotNull)
-     * @param fieldList A set of field(s) (NotNull)
-     * @return Hashmaps represented by List of String corresponding to each key of keys in keyList (NotNull)
+     * Return hash field value list for the specified key.
+     * @param keyList key list (NotNull)
+     * @param fieldList field list (NotNull)
+     * @return hash field value list for the specified key list (NotNull)
      */
     List<List<String>> findMultiHash(List<String> keyList, Set<String> fieldList);
 
@@ -94,123 +94,126 @@ public interface KvsCacheManager {
     //                                                String
     //                                                ------
     /**
-     * Register a String value into KVS.
-     * @param key Key for the value to register (NotNull)
-     * @param value String value to register (NotNull)
+     * Register value for the specified key.
+     * @param key key (NotNull)
+     * @param value value (NotNull)
      */
     void registerString(String key, String value);
 
     /**
-     * Register a String value into KVS with ttl
-     * @param key Key for the value to register (NotNull)
-     * @param value String value to register (NotNull)
-     * @param expireDateTime Time To Live (NullAllowed: use server-config if null is set)
+     * Register value for the specified key. (Specify expire date time.)
+     * @param key key (NotNull)
+     * @param value value (NotNull)
+     * @param expireDateTime expire date time (NullAllowed: If it is null, it depends on the KVS server setting)
      */
     void registerString(String key, String value, LocalDateTime expireDateTime);
 
     /**
-     * Register all key-value pairs contained in the assigned Map.
-     * @param keyValueMap Map of key-value pairs (NotNull)
+     * Register the specified combination of key and value.
+     * @param combinationKeyValueMap combination of key and value (NotNull)
      */
-    void registerMultiString(Map<String, String> keyValueMap);
+    void registerMultiString(Map<String, String> combinationKeyValueMap);
 
     /**
-     * Register all key-value pairs contained in the assigned Map with ttl.
-     * @param keyValueMap Map of key-value pairs (NotNull)
-     * @param expireDateTime Time To Live (NullAllowed: use server-config if null is set)
+     * Register the specified combination of key and value. (Specify expire date time.)
+     * @param combinationKeyValueMap combination of key and value (NotNull)
+     * @param expireDateTime expire date time (NullAllowed: If it is null, it depends on the KVS server setting)
      */
-    void registerMultiString(Map<String, String> keyValueMap, LocalDateTime expireDateTime);
+    void registerMultiString(Map<String, String> combinationKeyValueMap, LocalDateTime expireDateTime);
 
     // -----------------------------------------------------
     //                                                  List
     //                                                  ----
     /**
-     * Register a list of String values into KVS.
-     * @param key Key for the list of String values to register (NotNull)
-     * @param value A list of String values to register as a value (NotNull)
+     * Register list for the specified key.
+     * @param key key (NotNull)
+     * @param list list (NotNull)
      */
-    void registerList(String key, List<String> value);
+    void registerList(String key, List<String> list);
 
     /**
-     * Register a list of String values into KVS with ttl.
-     * @param key Key for the list of String values to register (NotNull)
-     * @param value A list of String values to register as a value (NotNull)
-     * @param expireDateTime Time To Live (NullAllowed: use server-config if null is set)
+     * Register list for the specified key. (Specify expire date time.)
+     * @param key key (NotNull)
+     * @param list list (NotNull)
+     * @param expireDateTime expire date time (NullAllowed: If it is null, it depends on the KVS server setting)
      */
-    void registerList(String key, List<String> value, LocalDateTime expireDateTime);
+    void registerList(String key, List<String> list, LocalDateTime expireDateTime);
 
     /**
-     * Register all key-value pairs contained in the assigned Map.
-     * @param keyValueMap A Map containing pairs of the key and associated List (NotNull)
+     * Register a combination of the specified key and list.
+     * @param combinationKeyListMap combination of key list map (NotNull)
      */
-    void registerMultiList(Map<String, List<String>> keyValueMap);
+    void registerMultiList(Map<String, List<String>> combinationKeyListMap);
 
     /**
-     * Register all key-value pairs contained in the assigned Map with ttl.
-     * @param keyValueMap A Map containing pairs of the key and associated List (NotNull)
-     * @param expireDateTime Time To Live (NullAllowed: use server-config if null is set)
+     * Register a combination of the specified key and list. (Specify expire date time.)
+     * @param combinationKeyListMap combination of key list map (NotNull)
+     * @param expireDateTime expire date time (NullAllowed: If it is null, it depends on the KVS server setting)
      */
-    void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime expireDateTime);
+    void registerMultiList(Map<String, List<String>> combinationKeyListMap, LocalDateTime expireDateTime);
 
     // -----------------------------------------------------
     //                                                  Hash
     //                                                  ----
     /**
-     * Register a hashmap into KVS.
-     * @param key A key for the hashmap to register (NotNull)
-     * @param fieldValueMap A Map to register (NotNull)
+     * Register hash for the specified key.
+     * @param key key (NotNull)
+     * @param hash hash (NotNull)
      */
-    void registerHash(String key, Map<String, String> fieldValueMap);
+    void registerHash(String key, Map<String, String> hash);
 
     /**
-     * Register a hashmap into KVS with ttl.
-     * @param key A key for the hashmap to register (NotNull)
-     * @param fieldValueMap A Map to register (NotNull)
-     * @param expireDateTime Time To Live (NullAllowed: use server-config if null is set)
+     * Register hash for the specified key. (Specify expire date time.)
+     * @param key key (NotNull)
+     * @param hash hash (NotNull)
+     * @param expireDateTime expire date time (NullAllowed: If it is null, it depends on the KVS server setting)
      */
-    void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime expireDateTime);
+    void registerHash(String key, Map<String, String> hash, LocalDateTime expireDateTime);
 
     /**
-     * Register all key-value pairs contained in the assigned Map.
-     * @param keyValueMap A Map containing pairs of the key and associated Map (NotNull)
+     * Register a combination of the specified key and hash.
+     * @param combinationKeyHashMap combination of key hash map (NotNull)
      */
-    void registerMultiHash(Map<String, Map<String, String>> keyValueMap);
+    void registerMultiHash(Map<String, Map<String, String>> combinationKeyHashMap);
 
     /**
-     * Register all key-value pairs contained in the assigned Map with ttl.
-     * @param keyValueMap A Map containing pairs of the key and associated Map (NotNull)
-     * @param expireDateTime Time To Live (NullAllowed: use server-config if null is set)
+     * Register a combination of the specified key and hash. (Specify expire date time.)
+     * @param combinationKeyHashMap combination of key hash map (NotNull)
+     * @param expireDateTime expire date time (NullAllowed: If it is null, it depends on the KVS server setting)
      */
-    void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime expireDateTime);
+    void registerMultiHash(Map<String, Map<String, String>> combinationKeyHashMap, LocalDateTime expireDateTime);
 
     // ===================================================================================
     //                                                                              Delete
     //                                                                              ======
     /**
-     * Delete a value corresponding to assigned key.
-     * @param key A key associated with the value to be deleted (NotNull)
+     * Remove the specified key.
+     * @param key key to delete (NotNull)
      */
     void delete(String key);
 
     /**
-     * Delete value(s) corresponding to assigned key(s).
-     * @param keys Key(s) associated with the value(s) to be deleted (NotNull)
+     * Remove the specified keys.
+     * @param keys Keys to delete (NotNull)
      */
     void delete(String... keys);
+
+    // ===================================================================================
+    //                                                                                 TTL
+    //                                                                                 ===
+    /**
+     * Return the ttl.
+     * @param key key (NotNull)
+     * @return The ttl
+     */
+    Long ttl(String key);
 
     // ===================================================================================
     //                                                                               Other
     //                                                                               =====
     /**
-     * Return the ttl.
-     * @param key Key (NotNull)
-     * @return The ttl
-     */
-    Long ttl(String key);
-
-    /**
-     * Return the number of active connections in connection pool.
-     * @return The number of active connections
+     * Get the number of active connections in connection pool.
+     * @return The number of active connections in connection pool
      */
     int getNumActive();
 }

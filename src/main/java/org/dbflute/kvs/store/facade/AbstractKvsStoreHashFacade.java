@@ -18,8 +18,10 @@ package org.dbflute.kvs.store.facade;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -30,7 +32,6 @@ import org.dbflute.kvs.store.KvsStoreManager;
 import org.dbflute.kvs.store.entity.KvsStoreEntity;
 import org.dbflute.kvs.store.entity.dbmeta.KvsStoreDBMeta;
 import org.dbflute.optional.OptionalEntity;
-import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
 
 /**
@@ -56,9 +57,9 @@ public abstract class AbstractKvsStoreHashFacade implements KvsStoreFacade {
     //                                                                                ====
     @Override
     public <ENTITY extends KvsStoreEntity> OptionalEntity<ENTITY> findEntity(KvsStoreDBMeta kvsStoreDBMeta, List<Object> serchKeyList) {
-        Map<String, Object> allColumnMap = kvsStoreDBMeta.extractAllColumnMap(kvsStoreDBMeta.newKvsStoreEntity());
-        List<String> value = kvsStoreManager
-                .findHash(generateKey(kvsStoreDBMeta.getProjectName(), kvsStoreDBMeta.getTableName(), serchKeyList), allColumnMap.keySet());
+        final String key = generateKey(kvsStoreDBMeta.getProjectName(), kvsStoreDBMeta.getTableName(), serchKeyList);
+        final Map<String, Object> allColumnMap = kvsStoreDBMeta.extractAllColumnMap(kvsStoreDBMeta.newKvsStoreEntity());
+        final List<String> value = kvsStoreManager.findHash(key, allColumnMap.keySet());
         return OptionalEntity.ofNullable(kvsStoreConverterHandler.toEntity(value, kvsStoreDBMeta), () -> {
             createBhvExThrower().throwSelectEntityAlreadyDeletedException(serchKeyList);
         });
@@ -67,22 +68,19 @@ public abstract class AbstractKvsStoreHashFacade implements KvsStoreFacade {
     @Override
     public <ENTITY extends KvsStoreEntity> Map<List<Object>, ENTITY> findEntityMap(KvsStoreDBMeta kvsStoreDBMeta,
             List<List<Object>> searchKeyListList) {
-        List<String> keyList = searchKeyListList.stream().map(serchKeyList -> {
+        final List<String> keyList = searchKeyListList.stream().map(serchKeyList -> {
             return generateKey(kvsStoreDBMeta.getProjectName(), kvsStoreDBMeta.getTableName(), serchKeyList);
         }).collect(Collectors.toList());
+        final Map<String, Object> allColumnMap = kvsStoreDBMeta.extractAllColumnMap(kvsStoreDBMeta.newKvsStoreEntity());
 
-        Map<String, Object> allColumnMap = kvsStoreDBMeta.extractAllColumnMap(kvsStoreDBMeta.newKvsStoreEntity());
-        List<List<String>> list = kvsStoreManager.findMultiHash(keyList, allColumnMap.keySet());
+        final List<List<String>> list = kvsStoreManager.findMultiHash(keyList, allColumnMap.keySet());
 
-        Map<List<Object>, ENTITY> valueMap = DfCollectionUtil.newLinkedHashMap();
-
-        list.forEach(value -> {
-            if (value == null) {
-                return;
-            }
-            ENTITY entity = kvsStoreConverterHandler.toEntity(value, kvsStoreDBMeta);
-            valueMap.put(kvsStoreDBMeta.extractKeyList(entity), entity);
-        });
+        final Map<List<Object>, ENTITY> valueMap = list.stream().filter(value -> value != null).map(value -> {
+            final ENTITY entity = kvsStoreConverterHandler.toEntity(value, kvsStoreDBMeta);
+            return entity;
+        }).collect(Collectors.toMap(keyMapper -> {
+            return kvsStoreDBMeta.extractKeyList(keyMapper);
+        }, valueMapper -> valueMapper, (d1, d2) -> d2, LinkedHashMap::new));
         return valueMap;
     }
 
@@ -102,8 +100,8 @@ public abstract class AbstractKvsStoreHashFacade implements KvsStoreFacade {
     @Override
     public <ENTITY extends KvsStoreEntity> void insertOrUpdate(KvsStoreDBMeta kvsStoreDBMeta, List<Object> searchKeyList, ENTITY entity,
             LocalDateTime expireDateTime) {
-        String key = generateKey(kvsStoreDBMeta.getProjectName(), kvsStoreDBMeta.getTableName(), searchKeyList);
-        Map<String, String> columnMap = kvsStoreDBMeta.extractAllColumnMap(entity)
+        final String key = generateKey(kvsStoreDBMeta.getProjectName(), kvsStoreDBMeta.getTableName(), searchKeyList);
+        final Map<String, String> columnMap = kvsStoreDBMeta.extractAllColumnMap(entity)
                 .entrySet()
                 .stream()
                 .collect(HashMap::new, (map, column) -> map.put(column.getKey(), DfTypeUtil.toString(column.getValue())), Map::putAll);
@@ -156,7 +154,7 @@ public abstract class AbstractKvsStoreHashFacade implements KvsStoreFacade {
         sb.append(keyDelimiter).append(tableName);
         searchkeyList.forEach(searchKey -> {
             sb.append(keyDelimiter);
-            sb.append(toString(searchKey));
+            sb.append(Objects.toString(searchKey, ""));
         });
         return sb.toString();
     }
@@ -164,10 +162,6 @@ public abstract class AbstractKvsStoreHashFacade implements KvsStoreFacade {
     // ===================================================================================
     //                                                                        Small Helper
     //                                                                        ============
-    protected String toString(final Object obj) {
-        return obj == null ? "" : obj.toString();
-    }
-
     protected boolean isEmpty(Collection<?> coll) {
         return coll == null || coll.isEmpty();
     }

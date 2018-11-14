@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -244,7 +245,7 @@ public class KvsCacheBusinessAssist {
         sb.append(keyDelimiter).append(tableName.toUpperCase()); // Because MySQL makes table name lower-case when storig it.
         searchKeyList.forEach(searchKey -> {
             sb.append(keyDelimiter);
-            sb.append(toString(searchKey));
+            sb.append(Objects.toString(searchKey, ""));
         });
         return sb.toString();
     }
@@ -595,10 +596,6 @@ public class KvsCacheBusinessAssist {
     // ===================================================================================
     //                                                                        Small Helper
     //                                                                        ============
-    protected String toString(final Object obj) {
-        return obj == null ? "" : obj.toString();
-    }
-
     protected boolean isNotEmpty(Collection<?> coll) {
         return !(coll == null || coll.isEmpty());
     }

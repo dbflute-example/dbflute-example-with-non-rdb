@@ -191,6 +191,7 @@ public interface KvsDelegator {
      * @param key key (NotNull)
      * @param field field (NotNull)
      * @param value value (NotNull)
+     * @return If the field already exists, false is returned, otherwise if a new field is created true is returned.
      */
     boolean registerHashNx(String key, String field, String value);
 
@@ -200,6 +201,7 @@ public interface KvsDelegator {
      * @param field field (NotNull)
      * @param value value (NotNull)
      * @param expireDateTime expire date time (NullAllowed: If it is null, it depends on the KVS server setting)
+     * @return If the field already exists, false is returned, otherwise if a new field is created true is returned.
      */
     boolean registerHashNx(String key, String field, String value, LocalDateTime expireDateTime);
 
