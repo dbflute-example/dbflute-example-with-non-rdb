@@ -57,21 +57,37 @@ function processRemoteApi(request) {
     // _/_/_/_/_/_/_/_/_/_/
     for (var pathKey in pathMap) {
         var path = pathMap[pathKey];
+        var commonParameters = pathMap[pathKey].parameters;
         for (var methodKey in pathMap[pathKey]) {
-            var multipleHttpMethod = pathMap[pathKey].size() > 1;
             var method = path[methodKey];
             var api = new java.util.LinkedHashMap();
             api.schema = schema;
             api.package = request.package;
             api.url = pathKey;
             api.httpMethod = methodKey;
-            api.multipleHttpMethod = multipleHttpMethod;
             api.consumes = method.consumes;
             api.produces = method.produces;
             api.methodBean = method;
+            if (commonParameters && !commonParameters.equals(api.methodBean)) {
+                if (api.methodBean.parameters) {
+                    api.methodBean.parameters.addAll(commonParameters);
+                } else {
+                    api.methodBean.parameters = commonParameters;
+                }
+            }
             if (scriptEngine.invokeMethod(rule, 'target', api)) {
                 api.url = scriptEngine.invokeMethod(rule, 'url', api);
                 apiList.push(api);
+            }
+        }
+    }
+    for (var apiIndex in apiList) {
+        var api = apiList[apiIndex];
+        for (var comparisonApiIndex in apiList) {
+            var comparisonApi = apiList[comparisonApiIndex];
+            if (!api.equals(comparisonApi) && api.url === comparisonApi.url) {
+                api.multipleHttpMethod = true;
+                break;
             }
         }
     }
