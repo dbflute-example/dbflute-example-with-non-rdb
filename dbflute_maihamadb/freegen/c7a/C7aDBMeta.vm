@@ -16,6 +16,8 @@
 #set ($rule = $scriptEngine.get('c7aRule'))
 ${manager.allClassCopyright}package ${data.package};
 #set ($importList = [])
+#set($added = $importList.add('java.util.Map'))
+#set($added = $importList.add('org.dbflute.util.DfCollectionUtil'))
 #generateImports($importList, $data.package, $scriptEngine.invokeMethod($rule, 'importOrderList'))
 
 /**
@@ -42,6 +44,31 @@ public class ${data.className} extends $data.extendsClass {
     @Override
     public String getTableDbName() {
         return "${data.tableName}";
+    }
+
+    @Override
+    public Map<String, String> asTableDbNameMap() {
+#set($tableDbNameMap = {})
+#set($nomal = '')
+#foreach($clustering in $data.clusteringColumnList)
+#set($velocityIndex = $velocityCount - 1)
+#set($nomal = $nomal + $clustering + ' ' + $data.clusteringOrderList[$velocityIndex].toLowerCase() + ', ')
+#end
+#set($put = $tableDbNameMap.put($nomal, $data.tableName))
+#foreach($materializedViewMeta in $data.materializedViewMetaList)
+#set($nomal = '')
+#foreach($clustering in $materializedViewMeta.clusteringColumnList)
+#set($velocityIndex = $velocityCount - 1)
+#set($nomal = $nomal + $clustering + ' ' + $materializedViewMeta.clusteringOrderList[$velocityIndex].toLowerCase() + ', ')
+#end
+#set($put = $tableDbNameMap.put($nomal, $materializedViewMeta.name))
+#end
+        Map<String, String> map = DfCollectionUtil.newLinkedHashMap();
+#foreach($entry in $tableDbNameMap.entrySet())
+        map.put("$entry.key", "$entry.value");
+        map.put("$entry.key.replaceAll(' asc, ', ' xxx, ').replaceAll(' desc, ', ' asc, ').replaceAll('xxx, ', 'desc, ')", "$entry.value");
+#end
+        return map;
     }
 
     // ===================================================================================

@@ -55,7 +55,7 @@ public abstract class ${data.className} extends ${data.frameworkBehaviorClass} {
 
     @Override
     protected String getUrlBase() {
-        // TODO you #change_it set your base URL for the remote api here
-        throw new IllegalStateException("set your common default rule here.");
+        // TODO you #change_it set base URL for the remote api here
+        throw new IllegalStateException("set url base here.");
     }
 }

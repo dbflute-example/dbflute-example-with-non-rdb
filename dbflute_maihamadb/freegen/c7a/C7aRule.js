@@ -15,12 +15,12 @@ var baseRule = {
     // ===================================================================================
     //                                                                               Base
     //                                                                              ======
-    schema: function() {
-        throw new Error('override schema()');
+    schema: function(request) {
+        return manager.initUncap(request.requestName.replace(/^C7a/g, ''));
     },
 
-    schemaShort: function(schema) {
-        return schema;
+    schemaShort: function(request) {
+        return this.schema(request);
     },
 
     schemaPackage: function(schema) {
@@ -186,6 +186,10 @@ var baseRule = {
         return null;
     },
 
+    enablePagingCount: function(c7a, tableMeta) {
+        return false;
+    },
+
     // ===================================================================================
     //                                                                            Behavior
     //                                                                            ========
@@ -265,6 +269,14 @@ var baseRule = {
             'varchar': 'String',
             'varint': 'java.math.BigInteger'
         };
+    },
+
+    /**
+     * Return filter Table Name.
+     * @return filter Table Name. (NullAllowed)
+     */
+    filterTableName: function(c7a, tableMeta) {
+        return null;
     },
 };
 

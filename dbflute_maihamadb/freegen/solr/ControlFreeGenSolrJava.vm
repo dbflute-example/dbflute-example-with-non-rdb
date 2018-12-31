@@ -13,7 +13,6 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-$manager.info("requestList: ${requestList.size()}")
 #set ($genSolrCore = false)
 
 #foreach ($request in $requestList)
@@ -21,7 +20,7 @@ $manager.info("requestList: ${requestList.size()}")
 $request.enableOutputDirectory()
 $manager.makeDirectory($request.generateDirPath)
 
-#if ($request.isResourceTypeSolr() && ($manager.isTargetContainerSeasar() || $manager.isTargetContainerLastaDi() || $tableMap.targetContainer))
+#if ($request.isResourceTypeSolr() && ($manager.isTargetContainerSeasar() || $manager.isTargetContainerLastaDi()))
   #if (!$genSolrCore)
     #set ($genSolrCore = true)
 
@@ -230,13 +229,13 @@ $manager.makeDirectory($request.generateDirPath)
     $generator.parse("./solr/SolrExIndexEntity.vm", $path, "", "")
   #end
 
-  #if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+  #if ($manager.isTargetContainerSeasar())
     #set ($path = "../resources/solr/di/solr-${manager.initUncap($tableMap.schema)}.dicon")
     $manager.makeDirectory($path)
     $request.info("parse('${path}')")
     $generator.parse("./solr/allcommon/container/seasar/SolrDicon.vm", $path, "", "")
   #end
-  #if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+  #if ($manager.isTargetContainerLastaDi())
     #set ($path = "../resources/solr/di/solr-${manager.initUncap($tableMap.schema)}.xml")
     $manager.makeDirectory($path)
     $request.info("parse('${path}')")
@@ -252,13 +251,13 @@ $manager.makeDirectory($request.generateDirPath)
 #end
 
 #if ($genSolrCore)
-    #if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+    #if ($manager.isTargetContainerSeasar())
       #set ($path = "../resources/solr/di/solr-all.dicon")
       $manager.makeDirectory($path)
       $request.info("parse('${path}')")
       $generator.parse("./solr/allcommon/container/seasar/SolrAllDicon.vm", $path, "", "")
     #end
-    #if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+    #if ($manager.isTargetContainerLastaDi())
       #set ($path = "../resources/solr/di/solr-all.xml")
       $manager.makeDirectory($path)
       $request.info("parse('${path}')")

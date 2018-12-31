@@ -103,6 +103,13 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
     //                                                  Hash
     //                                                  ----
     @Override
+    public Map<String, String> findHash(String key) {
+        try (Jedis jedis = kvsRedisPool.getResource()) {
+            return jedis.hgetAll(key);
+        }
+    }
+
+    @Override
     public List<String> findHash(String key, Set<String> fieldList) {
         try (Jedis jedis = kvsRedisPool.getResource()) {
             List<String> list = jedis.hmget(key, fieldList.toArray(new String[] {}));
@@ -190,19 +197,19 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
     //                                                  List
     //                                                  ----
     @Override
-    public void registerList(String key, List<String> value) {
-        registerList(key, value, null);
+    public void registerList(String key, List<String> list) {
+        registerList(key, list, null);
     }
 
     @Override
-    public void registerList(String key, List<String> value, LocalDateTime expireDateTime) {
-        if (value.isEmpty()) {
+    public void registerList(String key, List<String> list, LocalDateTime expireDateTime) {
+        if (list.isEmpty()) {
             delete(key);
             return;
         }
         try (Jedis jedis = kvsRedisPool.getResource(); Pipeline pipeline = jedis.pipelined()) {
             pipeline.del(key);
-            pipeline.rpush(key, value.stream().distinct().toArray(size -> new String[size]));
+            pipeline.rpush(key, list.stream().distinct().toArray(size -> new String[size]));
             if (expireDateTime != null) {
                 expireAt(pipeline, key, expireDateTime);
             }
@@ -213,19 +220,19 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
     }
 
     @Override
-    public void registerMultiList(Map<String, List<String>> keyValueMap) {
-        registerMultiList(keyValueMap, null);
+    public void registerMultiList(Map<String, List<String>> keyListMap) {
+        registerMultiList(keyListMap, null);
     }
 
     @Override
-    public void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime expireDateTime) {
+    public void registerMultiList(Map<String, List<String>> keyListMap, LocalDateTime expireDateTime) {
         try (Jedis jedis = kvsRedisPool.getResource(); Pipeline pipeline = jedis.pipelined()) {
-            keyValueMap.forEach((key, value) -> {
+            keyListMap.forEach((key, list) -> {
                 pipeline.del(key);
-                if (value.isEmpty()) {
+                if (list.isEmpty()) {
                     return;
                 }
-                pipeline.rpush(key, value.stream().distinct().toArray(size -> new String[size]));
+                pipeline.rpush(key, list.stream().distinct().toArray(size -> new String[size]));
                 if (expireDateTime != null) {
                     expireAt(pipeline, key, expireDateTime);
                 }
@@ -240,15 +247,15 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
     //                                                  Hash
     //                                                  ----
     @Override
-    public void registerHash(String key, Map<String, String> fieldValueMap) {
-        registerHash(key, fieldValueMap, null);
+    public void registerHash(String key, Map<String, String> hash) {
+        registerHash(key, hash, null);
 
     }
 
     @Override
-    public void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime expireDateTime) {
+    public void registerHash(String key, Map<String, String> hash, LocalDateTime expireDateTime) {
         try (Jedis jedis = kvsRedisPool.getResource(); Pipeline pipeline = jedis.pipelined()) {
-            pipeline.hmset(key, fieldValueMap.entrySet().stream().collect(
+            pipeline.hmset(key, hash.entrySet().stream().collect(
                     Collectors.toMap(fieldValue -> fieldValue.getKey(), fieldValue -> Objects.toString(fieldValue.getValue(), ""))));
             if (expireDateTime != null) {
                 expireAt(pipeline, key, expireDateTime);
@@ -260,16 +267,35 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
     }
 
     @Override
-    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap) {
-        registerMultiHash(keyValueMap, null);
+    public boolean registerHashNx(String key, String field, String value) {
+        return registerHashNx(key, field, value, null);
+    }
+
+    @Override
+    public boolean registerHashNx(String key, String field, String value, LocalDateTime expireDateTime) {
+        try (Jedis jedis = kvsRedisPool.getResource()) {
+            final Long result = jedis.hsetnx(key, field, value);
+            final boolean register = result == 1L;
+            if (register) {
+                if (expireDateTime != null) {
+                    jedis.expireAt(key, TimeUnit.MILLISECONDS.toSeconds(new HandyDate(expireDateTime).getDate().getTime()));
+                }
+            }
+            return register;
+        }
+    }
+
+    @Override
+    public void registerMultiHash(Map<String, Map<String, String>> keyHashMap) {
+        registerMultiHash(keyHashMap, null);
 
     }
 
     @Override
-    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime expireDateTime) {
+    public void registerMultiHash(Map<String, Map<String, String>> keyHashMap, LocalDateTime expireDateTime) {
         try (Jedis jedis = kvsRedisPool.getResource(); Pipeline pipeline = jedis.pipelined()) {
-            keyValueMap.forEach((key, fieldValueMap) -> {
-                pipeline.hmset(key, fieldValueMap.entrySet().stream().collect(
+            keyHashMap.forEach((key, hash) -> {
+                pipeline.hmset(key, hash.entrySet().stream().collect(
                         Collectors.toMap(fieldValue -> fieldValue.getKey(), fieldValue -> Objects.toString(fieldValue.getValue(), ""))));
                 if (expireDateTime != null) {
                     expireAt(pipeline, key, expireDateTime);
@@ -278,18 +304,6 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
             pipeline.sync();
         } catch (IOException e) {
             throw new KvsException("kvs error.", e);
-        }
-    }
-
-    /**
-     * Set Time To Live to a value in KVS that is specified by the assigned key.
-     * @param pipeline Pipeline (NotNull)
-     * @param key Key for a value in KVS (NotNull)
-     * @param expireDateTime Time To Live (NullAllowed: do not set ttl if null)
-     */
-    protected void expireAt(Pipeline pipeline, String key, LocalDateTime expireDateTime) {
-        if (expireDateTime != null) {
-            pipeline.expireAt(key, TimeUnit.MILLISECONDS.toSeconds(new HandyDate(expireDateTime).getDate().getTime()));
         }
     }
 
@@ -313,9 +327,26 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
         }
     }
 
+    @Override
+    public void deleteHash(String key, Set<String> fieldList) {
+        try (Jedis jedis = kvsRedisPool.getResource()) {
+            jedis.hdel(key, fieldList.toArray(new String[fieldList.size()]));
+        }
+    }
+
     // ===================================================================================
-    //                                                                               Other
-    //                                                                               =====
+    //                                                                              Exists
+    //                                                                              ======
+    @Override
+    public boolean exists(String key) {
+        try (Jedis jedis = kvsRedisPool.getResource()) {
+            return jedis.exists(key);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                                 TTL
+    //                                                                                 ===
     @Override
     public Long ttl(String key) {
         try (Jedis jedis = kvsRedisPool.getResource()) {
@@ -323,6 +354,30 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
         }
     }
 
+    @Override
+    public void expireAt(String key, LocalDateTime expireDateTime) {
+        try (Jedis jedis = kvsRedisPool.getResource(); Pipeline pipeline = jedis.pipelined()) {
+            expireAt(pipeline, key, expireDateTime);
+        } catch (final IOException e) {
+            throw new KvsException("kvs error.", e);
+        }
+    }
+
+    /**
+     * Set Time To Live to a value in KVS that is specified by the assigned key.
+     * @param pipeline Pipeline (NotNull)
+     * @param key Key for a value in KVS (NotNull)
+     * @param expireDateTime Time To Live (NullAllowed: do not set ttl if null)
+     */
+    protected void expireAt(Pipeline pipeline, String key, LocalDateTime expireDateTime) {
+        if (expireDateTime != null) {
+            pipeline.expireAt(key, TimeUnit.MILLISECONDS.toSeconds(new HandyDate(expireDateTime).getDate().getTime()));
+        }
+    }
+
+    // ===================================================================================
+    //                                                                               Other
+    //                                                                               =====
     @Override
     public int getNumActive() {
         return kvsRedisPool.getNumActive();

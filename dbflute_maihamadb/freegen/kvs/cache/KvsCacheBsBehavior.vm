@@ -26,7 +26,7 @@
 #end
 #set ($importList = [])
 #set($added = $importList.add('javax.annotation.Resource'))
-#set($added = $importList.add("${request.package}.${tableMap.schema}.facade.${manager.initCap($tableMap.schema)}KvsCacheFacade"))
+#set($added = $importList.add("${data.kvs.kvsCacheFacadeImpl.package}.${data.kvs.kvsCacheFacadeImpl.className}"))
 #if ($tableMap.suppressBehaviorBasicMethodGen != 'true')
 #set($added = $importList.add('java.time.LocalDateTime'))
 #set($added = $importList.add('java.util.Comparator'))
@@ -39,39 +39,39 @@
 #set($added = $importList.add('java.util.stream.Collectors'))
 #set($added = $importList.add('java.util.stream.Stream'))
 #set($added = $importList.add('org.dbflute.dbmeta.info.ColumnInfo'))
-#set($added = $importList.add('org.dbflute.kvs.cache.bhv.AbstractKvsCacheBehaviorWritable'))
+#set($added = $importList.add("${data.extendsClass}"))
 #set($added = $importList.add('org.dbflute.optional.OptionalEntity'))
 #set($added = $importList.add('org.dbflute.util.DfCollectionUtil'))
-#set($added = $importList.add("${tableMap.dbflutePackage}.bsentity.dbmeta.$!{tableMap.schemaPrefix}${table.camelizedName}Dbm"))
-#set($added = $importList.add("${tableMap.dbflutePackage}.cbean.$!{tableMap.schemaPrefix}${table.camelizedName}CB"))
-#set($added = $importList.add("${tableMap.dbflutePackage}.exentity.$!{tableMap.schemaPrefix}${table.camelizedName}"))
-#set($added = $importList.add("${request.package}.${tableMap.schema}.cbean.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB"))
+#set($added = $importList.add("${data.dbflute.dbMeta.package}.${data.dbflute.dbMeta.className}"))
+#set($added = $importList.add("${data.dbflute.exConditionBean.package}.${data.dbflute.exConditionBean.className}"))
+#set($added = $importList.add("${data.dbflute.exEntity.package}.${data.dbflute.exEntity.className}"))
+#set($added = $importList.add("${data.exConditionBean.package}.${data.exConditionBean.className}"))
 #end
-${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.bsbhv;
+${manager.allClassCopyright}package ${data.package};
 #generateImports($importList, $data.package, $scriptEngine.invokeMethod($rule, 'importOrderList'))
 
 /**
- * The behavior of (${table.comment})${table.capCamelName}.
+ * The behavior of (${data.comment})${data.tableName}.
  * @author FreeGen
  */
-public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv extends AbstractKvsCacheBehaviorWritable<$!{tableMap.schemaPrefix}${table.camelizedName}, $!{tableMap.schemaPrefix}${table.camelizedName}CB, Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB> {
+public abstract class ${data.className} extends ${data.extendsClassName} {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** ${manager.initCap($tableMap.schema)}KvsCacheFacade. */
+    /** ${manager.initCap($data.kvs.schema)}KvsCacheFacade. */
     @Resource
-    private ${manager.initCap($tableMap.schema)}KvsCacheFacade ${tableMap.schema}KvsCacheFacade;
+    private ${manager.initCap($data.kvs.schema)}KvsCacheFacade ${data.kvs.schema}KvsCacheFacade;
 
-#if ($tableMap.suppressBehaviorBasicMethodGen != 'true')
+#if (!$data.suppressBehaviorBasicMethodGen)
     /**
      * Handle the meta as DBMeta, that has all info of the table.
      * @return DBMeta instance (NotNull)
      */
-    public $!{tableMap.schemaPrefix}${table.camelizedName}Dbm asDBMeta() {
-        return $!{tableMap.schemaPrefix}${table.camelizedName}Dbm.getInstance();
+    public ${data.dbflute.dbMeta.className} asDBMeta() {
+        return ${data.dbflute.dbMeta.className}.getInstance();
     }
-#foreach ($column in $table.columnList)
+#foreach ($column in $data.columnList)
 
     // ===================================================================================
     //                                                              ${column.capCamelName}
@@ -85,24 +85,24 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
      *   <li>use ifPresent() and orElse() if it might be empty</li>
      * </ul>
      * <pre>
-     * <span style="color: #0000C0">kvs$!{tableMap.schemaPrefix}${table.camelizedName}Bhv</span>.<span style="color: #CC4747">selectEntityBy${column.capCamelName}</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     * <span style="color: #0000C0">${manager.initUncap($data.subClassName)}</span>.<span style="color: #CC4747">selectEntityBy${column.capCamelName}</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     <span style="color: #3F7E5E">// Setting query condition to the key column is required</span>
      *     <span style="color: #553000">cb</span>.query().set${column.capCamelName}_Equal(1);
      *     <span style="color: #3F7E5E">// Condition for other column(s) can be set if necessary</span>
      *     <span style="color: #553000">cb</span>.query().set...
-     * }).<span style="color: #CC4747">alwaysPresent</span>(<span style="color: #553000">${table.uncapCamelName}</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     * }).<span style="color: #CC4747">alwaysPresent</span>(<span style="color: #553000">${manager.initUncap($data.tableName)}</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     ...
      * });
      * </pre>
-     * @param cbLambda The callback for condition-bean of Kvs$!{tableMap.schemaPrefix}${table.camelizedName} (NotNull)
+     * @param cbLambda The callback for condition-bean of Kvs${data.dbflute.exEntity.className} (NotNull)
      * @return The optional entity selected by the condition (NotNull: if no data, empty entity)
      */
-    public OptionalEntity<$!{tableMap.schemaPrefix}${table.camelizedName}> selectEntityBy${column.capCamelName}(Consumer<Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB> cbLambda) {
-        Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB = createCB(cbLambda);
-        $!{tableMap.schemaPrefix}${table.camelizedName}CB cb = adjustKvsConditionBeanOf${column.capCamelName}(kvsCB);
+    public OptionalEntity<${data.dbflute.exEntity.className}> selectEntityBy${column.capCamelName}(Consumer<${data.exConditionBean.className}> cbLambda) {
+        ${data.exConditionBean.className} kvsCB = createCB(cbLambda);
+        ${data.dbflute.exConditionBean.className} cb = adjustKvsConditionBeanOf${column.capCamelName}(kvsCB);
 
-        OptionalEntity<$!{tableMap.schemaPrefix}${table.camelizedName}> optEntity =
-                ${tableMap.schema}KvsCacheFacade.findEntity(createKvsKeyListOf${column.capCamelName}(kvsCB), cb, expireDateTimeLambdaOf${column.capCamelName}());
+        OptionalEntity<${data.dbflute.exEntity.className}> optEntity =
+                ${data.kvs.schema}KvsCacheFacade.findEntity(createKvsKeyListOf${column.capCamelName}(kvsCB), cb, expireDateTimeLambdaOf${column.capCamelName}());
 
         return Stream.of(optEntity)
                 .filter(OptionalEntity::isPresent)
@@ -113,24 +113,24 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
                 .orElseGet(() -> OptionalEntity.empty());
     }
 
-    // KVS CB から ${column.capCamelName} 用の $!{tableMap.schemaPrefix}${table.camelizedName}CB を作成して返します。
-    protected $!{tableMap.schemaPrefix}${table.camelizedName}CB adjustKvsConditionBeanOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB) {
-        $!{tableMap.schemaPrefix}${table.camelizedName}CB cb = new $!{tableMap.schemaPrefix}${table.camelizedName}CB();
+    // KVS CB から ${column.capCamelName} 用の ${data.dbflute.exConditionBean.className} を作成して返します。
+    protected ${data.dbflute.exConditionBean.className} adjustKvsConditionBeanOf${column.capCamelName}(${data.exConditionBean.className} kvsCB) {
+        ${data.dbflute.exConditionBean.className} cb = new ${data.dbflute.exConditionBean.className}();
         addKvsConditionOf${column.capCamelName}(kvsCB, cb);
 
         return cb;
     }
 
     // ${column.capCamelName} で DB に使う条件のみを kvsCB から取り出し cb に設定します。
-    protected void addKvsConditionOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB, $!{tableMap.schemaPrefix}${table.camelizedName}CB cb) {
-        addDefaultSpecifyColumnOf$!{tableMap.schemaPrefix}${column.capCamelName}(kvsCB, cb);
+    protected void addKvsConditionOf${column.capCamelName}(${data.exConditionBean.className} kvsCB, ${data.dbflute.exConditionBean.className} cb) {
+        addDefaultSpecifyColumnOf$!{data.kvs.schemaShort}${column.capCamelName}(kvsCB, cb);
         addDefaultWhereOf${column.capCamelName}(kvsCB, cb);
     }
 
     // ${column.capCamelName} 用の select 句の列挙されるカラムを CB に設定します。
-    protected void addDefaultSpecifyColumnOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB, $!{tableMap.schemaPrefix}${table.camelizedName}CB cb) {
-#set ($targetdb = $tableMap.databaseMap[${tableMap.schema}].instance)
-#set ($dbTable = $targetdb.getTable($table.uncapCamelName))
+    protected void addDefaultSpecifyColumnOf${column.capCamelName}(${data.exConditionBean.className} kvsCB, ${data.dbflute.exConditionBean.className} cb) {
+#set ($targetdb = $data.dbflute.instance)
+#set ($dbTable = $targetdb.getTable($data.tableName))
 #if ($dbTable.isDeprecatedSpecifyBatchColumn())
 #foreach ($dbColumn in $dbTable.columnList)
 #set ($initCapName = ${manager.initCap($dbColumn.javaName)})
@@ -142,7 +142,7 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
     }
 
     // ${column.capCamelName} 用のキー条件を CB に設定します。
-    protected void addDefaultWhereOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB, $!{tableMap.schemaPrefix}${table.camelizedName}CB cb) {
+    protected void addDefaultWhereOf${column.capCamelName}(${data.exConditionBean.className} kvsCB, ${data.dbflute.exConditionBean.className} cb) {
         Map<ColumnInfo, Object> columnEqualValue = kvsCB.query().xdfgetColumnEqualValue();
 
 #foreach ($kvsKey in $column.kvsKeys)
@@ -157,15 +157,15 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
     }
 
 #if ($column.expireDateTimeAggregate == 'custom')
-    protected abstract Function<$!{tableMap.schemaPrefix}${table.camelizedName}, LocalDateTime> expireDateTimeLambdaOf${column.capCamelName}();
+    protected abstract Function<${data.dbflute.exEntity.className}, LocalDateTime> expireDateTimeLambdaOf${column.capCamelName}();
 #else
-    protected Function<$!{tableMap.schemaPrefix}${table.camelizedName}, LocalDateTime> expireDateTimeLambdaOf${column.capCamelName}() {
+    protected Function<${data.dbflute.exEntity.className}, LocalDateTime> expireDateTimeLambdaOf${column.capCamelName}() {
 #if ($column.expireDateTime)
         String expireDateTimeColumnFlexibleName = "$column.expireDateTime";
 #else
         String expireDateTimeColumnFlexibleName = null;
 #end
-        return expireDateTimeLambda(${tableMap.schema}KvsCacheFacade, expireDateTimeColumnFlexibleName);
+        return expireDateTimeLambda(${data.kvs.schema}KvsCacheFacade, expireDateTimeColumnFlexibleName);
     }
 #end
 #else
@@ -181,20 +181,20 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
      *     ... = <span style="color: #553000">detail</span>.get...;
      * });
      * </pre>
-     * @param cbLambda The callback for condition-bean of Kvs$!{tableMap.schemaPrefix}${table.camelizedName} (NotNull)
+     * @param cbLambda The callback for condition-bean of Kvs${data.dbflute.exEntity.className} (NotNull)
      * @return The List of entities selected by the condition (NotNull: if no data, empty list)
      */
-    public List<$!{tableMap.schemaPrefix}${table.camelizedName}> selectListBy${column.capCamelName}(Consumer<Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB> cbLambda) {
-        Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB = createCB(cbLambda);
-        $!{tableMap.schemaPrefix}${table.camelizedName}CB cb = adjustKvsConditionBeanOf${column.capCamelName}(kvsCB);
+    public List<${data.dbflute.exEntity.className}> selectListBy${column.capCamelName}(Consumer<${data.exConditionBean.className}> cbLambda) {
+        ${data.exConditionBean.className} kvsCB = createCB(cbLambda);
+        ${data.dbflute.exConditionBean.className} cb = adjustKvsConditionBeanOf${column.capCamelName}(kvsCB);
 
-        List<$!{tableMap.schemaPrefix}${table.camelizedName}> list =
-                ${tableMap.schema}KvsCacheFacade.findList(createKvsKeyListOf${column.capCamelName}(kvsCB), cb, expireDateTimeLambdaOf${column.capCamelName}());
+        List<${data.dbflute.exEntity.className}> list =
+                ${data.kvs.schema}KvsCacheFacade.findList(createKvsKeyListOf${column.capCamelName}(kvsCB), cb, expireDateTimeLambdaOf${column.capCamelName}());
 
-        Predicate<$!{tableMap.schemaPrefix}${table.camelizedName}> filter = kvsCB.query().getWherePredicate();
-        Comparator<$!{tableMap.schemaPrefix}${table.camelizedName}> sorted = kvsCB.query().getOrderByComparator();
+        Predicate<${data.dbflute.exEntity.className}> filter = kvsCB.query().getWherePredicate();
+        Comparator<${data.dbflute.exEntity.className}> sorted = kvsCB.query().getOrderByComparator();
 
-        Stream<$!{tableMap.schemaPrefix}${table.camelizedName}> stream = list.stream().filter(filter);
+        Stream<${data.dbflute.exEntity.className}> stream = list.stream().filter(filter);
 
         if (sorted != null) {
             stream = stream.sorted(sorted);
@@ -207,16 +207,16 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
         return stream.collect(Collectors.toList());
     }
 
-    // KVS CB から ${column.capCamelName} 用の $!{tableMap.schemaPrefix}${table.camelizedName}CB を作成して返します。
-    protected $!{tableMap.schemaPrefix}${table.camelizedName}CB adjustKvsConditionBeanOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB) {
-        $!{tableMap.schemaPrefix}${table.camelizedName}CB cb = new $!{tableMap.schemaPrefix}${table.camelizedName}CB();
+    // KVS CB から ${column.capCamelName} 用の ${data.dbflute.exConditionBean.className} を作成して返します。
+    protected ${data.dbflute.exConditionBean.className} adjustKvsConditionBeanOf${column.capCamelName}(${data.exConditionBean.className} kvsCB) {
+        ${data.dbflute.exConditionBean.className} cb = new ${data.dbflute.exConditionBean.className}();
         addKvsConditionOf${column.capCamelName}(kvsCB, cb);
 
         return cb;
     }
 
-    // $!{tableMap.schemaPrefix}${column.capCamelName} で DB に使う条件のみを kvsCB から取り出し cb に設定します。
-    protected void addKvsConditionOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB, $!{tableMap.schemaPrefix}${table.camelizedName}CB cb) {
+    // $!{data.kvs.schemaShort}${column.capCamelName} で DB に使う条件のみを kvsCB から取り出し cb に設定します。
+    protected void addKvsConditionOf${column.capCamelName}(${data.exConditionBean.className} kvsCB, ${data.dbflute.exConditionBean.className} cb) {
         addDefaultSpecifyColumnOf${column.capCamelName}(kvsCB, cb);
         addDefaultWhereOf${column.capCamelName}(kvsCB, cb);
         addDefaultOrderByOf${column.capCamelName}(cb);
@@ -224,9 +224,9 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
     }
 
     // ${column.capCamelName} 用の select 句の列挙されるカラムを CB に設定します。
-    protected void addDefaultSpecifyColumnOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB, $!{tableMap.schemaPrefix}${table.camelizedName}CB cb) {
-#set ($targetdb = $tableMap.databaseMap[${tableMap.schema}].instance)
-#set ($dbTable = $targetdb.getTable($table.uncapCamelName))
+    protected void addDefaultSpecifyColumnOf${column.capCamelName}(${data.exConditionBean.className} kvsCB, ${data.dbflute.exConditionBean.className} cb) {
+#set ($targetdb = $data.dbflute.instance)
+#set ($dbTable = $targetdb.getTable($data.tableName))
 #if ($dbTable.isDeprecatedSpecifyBatchColumn())
 #foreach ($dbColumn in $dbTable.columnList)
 #set ($initCapName = ${manager.initCap($dbColumn.javaName)})
@@ -238,7 +238,7 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
     }
 
     // ${column.capCamelName} 用のキー条件を CB に設定します。
-    protected void addDefaultWhereOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB, $!{tableMap.schemaPrefix}${table.camelizedName}CB cb) {
+    protected void addDefaultWhereOf${column.capCamelName}(${data.exConditionBean.className} kvsCB, ${data.dbflute.exConditionBean.className} cb) {
         Map<ColumnInfo, Object> columnEqualValue = kvsCB.query().xdfgetColumnEqualValue();
 
 #foreach ($kvsKey in $column.kvsKeys)
@@ -253,7 +253,7 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
     }
 
     // ${column.capCamelName} 用のデフォルトソート順を CB に設定します。
-    protected void addDefaultOrderByOf${column.capCamelName}($!{tableMap.schemaPrefix}${table.camelizedName}CB cb) {
+    protected void addDefaultOrderByOf${column.capCamelName}(${data.dbflute.exConditionBean.className} cb) {
 #foreach ($order in $column.orderBy)
 #set ($ascDesc = "Asc")
 #foreach($value in $order.split(' '))
@@ -272,22 +272,22 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
 #set ($expireDateTimeAggregate = $column.expireDateTimeAggregate)
 #end
 #if ($expireDateTimeAggregate == 'custom')
-    protected abstract Function<List<$!{tableMap.schemaPrefix}${table.camelizedName}>, LocalDateTime> expireDateTimeLambdaOf${column.capCamelName}();
+    protected abstract Function<List<${data.dbflute.exEntity.className}>, LocalDateTime> expireDateTimeLambdaOf${column.capCamelName}();
 #else
-    protected Function<List<$!{tableMap.schemaPrefix}${table.camelizedName}>, LocalDateTime> expireDateTimeLambdaOf${column.capCamelName}() {
+    protected Function<List<${data.dbflute.exEntity.className}>, LocalDateTime> expireDateTimeLambdaOf${column.capCamelName}() {
 #if ($column.expireDateTime)
         String expireDateTimeColumnFlexibleName = "$column.expireDateTime";
 #else
         String expireDateTimeColumnFlexibleName = null;
 #end
-        return expireDateTimeOf${manager.initCap($manager.camelize($expireDateTimeAggregate))}InListLambda(${tableMap.schema}KvsCacheFacade, expireDateTimeColumnFlexibleName);
+        return expireDateTimeOf${manager.initCap($manager.camelize($expireDateTimeAggregate))}InListLambda(${data.kvs.schema}KvsCacheFacade, expireDateTimeColumnFlexibleName);
     }
 #end
 
     /**
      * ${column.capCamelName} 用のデフォルトソート順を Comparator で取得します。
      */
-    protected Comparator<$!{tableMap.schemaPrefix}${table.camelizedName}> createDefaultOrderByOf${column.capCamelName}() {
+    protected Comparator<${data.dbflute.exEntity.className}> createDefaultOrderByOf${column.capCamelName}() {
 #foreach ($order in $column.orderBy)
 #set ($methodName = "")
 #set ($ascDesc = "Comparator.naturalOrder()")
@@ -299,9 +299,9 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
 #end
 #end
 #if ($velocityCount == 1)
-        Comparator<$!{tableMap.schemaPrefix}${table.camelizedName}> comparator = Comparator.comparing($!{tableMap.schemaPrefix}${table.camelizedName}::get${manager.camelize($methodName)}, $ascDesc);
+        Comparator<${data.dbflute.exEntity.className}> comparator = Comparator.comparing(${data.dbflute.exEntity.className}::get${manager.camelize($methodName)}, $ascDesc);
 #else
-        comparator.thenComparing($!{tableMap.schemaPrefix}${table.camelizedName}::get${manager.camelize($methodName)}, Comparator.naturalOrder());
+        comparator.thenComparing(${data.dbflute.exEntity.className}::get${manager.camelize($methodName)}, Comparator.naturalOrder());
 #end
 #end
         return comparator;
@@ -316,7 +316,7 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
      *   <li>use ifPresent() and orElse() if it might be empty</li>
      * </ul>
      * <pre>
-     * <span style="color: #0000C0">kvs$!{tableMap.schemaPrefix}${table.camelizedName}Bhv</span>.<span style="color: #CC4747">ttlBy${column.capCamelName}</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     * <span style="color: #0000C0">${manager.initUncap($data.subClassName)}</span>.<span style="color: #CC4747">ttlBy${column.capCamelName}</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     <span style="color: #3F7E5E">// Setting query condition to the key column is required</span>
      *     <span style="color: #553000">cb</span>.query().set${column.capCamelName}_Equal(1);
      *     <span style="color: #3F7E5E">// Condition for other column(s) can be set if necessary</span>
@@ -325,13 +325,13 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
      *     ...
      * });
      * </pre>
-     * @param cbLambda The callback for condition-bean of Kvs$!{tableMap.schemaPrefix}${table.camelizedName} (NotNull)
+     * @param cbLambda The callback for condition-bean of Kvs${data.dbflute.exEntity.className} (NotNull)
      * @return The optional ttl selected by the condition (NotNull: if no data, empty ttl)
      */
-    public OptionalEntity<Long> selectTtlBy${column.capCamelName}(Consumer<Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB> cbLambda) {
-        Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB = createCB(cbLambda);
-        $!{tableMap.schemaPrefix}${table.camelizedName}CB cb = adjustKvsConditionBeanOf${column.capCamelName}(kvsCB);
-        return ${tableMap.schema}KvsCacheFacade.ttl(createKvsKeyListOf${column.capCamelName}(kvsCB), cb);
+    public OptionalEntity<Long> selectTtlBy${column.capCamelName}(Consumer<${data.exConditionBean.className}> cbLambda) {
+        ${data.exConditionBean.className} kvsCB = createCB(cbLambda);
+        ${data.dbflute.exConditionBean.className} cb = adjustKvsConditionBeanOf${column.capCamelName}(kvsCB);
+        return ${data.kvs.schema}KvsCacheFacade.ttl(createKvsKeyListOf${column.capCamelName}(kvsCB), cb);
     }
 
     /**
@@ -347,14 +347,14 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
      *     <span style="color: #70226C">return</span> sakuhin;
      * });
      * </pre>
-     * @param entityLambda The handler of entity row of $!{tableMap.schemaPrefix}${table.camelizedName} (NotNull)
+     * @param entityLambda The handler of entity row of ${data.dbflute.exEntity.className} (NotNull)
      * @return The Entity used to insert/update with automatically-set column value (NotNull)
      */
-    public $!{tableMap.schemaPrefix}${table.camelizedName} insertOrUpdateBy${column.capCamelName}(Supplier<$!{tableMap.schemaPrefix}${table.camelizedName}> entityLambda) {
-        $!{tableMap.schemaPrefix}${table.camelizedName} ${table.uncapCamelName} = entityLambda.get();
-        ${tableMap.schema}KvsCacheFacade.insertOrUpdate(createKvsKeyListOf${column.capCamelName}(${table.uncapCamelName}), ${table.uncapCamelName});
+    public ${data.dbflute.exEntity.className} insertOrUpdateBy${column.capCamelName}(Supplier<${data.dbflute.exEntity.className}> entityLambda) {
+        ${data.dbflute.exEntity.className} ${manager.initUncap($data.tableName)} = entityLambda.get();
+        ${data.kvs.schema}KvsCacheFacade.insertOrUpdate(createKvsKeyListOf${column.capCamelName}(${manager.initUncap($data.tableName)}), ${manager.initUncap($data.tableName)});
 
-        return ${table.uncapCamelName};
+        return ${manager.initUncap($data.tableName)};
     }
 
     /**
@@ -367,17 +367,17 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
      *     <span style="color: #70226C">return</span> sakuhin;
      * });
      * </pre>
-     * @param entityLambda The handler of entity row of $!{tableMap.schemaPrefix}${table.camelizedName} (NotNull)
+     * @param entityLambda The handler of entity row of ${data.dbflute.exEntity.className} (NotNull)
      * @return The Entity used to delete (NotNull)
      */
-    public $!{tableMap.schemaPrefix}${table.camelizedName} deleteBy${column.capCamelName}(Supplier<$!{tableMap.schemaPrefix}${table.camelizedName}> entityLambda) {
-        $!{tableMap.schemaPrefix}${table.camelizedName} ${table.uncapCamelName} = entityLambda.get();
-        ${tableMap.schema}KvsCacheFacade.delete(createKvsKeyListOf${column.capCamelName}(${table.uncapCamelName}), ${table.uncapCamelName});
+    public ${data.dbflute.exEntity.className} deleteBy${column.capCamelName}(Supplier<${data.dbflute.exEntity.className}> entityLambda) {
+        ${data.dbflute.exEntity.className} ${manager.initUncap($data.tableName)} = entityLambda.get();
+        ${data.kvs.schema}KvsCacheFacade.delete(createKvsKeyListOf${column.capCamelName}(${manager.initUncap($data.tableName)}), ${manager.initUncap($data.tableName)});
 
-        return ${table.uncapCamelName};
+        return ${manager.initUncap($data.tableName)};
     }
 
-    protected List<Object> createKvsKeyListOf${column.capCamelName}(Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB kvsCB) {
+    protected List<Object> createKvsKeyListOf${column.capCamelName}(${data.exConditionBean.className} kvsCB) {
         List<Object> kvsKeyList = DfCollectionUtil.newArrayList();
         kvsKeyList.add("${column.name}");
 
@@ -396,19 +396,19 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv ex
         return kvsKeyList;
     }
 
-    protected List<Object> createKvsKeyListOf${column.capCamelName}($!{tableMap.schemaPrefix}${table.camelizedName} ${table.uncapCamelName}) {
+    protected List<Object> createKvsKeyListOf${column.capCamelName}(${data.dbflute.exEntity.className} ${manager.initUncap($data.tableName)}) {
         List<Object> kvsKeyList = DfCollectionUtil.newArrayList();
         kvsKeyList.add("${column.name}");
 #foreach ($kvsKey in $column.kvsKeys)
-        kvsKeyList.add(${table.uncapCamelName}.get${manager.camelize($kvsKey)}());
+        kvsKeyList.add(${manager.initUncap($data.tableName)}.get${manager.camelize($kvsKey)}());
 #end
         return kvsKeyList;
     }
 #end
 
     @Override
-    public Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB newConditionBean() {
-        return new Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB();
+    public ${data.exConditionBean.className} newConditionBean() {
+        return new ${data.exConditionBean.className}();
     }
 #end
 }

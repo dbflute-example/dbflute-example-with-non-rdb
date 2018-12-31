@@ -16,6 +16,7 @@
 package org.dbflute.kvs.core.delegator;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -101,6 +102,22 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     //                                                  Hash
     //                                                  ----
     @Override
+    public Map<String, String> findHash(String key) {
+        Object value = getInExpireDateTime(key);
+        if (value == null) {
+            value = DfCollectionUtil.newLinkedHashMap();
+        }
+        if (value instanceof Map<?, ?>) {
+            @SuppressWarnings("unchecked")
+            Map<String, String> map = (Map<String, String>) value;
+            return map;
+        } else {
+            String msg = "The type of the return value is invalid. expected=%s, actual=%s";
+            throw new KvsException(String.format(msg, Map.class, value.getClass()));
+        }
+    }
+
+    @Override
     public List<String> findHash(String key, Set<String> fieldList) {
         Object value = getInExpireDateTime(key);
         if (value == null) {
@@ -156,24 +173,24 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     //                                                  List
     //                                                  ----
     @Override
-    public void registerList(String key, List<String> value) {
-        registerList(key, value, null);
+    public void registerList(String key, List<String> list) {
+        registerList(key, list, null);
     }
 
     @Override
-    public void registerList(String key, List<String> value, LocalDateTime expireDateTime) {
-        registerMultiList(DfCollectionUtil.newLinkedHashMap(key, value), expireDateTime);
+    public void registerList(String key, List<String> list, LocalDateTime expireDateTime) {
+        registerMultiList(DfCollectionUtil.newLinkedHashMap(key, list), expireDateTime);
     }
 
     @Override
-    public void registerMultiList(Map<String, List<String>> keyValueMap) {
-        registerMultiList(keyValueMap, null);
+    public void registerMultiList(Map<String, List<String>> keyListMap) {
+        registerMultiList(keyListMap, null);
     }
 
     @Override
-    public void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime expireDateTime) {
-        keyValueMap.forEach((key, value) -> {
-            KEY_VALUE_MAP.put(key, value);
+    public void registerMultiList(Map<String, List<String>> keyListMap, LocalDateTime expireDateTime) {
+        keyListMap.forEach((key, list) -> {
+            KEY_VALUE_MAP.put(key, list);
             if (expireDateTime != null) {
                 KEY_EXPIRE_DATE_TIME_MAP.put(key, expireDateTime);
             }
@@ -184,35 +201,66 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     //                                                  Hash
     //                                                  ----
     @Override
-    public void registerHash(String key, Map<String, String> fieldValueMap) {
-        registerHash(key, fieldValueMap, null);
+    public void registerHash(String key, Map<String, String> hash) {
+        registerHash(key, hash, null);
     }
 
     @Override
-    public void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime expireDateTime) {
-        registerMultiHash(DfCollectionUtil.newLinkedHashMap(key, fieldValueMap), expireDateTime);
+    public void registerHash(String key, Map<String, String> hash, LocalDateTime expireDateTime) {
+        registerMultiHash(DfCollectionUtil.newLinkedHashMap(key, hash), expireDateTime);
     }
 
     @Override
-    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap) {
-        registerMultiHash(keyValueMap, null);
+    public boolean registerHashNx(String key, String field, String value) {
+        return registerHashNx(key, field, value, null);
     }
 
     @Override
-    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime expireDateTime) {
-        keyValueMap.forEach((key, fieldValueMap) -> {
+    public boolean registerHashNx(String key, String field, String value, LocalDateTime expireDateTime) {
+        synchronized (KEY_VALUE_MAP) {
+            Object holdValue = getInExpireDateTime(key);
+            if (holdValue == null) {
+                KEY_VALUE_MAP.put(key, DfCollectionUtil.newLinkedHashMap(field, value));
+                if (expireDateTime != null) {
+                    KEY_EXPIRE_DATE_TIME_MAP.put(key, expireDateTime);
+                }
+                return true;
+            }
+            if (holdValue instanceof Map<?, ?>) {
+                @SuppressWarnings("all")
+                Map<String, String> map = (Map<String, String>) holdValue;
+                if (map.containsKey(field)) {
+                    return false;
+                }
+                map.put(field, value);
+                if (expireDateTime != null) {
+                    KEY_EXPIRE_DATE_TIME_MAP.put(key, expireDateTime);
+                }
+            }
+            return true;
+        }
+    }
+
+    @Override
+    public void registerMultiHash(Map<String, Map<String, String>> keyHashMap) {
+        registerMultiHash(keyHashMap, null);
+    }
+
+    @Override
+    public void registerMultiHash(Map<String, Map<String, String>> keyHashMap, LocalDateTime expireDateTime) {
+        keyHashMap.forEach((key, hash) -> {
             Object value = getInExpireDateTime(key);
             if (value == null) {
-                KEY_VALUE_MAP.put(key, fieldValueMap);
+                KEY_VALUE_MAP.put(key, hash);
                 if (expireDateTime != null) {
                     KEY_EXPIRE_DATE_TIME_MAP.put(key, expireDateTime);
                 }
                 return;
             }
-            if (fieldValueMap instanceof Map<?, ?>) {
+            if (hash instanceof Map<?, ?>) {
                 @SuppressWarnings("all")
                 Map<String, String> map = (Map<String, String>) value;
-                map.putAll(fieldValueMap);
+                map.putAll(hash);
                 if (expireDateTime != null) {
                     KEY_EXPIRE_DATE_TIME_MAP.put(key, expireDateTime);
                 }
@@ -237,14 +285,60 @@ public class KvsLocalMapDelegator implements KvsDelegator {
         });
     }
 
+    // -----------------------------------------------------
+    //                                                  Hash
+    //                                                  ----
+    @Override
+    public void deleteHash(String key, Set<String> fieldList) {
+        Object value = getInExpireDateTime(key);
+        if (value == null) {
+            return;
+        }
+
+        if (value instanceof Map<?, ?>) {
+            @SuppressWarnings("unchecked")
+            Map<String, String> map = (Map<String, String>) value;
+            fieldList.stream().forEach(field -> map.remove(field));
+        } else {
+            String msg = "The type of the return value is invalid. expected=%s, actual=%s";
+            throw new KvsException(String.format(msg, Map.class, value.getClass()));
+        }
+    }
+
+    // ===================================================================================
+    //                                                                              Exists
+    //                                                                              ======
+    @Override
+    public boolean exists(String key) {
+        return (getInExpireDateTime(key) != null);
+    }
+
+    // ===================================================================================
+    //                                                                                 TTL
+    //                                                                                 ===
+    @Override
+    public Long ttl(String key) {
+        if (!KEY_EXPIRE_DATE_TIME_MAP.containsKey(key)) {
+            return -1L;
+        }
+
+        final LocalDateTime current = LocalDateTime.now();
+        final LocalDateTime expire = KEY_EXPIRE_DATE_TIME_MAP.get(key);
+        return ChronoUnit.SECONDS.between(current, expire);
+    }
+
+    @Override
+    public void expireAt(String key, LocalDateTime expireDateTime) {
+        if (!KEY_VALUE_MAP.containsKey(key)) {
+            String msg = "Key don't exist. Key=%s";
+            throw new KvsException(String.format(msg, key));
+        }
+        KEY_EXPIRE_DATE_TIME_MAP.put(key, expireDateTime);
+    }
+
     // ===================================================================================
     //                                                                               Other
     //                                                                               =====
-    @Override
-    public Long ttl(String key) {
-        return 1L;
-    }
-
     @Override
     public int getNumActive() {
         return 1;

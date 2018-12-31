@@ -15,15 +15,27 @@
 ##
 ${manager.allClassCopyright}package org.dbflute.c7a.cbean;
 
+import org.dbflute.c7a.entity.dbmeta.C7aDBMeta;
 import org.dbflute.optional.OptionalEntity;
 
 import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.Statement;
+import com.datastax.driver.core.querybuilder.Update;
+import com.datastax.driver.core.querybuilder.Delete;
 
 /**
  * @author FreeGen
  */
 public interface C7aConditionBean {
+
+    // ===================================================================================
+    //                                                                             DB Meta
+    //                                                                             =======
+    /**
+     * Handle the meta as DBMeta, that has all info of the table.
+     * @return The (singleton) instance of DB meta for the table. (NotNull)
+     */
+    C7aDBMeta asDBMeta();
 
     /**
      * Handle the meta as table DB name, that can be identity of table..
@@ -31,16 +43,43 @@ public interface C7aConditionBean {
      */
     String asTableDbName();
 
+    // ===================================================================================
+    //                                                                               Query
+    //                                                                               =====
     AbstractC7aConditionQuery query();
 
-    Statement buildSelect();
-
+    // ===================================================================================
+    //                                                                        Count Select
+    //                                                                        ============
     Statement buildSelectCount();
 
+    // ===================================================================================
+    //                                                                              Select
+    //                                                                              ======
+    Statement buildSelect();
+
+    // ===================================================================================
+    //                                                                              Update
+    //                                                                              ======
+    Update buildQueryUpdate();
+
+    // ===================================================================================
+    //                                                                              Delete
+    //                                                                              ======
+    Delete buildQueryDelete();
+
+    // ===================================================================================
+    //                                                                         Query Parts
+    //                                                                         ===========
     OptionalEntity<ConsistencyLevel> getConsistencyLevel();
 
     int getFetchSize();
 
+    String getPagingState();
+
+    // ===================================================================================
+    //                                                                      Paging Setting
+    //                                                                      ==============
     void enablePagingCount();
 
     void disablePagingCount();

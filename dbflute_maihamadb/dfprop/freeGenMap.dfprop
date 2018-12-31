@@ -54,7 +54,6 @@
             ; schema = examplestore
             ; schemaPrefix = Eg
             ; kvsPoolDiFile = kvs/di/kvs-pool-examplekvs.xml
-            ; type = hash
         }
     }
     # ==========================================================================

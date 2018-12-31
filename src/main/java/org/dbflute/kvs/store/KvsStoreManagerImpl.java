@@ -68,6 +68,11 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     //                                                  Hash
     //                                                  ----
     @Override
+    public Map<String, String> findHash(String key) {
+        return kvsStoreDelegator.findHash(key);
+    }
+
+    @Override
     public List<String> findHash(String key, Set<String> fieldList) {
         return kvsStoreDelegator.findHash(key, fieldList);
     }
@@ -94,13 +99,13 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     }
 
     @Override
-    public void registerMultiString(Map<String, String> keyValueMap) {
-        kvsStoreDelegator.registerMultiString(keyValueMap);
+    public void registerMultiString(Map<String, String> combinationKeyValueMap) {
+        kvsStoreDelegator.registerMultiString(combinationKeyValueMap);
     }
 
     @Override
-    public void registerMultiString(Map<String, String> keyValueMap, LocalDateTime expireDateTime) {
-        kvsStoreDelegator.registerMultiString(keyValueMap, expireDateTime);
+    public void registerMultiString(Map<String, String> combinationKeyValueMap, LocalDateTime expireDateTime) {
+        kvsStoreDelegator.registerMultiString(combinationKeyValueMap, expireDateTime);
     }
 
     // -----------------------------------------------------
@@ -117,13 +122,13 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     }
 
     @Override
-    public void registerMultiList(Map<String, List<String>> keyValueMap) {
-        kvsStoreDelegator.registerMultiList(keyValueMap);
+    public void registerMultiList(Map<String, List<String>> combinationKeyListMap) {
+        kvsStoreDelegator.registerMultiList(combinationKeyListMap);
     }
 
     @Override
-    public void registerMultiList(Map<String, List<String>> keyValueMap, LocalDateTime expireDateTime) {
-        kvsStoreDelegator.registerMultiList(keyValueMap, expireDateTime);
+    public void registerMultiList(Map<String, List<String>> combinationKeyListMap, LocalDateTime expireDateTime) {
+        kvsStoreDelegator.registerMultiList(combinationKeyListMap, expireDateTime);
     }
 
     // -----------------------------------------------------
@@ -140,13 +145,23 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     }
 
     @Override
-    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap) {
-        kvsStoreDelegator.registerMultiHash(keyValueMap);
+    public boolean registerHashNx(String key, String field, String value) {
+        return kvsStoreDelegator.registerHashNx(key, field, value);
     }
 
     @Override
-    public void registerMultiHash(Map<String, Map<String, String>> keyValueMap, LocalDateTime expireDateTime) {
-        kvsStoreDelegator.registerMultiHash(keyValueMap, expireDateTime);
+    public boolean registerHashNx(String key, String field, String value, LocalDateTime expireDateTime) {
+        return kvsStoreDelegator.registerHashNx(key, field, value, expireDateTime);
+    }
+
+    @Override
+    public void registerMultiHash(Map<String, Map<String, String>> combinationKeyHashMap) {
+        kvsStoreDelegator.registerMultiHash(combinationKeyHashMap);
+    }
+
+    @Override
+    public void registerMultiHash(Map<String, Map<String, String>> combinationKeyHashMap, LocalDateTime expireDateTime) {
+        kvsStoreDelegator.registerMultiHash(combinationKeyHashMap, expireDateTime);
     }
 
     // ===================================================================================
@@ -160,6 +175,27 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     @Override
     public void delete(String... keys) {
         kvsStoreDelegator.delete(keys);
+    }
+
+    @Override
+    public void deleteHash(String key, Set<String> fieldList) {
+        kvsStoreDelegator.deleteHash(key, fieldList);
+    }
+
+    // ===================================================================================
+    //                                                                              Exists
+    //                                                                              ======
+    @Override
+    public boolean exists(String key) {
+        return kvsStoreDelegator.exists(key);
+    }
+
+    // ===================================================================================
+    //                                                                            expireAt
+    //                                                                            ========
+    @Override
+    public void expireAt(String key, LocalDateTime expireDateTime) {
+        kvsStoreDelegator.expireAt(key, expireDateTime);
     }
 
     // ===================================================================================

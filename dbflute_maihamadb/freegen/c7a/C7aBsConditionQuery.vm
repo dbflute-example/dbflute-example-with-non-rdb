@@ -16,6 +16,7 @@
 #set ($rule = $scriptEngine.get('c7aRule'))
 ${manager.allClassCopyright}package ${data.package};
 #set ($importList = [])
+#set($added = $importList.add('java.util.Collection'))
 #if(!$data.materializedViewMetaList.isEmpty())
 #set($added = $importList.add('org.dbflute.cbean.sqlclause.orderby.OrderByElement'))
 #end
@@ -37,7 +38,7 @@ public abstract class ${data.className}#if ($data.extendsClass && $data.extendsC
 #end
 #foreach($property in $data.properties)
 #set($nestList = [])
-#generateC7aEqual($data, $property)
+#generateC7aQueryAccessor($data, $property)
 #set($nestList = [])
 #end
 #foreach($property in $data.properties)
@@ -70,13 +71,18 @@ public abstract class ${data.className}#if ($data.extendsClass && $data.extendsC
 
 #generateIndent($nestList.size())/** The property of ${property.fieldName}. (NullAllowed) */
 #generateIndent($nestList.size())protected $property.fieldClass _$property.fieldName;
+#if($data.primaryKeyList.indexOf($property.name) == $data.primaryKeyList.size() - 1)
+
+#generateIndent($nestList.size())/** The property of ${property.fieldName}. (NullAllowed) */
+#generateIndent($nestList.size())protected Collection<$property.fieldClass> _${property.fieldName}List;
+#end
 #end
 ## _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 ## generate c7a equal.
 ## @param class class (NotNull)
 ## @param property property (NotNull)
 ## _/_/_/_/_/_/_/_/_/_/
-#macro(generateC7aEqual, $data, $property)
+#macro(generateC7aQueryAccessor, $data, $property)
 
 #generateIndent($nestList.size())/**
 #generateIndent($nestList.size()) * [get] ${property.fieldName} Equal <br>
@@ -94,6 +100,25 @@ public abstract class ${data.className}#if ($data.extendsClass && $data.extendsC
 #generateIndent($nestList.size())    KvsAssertion.assertNullQuery("${property.fieldName}", _${property.fieldName});
 #generateIndent($nestList.size())    _$property.fieldName = $property.fieldName;
 #generateIndent($nestList.size())}
+#if($data.primaryKeyList.indexOf($property.name) == $data.primaryKeyList.size() - 1)
+
+#generateIndent($nestList.size())/**
+#generateIndent($nestList.size()) * [get] ${property.fieldName} InScope <br>
+#generateIndent($nestList.size()) * @return The value of the column '${property.name}'. (NullAllowed)
+#generateIndent($nestList.size()) */
+#generateIndent($nestList.size())public Collection<$property.fieldClass> get${manager.initCap($property.fieldName)}_InScope() {
+#generateIndent($nestList.size())    return _${property.fieldName}List;
+#generateIndent($nestList.size())}
+
+#generateIndent($nestList.size())/**
+#generateIndent($nestList.size()) * [set] ${property.fieldName} InScope <br>
+#generateIndent($nestList.size()) * @param ${property.fieldName} The value of the column ${property.name}. (NotNull)
+#generateIndent($nestList.size()) */
+#generateIndent($nestList.size())public void set${manager.initCap($property.fieldName)}_InScope(Collection<$property.fieldClass> ${property.fieldName}List) {
+#generateIndent($nestList.size())    KvsAssertion.assertNullQuery("${property.fieldName}List", _${property.fieldName}List);
+#generateIndent($nestList.size())    _${property.fieldName}List = ${property.fieldName}List;
+#generateIndent($nestList.size())}
+#end
 #end
 ## _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 ## generate c7a orderBy.

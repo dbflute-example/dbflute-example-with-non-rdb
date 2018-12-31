@@ -28,7 +28,6 @@ public class ${data.className} {
 
     public static C7aPool create() {
         C7aPool c7aPool = new C7aPool();
-        // TODO
         return c7aPool;
     }
 }

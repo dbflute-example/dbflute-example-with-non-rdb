@@ -13,19 +13,19 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.cbean.bs;
+${manager.allClassCopyright}package ${data.package};
 
 import org.dbflute.kvs.cache.cbean.KvsCacheConditionBean;
 import org.dbflute.optional.OptionalThing;
 
-import ${tableMap.dbflutePackage}.cbean.$!{tableMap.schemaPrefix}${table.camelizedName}CB;
-import ${request.package}.${tableMap.schema}.cbean.cq.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CQ;
+import ${data.dbflute.exConditionBean.package}.${data.dbflute.exConditionBean.className};
+import ${data.exConditionQuery.package}.${data.exConditionQuery.className};
 
 /**
- * The base condition-bean of (${table.comment})${table.capCamelName}.
+ * The base condition-bean of (${data.comment})${data.tableName}.
  * @author FreeGen
  */
-public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CB implements KvsCacheConditionBean {
+public abstract class ${data.className} implements KvsCacheConditionBean {
 
     // ===================================================================================
     //                                                                          Definition
@@ -35,18 +35,18 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CB imp
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CQ _conditionQuery;
+    protected ${data.exConditionQuery.className} _conditionQuery;
 
     // ===================================================================================
     //                                                                               Query
     //                                                                               =====
-    public Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CQ query() {
+    public ${data.exConditionQuery.className} query() {
         return doGetConditionQuery();
     }
 
-    protected Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CQ doGetConditionQuery() {
+    protected ${data.exConditionQuery.className} doGetConditionQuery() {
         if (_conditionQuery == null) {
-            _conditionQuery = new Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CQ();
+            _conditionQuery = new ${data.exConditionQuery.className}();
         }
         return _conditionQuery;
     }
@@ -67,8 +67,8 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CB imp
     // ===================================================================================
     //                                                                               to...
     //                                                                               =====
-    public $!{tableMap.schemaPrefix}${table.camelizedName}CB to$!{tableMap.schemaPrefix}${table.camelizedName}CB() {
-        $!{tableMap.schemaPrefix}${table.camelizedName}CB cb = new $!{tableMap.schemaPrefix}${table.camelizedName}CB();
+    public ${data.dbflute.exConditionBean.className} to${data.dbflute.exConditionBean.className}() {
+        ${data.dbflute.exConditionBean.className} cb = new ${data.dbflute.exConditionBean.className}();
 
         // where
         query().xdfgetColumnEqualValue().entrySet().stream().forEach(entry -> {

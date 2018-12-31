@@ -15,8 +15,9 @@
  */
 package org.docksidestage.remote.petstore.pet.findbytags;
 
+import javax.validation.constraints.NotNull;
+
 import org.lastaflute.core.util.Lato;
-import org.lastaflute.web.validation.Required;
 
 /**
  * The bean class as param for remote API of GET /pet/findByTags.
@@ -25,7 +26,7 @@ import org.lastaflute.web.validation.Required;
 public class RemotePetFindbytagsParam {
 
     /** The property of tags. (Tags to filter by) */
-    @Required
+    @NotNull
     public java.util.List<String> tags;
 
     @Override

@@ -16,10 +16,10 @@
 ${manager.allClassCopyright}package ${request.package};
 
 import org.dbflute.kvs.core.delegator.KvsRedisPool;
-#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+#if ($manager.isTargetContainerSeasar())
 import org.dbflute.saflute.core.util.ContainerUtil;
 #end
-#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+#if ($manager.isTargetContainerLastaDi())
 import org.lastaflute.core.util.ContainerUtil;
 #end
 

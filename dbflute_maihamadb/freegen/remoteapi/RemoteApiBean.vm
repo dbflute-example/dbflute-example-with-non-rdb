@@ -27,23 +27,13 @@ ${manager.allClassCopyright}package ${data.package};
 #foreach($propertyEntry in $data.properties.entrySet())
 #set ($property = $propertyEntry.value)
 #if (${property.required})
-#set($added = $importList.add('org.lastaflute.web.validation.Required'))
-#end
-#if ($property.items && $property.items['$ref'])
-#set ($nestType = $property.items['$ref'].replace('#/definitions/', ''))
-#elseif ($property['$ref'])
-#set ($nestType = $property['$ref'].replace('#/definitions/', ''))
-#end
-#if ($nestType && $nestType != '')
-#foreach($nestPropertyEntry in $definitionMap[$nestType].properties.entrySet())
-#set ($nestPropertyEntry.value.required =  $definitionMap[$nestType].required.contains($nestPropertyEntry.key))
-#set ($nestProperty = $nestPropertyEntry.value)
-#if (${nestProperty.required})
+#if ($property.type == 'array')
+#set($added = $importList.add('javax.validation.constraints.NotNull'))
+#else
 #set($added = $importList.add('org.lastaflute.web.validation.Required'))
 #end
 #end
-#set ($nestType = '')
-#end
+#analyzeImports($importList, $definitionMap, $property)
 #end
 #generateImports($importList, $data.package, $scriptEngine.invokeMethod($rule, 'importOrderList'))
 
@@ -65,6 +55,35 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
         return Lato.string(this);
     }
 }
+## analyze imports.
+## @param class class (NotNull)
+## @param propertyEntry propertyEntry (NotNull)
+## _/_/_/_/_/_/_/_/_/_/
+#macro(analyzeImports, $importList, $definitionMap, $property)
+#set ($nestType = '')
+#if ($property.items && $property.items['$ref'])
+#set ($nestType = $generator.getClass().forName('java.net.URLDecoder').decode($property.items['$ref'].replace('#/definitions/', ''), 'UTF-8'))
+#elseif ($property['$ref'])
+#set ($nestType = $generator.getClass().forName('java.net.URLDecoder').decode($property['$ref'].replace('#/definitions/', ''), 'UTF-8'))
+#end
+#if ($nestType && $nestType != '')
+#foreach($nestPropertyEntry in $definitionMap[$nestType].properties.entrySet())
+#set ($nestPropertyEntry.value.required = $definitionMap[$nestType].required.contains($nestPropertyEntry.key))
+#set ($nestProperty = $nestPropertyEntry.value)
+#if (${nestProperty.required})
+#if ($nestProperty.type == 'array')
+#set($added = $importList.add('javax.validation.constraints.NotNull'))
+#else
+#set($added = $importList.add('org.lastaflute.web.validation.Required'))
+#end
+#end
+#end
+#foreach($nestPropertyEntry in $definitionMap[$nestType].properties.entrySet())
+#analyzeImports($importList, $definitionMap, $nestPropertyEntry.value)
+#end
+#end
+#set ($nestType = '')
+#end
 ## _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 ## generate property.
 ## @param class class (NotNull)
@@ -94,7 +113,11 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
 #generateIndent($nestList.size())@XmlElement(name = "$propertyEntry.key")
 #end
 #if (${property.required})
+#if ($property.type == 'array')
+#generateIndent($nestList.size())@NotNull
+#else
 #generateIndent($nestList.size())@Required
+#end
 #end
 #if ($property.type == 'array')
 #if ($scriptEngine.invokeMethod($rule, 'beanPropertyManualMappingClass', $data.api, $class, $property))
@@ -104,7 +127,7 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
 #elseif (${typeMap[$property.items.type]})
 #set ($fieldClass = "${typeMap[$property.type]}<${typeMap[$property.items.type]}>")
 #else
-#set ($nestType = $property.items['$ref'].replace('#/definitions/', ''))
+#set ($nestType = $generator.getClass().forName('java.net.URLDecoder').decode($property.items['$ref'].replace('#/definitions/', ''), 'UTF-8'))
 #adjustType($nestType)
 #set ($fieldClass = "${typeMap[$property.type]}<$adjustType>")
 #generateIndent($nestList.size())@javax.validation.Valid
@@ -116,7 +139,7 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
 #elseif (${typeMap[$property.type]})
 #set ($fieldClass = ${typeMap[$property.type]})
 #else
-#set ($nestType = $property['$ref'].replace('#/definitions/', ''))
+#set ($nestType = $generator.getClass().forName('java.net.URLDecoder').decode($property['$ref'].replace('#/definitions/', ''), 'UTF-8'))
 #adjustType($nestType)
 #set ($fieldClass = $adjustType)
 #generateIndent($nestList.size())@javax.validation.Valid

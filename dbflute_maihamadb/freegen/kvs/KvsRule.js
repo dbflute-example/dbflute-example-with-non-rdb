@@ -6,6 +6,34 @@
 var baseRule = {
 
     // ===================================================================================
+    //                                                                               Base
+    //                                                                              ======
+    schema: function(request) {
+        if (request.tableMap.schema !== null) {
+            return request.tableMap.schema;
+        }
+        return manager.initUncap(request.requestName.replace(/^Kvs(Cache|Store)/g, ''));
+    },
+
+    schemaShort: function(request) {
+        if (request.tableMap.containsKey('schemaPrefix')) {
+            return request.tableMap.schemaPrefix ? request.tableMap.schemaPrefix : '';
+        }
+        return manager.initCap(this.schema(request));
+    },
+
+    kvsPoolDiFile: function(request) {
+        if (request.tableMap.kvsPoolDiFile) {
+            return request.tableMap.kvsPoolDiFile;
+        }
+        throw new Error('override kvsPoolDiFile(request)');
+    },
+
+    // ===================================================================================
+    //                                                                               Cache
+    //                                                                               =====
+
+    // ===================================================================================
     //                                                                              Option
     //                                                                              ======
     /**
@@ -17,8 +45,8 @@ var baseRule = {
     },
 
     /**
-     * Return java import order list.
-     * @return java import order list. (NotNull)
+     * Return converter handler.
+     * @return converter handler. (NotNull)
      */
     converterHandler: function() {
         // MapListString Instantiate everytime because of the statefulness of...

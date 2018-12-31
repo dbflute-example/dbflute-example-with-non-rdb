@@ -15,6 +15,8 @@
 ##
 ${manager.allClassCopyright}package org.dbflute.c7a.entity.dbmeta;
 
+import java.util.Map;
+
 /**
  * @author FreeGen
  */
@@ -29,8 +31,14 @@ public interface C7aDBMeta {
      */
     String getTableDbName();
 
+    /**
+     * Get the DB name map of the table, can be identity of table.
+     * @return The DB name map of the table. (NotNull)
+     */
+    Map<String, String> asTableDbNameMap();
+
     // ===================================================================================
-    //                                                                 OptimisticLock Info
+    //                                                                 OptimisticLock Info
     //                                                                 ===================
     /**
      * Does the table have optimistic lock? (basically has version no or update date?)

@@ -82,10 +82,10 @@ public abstract class KvsEgBsStoreExampleBhv {
     /**
      * Select the entity List by the condition-bean.
      * <pre>
-     * List&lt;KvsEgStoreExample&gt; kvsStoreExampleList = <span style="color: #0000C0">kvsEgStoreExampleBhv</span>.<span style="color: #CC4747">selectList</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
-     *     <span style="color: #553000">cb</span>.query().setEgkey_inScope(<span style="color: #553000">keyList</span>);
+     * List&lt;KvsEgStoreExample&gt; kvsEgStoreExampleList = <span style="color: #0000C0">kvsEgStoreExampleBhv</span>.<span style="color: #CC4747">selectList</span>(<span style="color: #553000">cb</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     <span style="color: #553000">cb</span>.query().setEgkey_InScope(<span style="color: #553000">keyList</span>);
      * });
-     * kvsStoreExampleList.forEach(<span style="color: #553000">storeExample</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     * kvsEgStoreExampleList.forEach(<span style="color: #553000">storeExample</span> <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
      *     ... = <span style="color: #553000">storeExample</span>.get...;
      * });
      * </pre>

@@ -14,29 +14,27 @@
 ## governing permissions and limitations under the License.
 ##
 #set ($kvsKeyCount = 0)
-#foreach ($column in $table.columnList)
+#foreach ($column in $data.columnList)
 #if ($column.kvsKey)
 #set ($kvsKeyCount = $kvsKeyCount + 1)
 #end
 #end
-${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.cbean.cq.bs;
+${manager.allClassCopyright}package ${data.package};
 
-#if ($kvsKeyCount == 1)
 import java.util.Collection;
 
-#end
 import org.dbflute.kvs.core.assertion.KvsAssertion;
 
 /**
- * The base condition-query of (${table.comment})${table.capCamelName}.
+ * The base condition-query of (${data.comment})${data.tableName}.
  * @author FreeGen
  */
-public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ {
+public abstract class ${data.className} {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-#foreach ($column in $table.columnList)
+#foreach ($column in $data.columnList)
 #if ($column.kvsKey)
 #if ($column.isNormalColumn)
 #set ($javaNative = ${column.type})
@@ -56,10 +54,14 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ {
 #end
 #end
 #end
+#if ($kvsKeyCount != 1)
+    protected Collection<${data.compoundKey.className}> _compoundKeyList;
+
+#end
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-#foreach ($column in $table.columnList)
+#foreach ($column in $data.columnList)
 #if ($column.kvsKey)
 #if ($column.isNormalColumn)
 #set ($javaNative = ${column.type})
@@ -86,7 +88,9 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ {
     public void set${column.capCamelName}_Equal(${javaNative} ${column.uncapCamelName}) {
         KvsAssertion.assertNullQuery("${column.uncapCamelName}", _${column.uncapCamelName});
 #if ($kvsKeyCount == 1)
-        KvsAssertion.assertNullQuery("${column.uncapCamelName}", _${column.uncapCamelName}List);
+        KvsAssertion.assertNullQuery("${column.uncapCamelName}List", _${column.uncapCamelName}List);
+#else
+        KvsAssertion.assertNullQuery("compoundKeyList", _compoundKeyList);
 #end
         _${column.uncapCamelName} = ${column.uncapCamelName};
     }
@@ -94,26 +98,112 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CQ {
 #end
 #end
 #if ($kvsKeyCount == 1)
-#foreach ($column in $table.columnList)
+#foreach ($column in $data.columnList)
 #if ($column.kvsKey)
     public Collection<${column.type}> xdfget${column.camelizedName}List() {
         return _${column.uncapCamelName}List;
     }
 
-    public void set${column.camelizedName}_inScope(Collection<${column.type}> ${column.uncapCamelName}List) {
+    public void set${column.camelizedName}_InScope(Collection<${column.type}> ${column.uncapCamelName}List) {
         KvsAssertion.assertNullQuery("${column.uncapCamelName}", _${column.uncapCamelName});
-        KvsAssertion.assertNullQuery("${column.uncapCamelName}", _${column.uncapCamelName}List);
+        KvsAssertion.assertNullQuery("${column.uncapCamelName}List", _${column.uncapCamelName}List);
         _${column.uncapCamelName}List = ${column.uncapCamelName}List;
     }
 
 #end
 #end
+#else
+    public static class ${data.compoundKey.className} {
+
+        // ===================================================================================
+        //                                                                           Attribute
+        //                                                                           =========
+#foreach ($column in $data.columnList)
+#if ($column.kvsKey)
+#if ($column.isNormalColumn)
+#set ($javaNative = ${column.type})
+#elseif ($column.isRefColumn)
+#set ($javaNative = ${column.camelizedName})
+#end
+        /** ${column.name}: ${column.comment} */
+#if ($column.default)
+        protected ${javaNative} _${column.uncapCamelName} = ${column.default};
+#else
+        protected ${javaNative} _${column.uncapCamelName};
+#end
+
+#end
+#end
+        // ===================================================================================
+        //                                                                            Accessor
+        //                                                                            ========
+#foreach ($column in $data.columnList)
+#if ($column.kvsKey)
+#if ($column.isNormalColumn)
+#set ($javaNative = ${column.type})
+#elseif ($column.isRefColumn)
+#set ($javaNative = ${column.camelizedName})
+#end
+        /**
+         * ${column.comment}を返す。
+         * @return ${column.comment}
+         */
+        public ${javaNative} get${column.capCamelName}() {
+#if ($javaNative.startsWith('java.util.Map') || $javaNative.startsWith('java.util.List'))
+            if (_${column.uncapCamelName} == null) {
+                _${column.uncapCamelName} = new ${javaNative.replaceAll('^java\.util\.List', 'java\.util\.ArrayList').replaceAll('^java\.util\.Map', 'java\.util\.LinkedHashMap')}();
+            }
+#end
+            return _${column.uncapCamelName};
+        }
+
+        /**
+         * ${column.comment}を設定する。
+         * @param ${column.uncapCamelName} ${column.comment}
+         */
+        public void set${column.capCamelName}(${javaNative} ${column.uncapCamelName}) {
+            _${column.uncapCamelName} = ${column.uncapCamelName};
+        }
+
+#end
+#end
+        @Override
+        public String toString() {
+            String delimiter = ", ";
+            StringBuilder sb = new StringBuilder();
+#foreach ($column in $data.columnList)
+#if ($column.kvsKey)
+            sb.append(delimiter).append(get${column.capCamelName}());
+#end
+#end
+            if (sb.length() > delimiter.length()) {
+                sb.delete(0, delimiter.length());
+            }
+            sb.insert(0, super.toString() + "{").append("}");
+            return sb.toString();
+        }
+    }
+
+    public Collection<${data.compoundKey.className}> xdfgetCompoundKeyList() {
+        return _compoundKeyList;
+    }
+
+    public void setCompoundKey_InScope(Collection<${data.compoundKey.className}> compoundKeyList) {
+        KvsAssertion.assertNullQuery("compoundKeyList", _compoundKeyList);
+#foreach ($column in $data.columnList)
+#if ($column.kvsKey)
+        KvsAssertion.assertNullQuery("${column.uncapCamelName}", _${column.uncapCamelName});
+#end
+#end
+        _compoundKeyList = compoundKeyList;
+    }
+
 #end
     @Override
     public String toString() {
         String delimiter = ", ";
         StringBuilder sb = new StringBuilder();
-#foreach ($column in $table.columnList)
+#foreach ($column in $data.columnList)
 #if ($column.kvsKey)
         sb.append(delimiter).append(_${column.uncapCamelName});
 #end

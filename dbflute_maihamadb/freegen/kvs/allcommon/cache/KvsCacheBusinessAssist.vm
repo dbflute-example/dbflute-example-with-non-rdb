@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -39,14 +40,14 @@ import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.exception.EntityDuplicatedException;
 import org.dbflute.optional.OptionalEntity;
-#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
+#if ($manager.isTargetContainerSeasar())
 import org.dbflute.saflute.core.magic.ThreadCacheContext;
 import org.dbflute.saflute.core.magic.async.AsyncManager;
 import org.dbflute.saflute.core.time.TimeManager;
 #end
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
-#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
+#if ($manager.isTargetContainerLastaDi())
 import org.lastaflute.core.magic.ThreadCacheContext;
 import org.lastaflute.core.magic.async.AsyncManager;
 import org.lastaflute.core.time.TimeManager;
@@ -83,8 +84,8 @@ public class KvsCacheBusinessAssist {
     protected final KvsCacheConverterHandler kvsCacheConverterHandler = new KvsCacheConverterHandler();
 
     // ===================================================================================
-    //                                                                                Find
-    //                                                                                ====
+    //                                                                Find (For KVS Cache)
+    //                                                                ====================
     /**
      * Retrieve an entity corresponding to the specified key-list.
      * When KVS does not have the value associated with the key-list,
@@ -99,7 +100,6 @@ public class KvsCacheBusinessAssist {
      * @return Entity as the result of the retrieval (NotNull)
      * @throws EntityAlreadyDeletedException When the entity has already been deleted. (not found)
      */
-    @SuppressWarnings("unchecked")
     public <ENTITY extends Entity> OptionalEntity<ENTITY> findEntity(BehaviorSelector selector, String dbName, List<Object> searchKeyList,
             ConditionBean cb, Function<ENTITY, LocalDateTime> expireDateTimeLambda) {
         final String kvsKey = generateKey(dbName, cb.asTableDbName(), searchKeyList);
@@ -112,31 +112,154 @@ public class KvsCacheBusinessAssist {
         final DBMeta dbmeta = cb.asDBMeta(); // Get metadata of the target table
 
         if (foundValue != null) {
-            final Entity foundEntity = kvsCacheConverterHandler.toEntity(foundValue, dbmeta);
+            final ENTITY foundEntity = kvsCacheConverterHandler.toEntity(foundValue, dbmeta);
             if (foundEntity != null) {
                 registerThreadCache(kvsKey, foundEntity);
-                return (OptionalEntity<ENTITY>) OptionalEntity.of(foundEntity);
+                return OptionalEntity.of(foundEntity);
             }
         }
 
-        final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
-        final OptionalEntity<ENTITY> optEntity = selectEntity(selector, columnInfoList, cb);
+        cb.disableColumnNullObject();
 
-        if (!optEntity.isPresent()) {
-            return optEntity;
-        }
+        final OptionalEntity<ENTITY> optEntity = selectEntity(selector, cb);
 
-        ENTITY entity = optEntity.get();
-
-        registerThreadCache(kvsKey, entity);
-        // Insert/Update an entity into(in) KVS asynchronously
-        asyncManager.async(() -> {
-            kvsCacheManager.registerString(kvsKey, kvsCacheConverterHandler.toMapString(entity), expireDateTimeLambda.apply(entity));
+        optEntity.ifPresent(entity -> {
+            registerThreadCache(kvsKey, entity);
+            // Insert/Update an entity into(in) KVS asynchronously
+            asyncManager.async(() -> {
+                kvsCacheManager.registerString(kvsKey, kvsCacheConverterHandler.toMapString(entity), expireDateTimeLambda.apply(entity));
+            });
         });
 
         return optEntity;
     }
 
+    /**
+     * Retrieve a list of entities corresponding to the specified key-list.
+     * When KVS does not have the value associated with the key-list,
+     * search the entity from RDB and store the result into KVS before return it.
+     * The type of the value stored into KVS will be List of MapString.
+     * @param selector Selector corresponding to the DB to connect to (NotNull）
+     * @param dbName The name of DB to connect to (NotNull)
+     * @param searchKeyList Key info. specified in KVS (equal to the search condition spedified by CB) (NotNull)
+     * @param cb CB that specifies query condition (NotNull)
+     * @param expireDateTimeLambda The callback for Time To Live (NotNull, MayReturnNull: then use server-config)
+     * @param <ENTITY> Entity of DBFlute
+     * @return List of entities as the result of retrieval (NotNull)
+     */
+    public <ENTITY extends Entity> List<ENTITY> findList(BehaviorSelector selector, String dbName, List<Object> searchKeyList,
+            ConditionBean cb, Function<List<ENTITY>, LocalDateTime> expireDateTimeLambda) {
+        final String kvsKey = generateKey(dbName, cb.asTableDbName(), searchKeyList);
+
+        final List<ENTITY> threadCachedList = findListFromThreadCache(kvsKey);
+        if (isNotEmpty(threadCachedList)) {
+            return threadCachedList;
+        }
+
+        final List<String> found = kvsCacheManager.findList(kvsKey); // String elements represent MapString in KVS
+
+        if (isNotEmpty(found)) {
+            List<ENTITY> entityList = kvsCacheConverterHandler.toEntityList(found, cb.asDBMeta());
+            if (isNotEmpty(entityList)) {
+                registerThreadCache(kvsKey, entityList);
+                return entityList;
+            }
+        }
+
+        cb.disableColumnNullObject();
+
+        final List<ENTITY> entityList = selectList(selector, cb);
+
+        registerThreadCache(kvsKey, entityList);
+        // Insert/Update an entity into(in) KVS asynchronously
+        asyncManager.async(() -> {
+            kvsCacheManager.registerList(kvsKey, kvsCacheConverterHandler.toMapStringList(entityList),
+                    expireDateTimeLambda.apply(entityList));
+        });
+
+        return entityList;
+    }
+
+    // ===================================================================================
+    //                                                    Insert Or Update (For KVS Cache)
+    //                                                    ================================
+    /**
+     * Insert/Update the specified entity into(in) RDB, and delete caches in KVS which contain the entity if exists.
+     * @param selector Selector corresponding to the DB to connect to (NotNull）
+     * @param dbName The name of DB to connect to (NotNull)
+     * @param searchKeyList Key info. specified in KVS (equal to the search condition spedified by CB) (NotNull)
+     * @param entity Entity to be inserted or updated (NotNull)
+     * @param <ENTITY> Entity of DBFlute
+     */
+    public <ENTITY extends Entity> void insertOrUpdate(BehaviorSelector selector, String dbName, List<Object> searchKeyList,
+            ENTITY entity) {
+        insertOrUpdate(selector, entity); // Insert/Update to RDB
+        removeCache(dbName, entity.asTableDbName(), searchKeyList);
+    }
+
+    // ===================================================================================
+    //                                                              Delete (For KVS Cache)
+    //                                                              ======================
+    /**
+     * Delete the specified entity from RDB and caches from KVS which contain the entity if exists.
+     * @param selector Selector corresponding to the DB to connect to (NotNull）
+     * @param dbName The name of DB to connect to (NotNull)
+     * @param searchKeyList Key info. specified in KVS (equal to the search condition spedified by CB) (NotNull)
+     * @param entity Entity to be deleted (NotNull)
+     * @param <ENTITY> Entity of DBFlute
+     * @return The number of deleted rows
+     */
+    public <ENTITY extends Entity> int delete(BehaviorSelector selector, String dbName, List<Object> searchKeyList, ENTITY entity) {
+        final int deleteCount = queryDelete(selector, entity);
+        removeCache(dbName, entity.asTableDbName(), searchKeyList);
+        return deleteCount;
+    }
+
+    public int queryDelete(BehaviorSelector selector, String dbName, List<Object> searchKeyList, ConditionBean cb) {
+        final int deleteCount = queryDelete(selector, cb);
+        removeCache(dbName, cb.asTableDbName(), searchKeyList);
+        return deleteCount;
+    }
+
+    // unused
+    /**
+     * Flush caches in KVS associated with specified key, but do nothing to RDB.
+     * @param selector Selector corresponding to the DB to connect to (NotNull）
+     * @param dbName The name of DB to connect to (NotNull)
+     * @param searchKeyList Key info. specified in KVS (equal to the search condition spedified by CB) (NotNull)
+     * @param entity Entity to identifies the caches to be flushed (NotNull)
+     * @param <ENTITY> Entity of DBFlute
+     */
+    public <ENTITY extends Entity> void clearCache(BehaviorSelector selector, String dbName, List<Object> searchKeyList, ENTITY entity) {
+        removeCache(dbName, entity.asTableDbName(), searchKeyList);
+    }
+
+    // ===================================================================================
+    //                                                        Generate Key (For KVS Cache)
+    //                                                        ============================
+    /**
+     * Generate a key-string for KVS to store a value by concatenating information of the value.
+     * e.g.) "<DB name>|<table name>|sercheKeyList(0)|searchKeyList(1)|..."
+     * @param dbName The name of DB to connect to (NotNull)
+     * @param tableName The name of table in RDB that contains the rows stored into KVS (NotNull)
+     * @param searchKeyList A list of keys for search (NotNull)
+     * @return A key-string used to store data into KVS (NotNull)
+     */
+    public String generateKey(String dbName, String tableName, List<Object> searchKeyList) {
+        final StringBuilder sb = new StringBuilder();
+        final String keyDelimiter = KEY_DELIMITER;
+        sb.append(dbName);
+        sb.append(keyDelimiter).append(tableName.toUpperCase()); // Because MySQL makes table name lower-case when storig it.
+        searchKeyList.forEach(searchKey -> {
+            sb.append(keyDelimiter);
+            sb.append(Objects.toString(searchKey, ""));
+        });
+        return sb.toString();
+    }
+
+    // ===================================================================================
+    //                                                        Find (For CB-Embedded Cache)
+    //                                                        ============================
     /**
      * Retrieve an entity corresponding to the specified key-list.
      * When KVS does not have the value associated with the key-list,
@@ -201,24 +324,29 @@ public class KvsCacheBusinessAssist {
             columnInfoList.removeAll(properties.stream().map(property -> dbmeta.findColumnInfo(property)).collect(Collectors.toSet()));
         }
 
-        final OptionalEntity<ENTITY> optEntity = selectEntity(selector, columnInfoList, cb);
+        columnInfoList.forEach(columnInfo -> {
+            if (columnInfo.canBeNullObject()) {
+                cb.invokeSpecifyColumn(columnInfo.getPropertyName());
+            }
+        });
+        cb.disableColumnNullObject();
 
-        if (!optEntity.isPresent()) {
-            return optEntity;
-        }
+        final OptionalEntity<ENTITY> optEntity = selectEntity(selector, cb);
 
-        ENTITY entity = optEntity.get();
-
-        reflectEntity(entity, cachedEntity);
-        registerThreadCache(kvsKey, entity);
-        // Insert/Update an entity into(in) KVS asynchronously
-        asyncManager.async(() -> {
-            Map<String, String> fieldValueMap = dbmeta.extractAllColumnMap(entity)
-                    .entrySet()
-                    .stream()
-                    .filter(entry -> columnInfoList.contains(dbmeta.findColumnInfo(entry.getKey())))
-                    .collect(HashMap::new, (map, column) -> map.put(column.getKey(), DfTypeUtil.toString(column.getValue())), Map::putAll);
-            kvsCacheManager.registerHash(kvsKey, fieldValueMap, expireDateTimeLambda.apply(entity));
+        ENTITY halfwayCachedEntity = cachedEntity;
+        optEntity.ifPresent(entity -> {
+            reflectEntity(entity, halfwayCachedEntity);
+            registerThreadCache(kvsKey, entity);
+            // Insert/Update an entity into(in) KVS asynchronously
+            asyncManager.async(() -> {
+                Map<String, String> fieldValueMap = dbmeta.extractAllColumnMap(entity)
+                        .entrySet()
+                        .stream()
+                        .filter(entry -> columnInfoList.contains(dbmeta.findColumnInfo(entry.getKey())))
+                        .collect(HashMap::new, (map, column) -> map.put(column.getKey(), DfTypeUtil.toString(column.getValue())),
+                                Map::putAll);
+                kvsCacheManager.registerHash(kvsKey, fieldValueMap, expireDateTimeLambda.apply(entity));
+            });
         });
 
         return optEntity;
@@ -274,11 +402,20 @@ public class KvsCacheBusinessAssist {
                 return;
             }
         }
+
         BehaviorReadable readable = selector.byName(dbmeta.getTableDbName());
         ConditionBean cb = readable.newConditionBean();
         cbLamda.accept(cb, noCachedSearchKeyListList);
-        final List<ColumnInfo> columnInfoList = DfCollectionUtil.newArrayList(specifiedColumnInfoSet);
-        List<Entity> entityList = selectList(selector, columnInfoList, cb);
+
+        specifiedColumnInfoSet.forEach(columnInfo -> {
+            if (columnInfo.canBeNullObject()) {
+                cb.invokeSpecifyColumn(columnInfo.getPropertyName());
+            }
+        });
+        cb.disableColumnNullObject();
+
+        List<Entity> entityList = selectList(selector, cb);
+
         Map<String, Map<String, String>> keyValueMap = DfCollectionUtil.newLinkedHashMap();
         entityList.forEach(entity -> {
             String kvsKey = generateKeyForColumnNullObject(dbName, dbmeta.getTableDbName(),
@@ -286,7 +423,7 @@ public class KvsCacheBusinessAssist {
             Map<String, String> fieldValueMap = dbmeta.extractAllColumnMap(entity)
                     .entrySet()
                     .stream()
-                    .filter(entry -> columnInfoList.contains(dbmeta.findColumnInfo(entry.getKey())))
+                    .filter(entry -> specifiedColumnInfoSet.contains(dbmeta.findColumnInfo(entry.getKey())))
                     .collect(HashMap::new, (map, column) -> map.put(column.getKey(), DfTypeUtil.toString(column.getValue())), Map::putAll);
             keyValueMap.put(kvsKey, fieldValueMap);
             registerThreadCache(kvsKey, entity);
@@ -298,126 +435,9 @@ public class KvsCacheBusinessAssist {
         });
     }
 
-    /**
-     * Retrieve a list of entities corresponding to the specified key-list.
-     * When KVS does not have the value associated with the key-list,
-     * search the entity from RDB and store the result into KVS before return it.
-     * The type of the value stored into KVS will be List of MapString.
-     * @param selector Selector corresponding to the DB to connect to (NotNull）
-     * @param dbName The name of DB to connect to (NotNull)
-     * @param searchKeyList Key info. specified in KVS (equal to the search condition spedified by CB) (NotNull)
-     * @param cb CB that specifies query condition (NotNull)
-     * @param expireDateTimeLambda The callback for Time To Live (NotNull, MayReturnNull: then use server-config)
-     * @param <ENTITY> Entity of DBFlute
-     * @return List of entities as the result of retrieval (NotNull)
-     */
-    @SuppressWarnings("unchecked")
-    public <ENTITY extends Entity> List<ENTITY> findList(BehaviorSelector selector, String dbName, List<Object> searchKeyList,
-            ConditionBean cb, Function<List<ENTITY>, LocalDateTime> expireDateTimeLambda) {
-        final String kvsKey = generateKey(dbName, cb.asTableDbName(), searchKeyList);
-
-        final List<ENTITY> threadCachedList = findListFromThreadCache(kvsKey);
-        if (isNotEmpty(threadCachedList)) {
-            return threadCachedList;
-        }
-
-        final List<String> found = kvsCacheManager.findList(kvsKey); // String elements represent MapString in KVS
-
-        if (isNotEmpty(found)) {
-            List<ENTITY> entityList = kvsCacheConverterHandler.toEntityList(found, cb.asDBMeta());
-            if (isNotEmpty(entityList)) {
-                registerThreadCache(kvsKey, entityList);
-                return entityList;
-            }
-        }
-
-        final List<ENTITY> entityList = (List<ENTITY>) selectList(selector, cb.asDBMeta().getColumnInfoList(), cb);
-        registerThreadCache(kvsKey, entityList);
-        // Insert/Update an entity into(in) KVS asynchronously
-        asyncManager.async(() -> {
-            kvsCacheManager.registerList(kvsKey, kvsCacheConverterHandler.toMapStringList(entityList),
-                    expireDateTimeLambda.apply(entityList));
-        });
-
-        return entityList;
-    }
-
     // ===================================================================================
-    //                                                                    Insert Or Update
-    //                                                                    ================
-    /**
-     * Insert/Update the specified entity into(in) RDB, and delete caches in KVS which contain the entity if exists.
-     * @param selector Selector corresponding to the DB to connect to (NotNull）
-     * @param dbName The name of DB to connect to (NotNull)
-     * @param searchKeyList Key info. specified in KVS (equal to the search condition spedified by CB) (NotNull)
-     * @param entity Entity to be inserted or updated (NotNull)
-     * @param <ENTITY> Entity of DBFlute
-     */
-    public <ENTITY extends Entity> void insertOrUpdate(BehaviorSelector selector, String dbName, List<Object> searchKeyList,
-            ENTITY entity) {
-        insertOrUpdate(selector, entity); // Insert/Update to RDB
-        removeCache(dbName, entity.asTableDbName(), searchKeyList);
-    }
-
-    // ===================================================================================
-    //                                                                             Delete
-    //                                                                           =========
-    /**
-     * Delete the specified entity from RDB and caches from KVS which contain the entity if exists.
-     * @param selector Selector corresponding to the DB to connect to (NotNull）
-     * @param dbName The name of DB to connect to (NotNull)
-     * @param searchKeyList Key info. specified in KVS (equal to the search condition spedified by CB) (NotNull)
-     * @param entity Entity to be deleted (NotNull)
-     * @param <ENTITY> Entity of DBFlute
-     * @return The number of deleted rows
-     */
-    public <ENTITY extends Entity> int delete(BehaviorSelector selector, String dbName, List<Object> searchKeyList, ENTITY entity) {
-        final int deleteCount = queryDelete(selector, entity);
-        removeCache(dbName, entity.asTableDbName(), searchKeyList);
-        return deleteCount;
-    }
-
-    public int queryDelete(BehaviorSelector selector, String dbName, List<Object> searchKeyList, ConditionBean cb) {
-        final int deleteCount = queryDelete(selector, cb);
-        removeCache(dbName, cb.asTableDbName(), searchKeyList);
-        return deleteCount;
-    }
-
-    /**
-     * Flush caches in KVS associated with specified key, but do nothing to RDB.
-     * @param selector Selector corresponding to the DB to connect to (NotNull）
-     * @param dbName The name of DB to connect to (NotNull)
-     * @param searchKeyList Key info. specified in KVS (equal to the search condition spedified by CB) (NotNull)
-     * @param entity Entity to identifies the caches to be flushed (NotNull)
-     * @param <ENTITY> Entity of DBFlute
-     */
-    public <ENTITY extends Entity> void clearCache(BehaviorSelector selector, String dbName, List<Object> searchKeyList, ENTITY entity) {
-        removeCache(dbName, entity.asTableDbName(), searchKeyList);
-    }
-
-    // ===================================================================================
-    //                                                                        Generate Key
-    //                                                                        ============
-    /**
-     * Generate a key-string for KVS to store a value by concatenating information of the value.
-     * e.g.) "<DB name>|<table name>|sercheKeyList(0)|searchKeyList(1)|..."
-     * @param dbName The name of DB to connect to (NotNull)
-     * @param tableName The name of table in RDB that contains the rows stored into KVS (NotNull)
-     * @param searchKeyList A list of keys for search (NotNull)
-     * @return A key-string used to store data into KVS (NotNull)
-     */
-    public String generateKey(String dbName, String tableName, List<Object> searchKeyList) {
-        final StringBuilder sb = new StringBuilder();
-        final String keyDelimiter = KEY_DELIMITER;
-        sb.append(dbName);
-        sb.append(keyDelimiter).append(tableName.toUpperCase()); // Because MySQL makes table name lower-case when storig it.
-        searchKeyList.forEach(searchKey -> {
-            sb.append(keyDelimiter);
-            sb.append(toString(searchKey));
-        });
-        return sb.toString();
-    }
-
+    //                                                Generate Key (For CB-Embedded Cache)
+    //                                                ====================================
     /**
      * Generate a key-string for KVS to store a value by concatenating information of the value.
      * e.g.) "COLUMN_NULL_OBJECT|<DB name>|<table name>|sercheKeyList(0)|searchKeyList(1)|..."
@@ -437,59 +457,35 @@ public class KvsCacheBusinessAssist {
     }
 
     // ===================================================================================
-    //                                                                               Cache
-    //                                                                               =====
-    protected <ENTITY extends Entity> void removeCache(String dbName, String tableDbName, List<Object> searchKeyList) {
-        final String kvsKey = generateKey(dbName, tableDbName, searchKeyList);
-        removeThreadCache(kvsKey);
-        // Insert/Update an entity into(in) KVS asynchronously
-        asyncManager.async(() -> {
-            kvsCacheManager.delete(kvsKey); // Delete value from KVS
-        });
+    //                                                                                 TTL
+    //                                                                                 ===
+    /**
+     * Return a LocalDateTime as the result of addition that adds ttl to current datetime.
+     * @param ttl Time To Live (sec) (NullAllowed)
+     * @return Current datetime + ttl (NullAllowed: return null if ttl is null)
+     */
+    public LocalDateTime calcExpireDateTime(Long ttl) {
+        if (ttl == null) {
+            return null;
+        }
+#if ($manager.isTargetContainerSeasar())
+        return timeManager.getCurrentLocalDateTime().plusSeconds(ttl);
+#end
+#if ($manager.isTargetContainerLastaDi())
+        return timeManager.currentDateTime().plusSeconds(ttl);
+#end
     }
 
     // ===================================================================================
     //                                                                              Select
     //                                                                              ======
-    /**
-     * Retrieve Entity, which is identified by assigned Selector and query condition,
-     * with columns of which associated ColumnInfo in the assigned columnInfoList is null.
-     * @param selector Selector corresponding to the DB to connect to (NotNull）
-     * @param columnInfoList A list of ColumnInfo for the target table (NotNull)
-     * @param cb CB that specifies query condition (NotNull)
-     * @param <ENTITY> Entity of DBFlute
-     * @return A retrieved entity (NotNull)
-     * @throws EntityAlreadyDeletedException When the entity is not found.
-     */
-    @SuppressWarnings("unchecked")
-    protected <ENTITY extends Entity> ENTITY selectEntityWithDeletedCheck(BehaviorSelector selector, List<ColumnInfo> columnInfoList,
-            ConditionBean cb) {
-        logger.debug("tableName={}, specifiedColumnInfoSet={}", cb.asTableDbName(), columnInfoList);
+    protected <ENTITY extends Entity> OptionalEntity<ENTITY> selectEntity(BehaviorSelector selector, ConditionBean cb) {
         final BehaviorReadable readable = selector.byName(cb.asTableDbName()); // Fetch abstract Behavior
-        columnInfoList.forEach(columnInfo -> {
-            if (columnInfo.canBeNullObject()) {
-                cb.invokeSpecifyColumn(columnInfo.getPropertyName());
-            }
-        });
-        cb.disableColumnNullObject();
-        return (ENTITY) readable.readEntityWithDeletedCheck(cb);
-    }
 
-    @SuppressWarnings("unchecked")
-    protected <ENTITY extends Entity> OptionalEntity<ENTITY> selectEntity(BehaviorSelector selector, List<ColumnInfo> columnInfoList,
-            ConditionBean cb) {
-        logger.debug("tableName={}, specifiedColumnInfoSet={}", cb.asTableDbName(), columnInfoList);
-        final BehaviorReadable readable = selector.byName(cb.asTableDbName()); // Fetch abstract Behavior
-        columnInfoList.forEach(columnInfo -> {
-            if (columnInfo.canBeNullObject()) {
-                cb.invokeSpecifyColumn(columnInfo.getPropertyName());
-            }
-        });
-        cb.disableColumnNullObject();
+        @SuppressWarnings("unchecked")
+        ENTITY entity = (ENTITY) readable.readEntity(cb);
 
-        Entity entity = readable.readEntity(cb);
-
-        return (OptionalEntity<ENTITY>) OptionalEntity.ofNullable(entity, () -> {
+        return OptionalEntity.ofNullable(entity, () -> {
             throw new IllegalArgumentException("Not found the entity by the condition. (might be deleted?)");
         });
     }
@@ -497,18 +493,11 @@ public class KvsCacheBusinessAssist {
     /**
      * Retrieve a list of entities by specified Selector and query condition.
      * @param selector Selector corresponding to the DB to connect to (NotNull）
-     * @param columnInfoList A list of ColumnInfo for the target table (NotNull)
      * @param cb CB that specifies query condition (NotNull)
      * @return A list of entities (NotNull)
      */
-    protected List<Entity> selectList(BehaviorSelector selector, List<ColumnInfo> columnInfoList, ConditionBean cb) {
+    protected <ENTITY extends Entity> List<ENTITY> selectList(BehaviorSelector selector, ConditionBean cb) {
         final BehaviorReadable readable = selector.byName(cb.asTableDbName()); // Fetch abstract Behavior
-        columnInfoList.forEach(columnInfo -> {
-            if (columnInfo.canBeNullObject()) {
-                cb.invokeSpecifyColumn(columnInfo.getPropertyName());
-            }
-        });
-        cb.disableColumnNullObject();
         return readable.readList(cb);
     }
 
@@ -566,21 +555,13 @@ public class KvsCacheBusinessAssist {
         return deleteCount;
     }
 
-    /**
-     * Return a LocalDateTime as the result of addition that adds ttl to current datetime.
-     * @param ttl Time To Live (sec) (NullAllowed)
-     * @return Current datetime + ttl (NullAllowed: return null if ttl is null)
-     */
-    public LocalDateTime calcExpireDateTime(Long ttl) {
-        if (ttl == null) {
-            return null;
-        }
-#if ($manager.isTargetContainerSeasar() || $tableMap.targetContainer == "seasar")
-        return timeManager.getCurrentLocalDateTime().plusSeconds(ttl);
-#end
-#if ($manager.isTargetContainerLastaDi() || $tableMap.targetContainer == "lasta_di")
-        return timeManager.currentDateTime().plusSeconds(ttl);
-#end
+    protected <ENTITY extends Entity> void removeCache(String dbName, String tableDbName, List<Object> searchKeyList) {
+        final String kvsKey = generateKey(dbName, tableDbName, searchKeyList);
+        removeThreadCache(kvsKey);
+        // Insert/Update an entity into(in) KVS asynchronously
+        asyncManager.async(() -> {
+            kvsCacheManager.delete(kvsKey); // Delete value from KVS
+        });
     }
 
     // ===================================================================================
@@ -627,10 +608,6 @@ public class KvsCacheBusinessAssist {
     // ===================================================================================
     //                                                                        Small Helper
     //                                                                        ============
-    protected String toString(final Object obj) {
-        return obj == null ? "" : obj.toString();
-    }
-
     protected boolean isNotEmpty(Collection<?> coll) {
         return !(coll == null || coll.isEmpty());
     }

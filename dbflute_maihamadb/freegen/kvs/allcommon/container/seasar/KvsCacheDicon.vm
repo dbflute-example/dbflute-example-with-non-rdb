@@ -16,10 +16,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.4//EN"
     "http://www.seasar.org/dtd/components24.dtd">
-<components namespace="kvs_store-${tableMap.schema}">
+<components namespace="kvs_store-${data.kvs.schema}">
     <include path="saflute_assist.dicon"/>
-    <include path="${tableMap.kvsPoolDiFile}"/>
-    <include path="${tableMap.dbfluteDiFile}"/>
+    <include path="${data.kvsPoolDiFile}"/>
+    <include path="${data.dbfluteDiFile}"/>
 
     <component name="kvsCacheManager" class="org.dbflute.kvs.cache.KvsCacheManagerImpl" />
     <component name="kvsCacheBusinessAssist" class="org.dbflute.kvs.cache.KvsCacheBusinessAssist" />
@@ -30,13 +30,13 @@
                 : new org.dbflute.kvs.cache.delegator.KvsCacheRedisDelegator()
     </component>
 
-    <component name="cacheTtl">provider.config().getKvsCache${manager.initCap($tableMap.schema)}TtlAsInteger()</component>
-    <component name="${tableMap.schema}KvsCacheFacade" class="${request.package}.${tableMap.schema}.facade.${manager.initCap($tableMap.schema)}KvsCacheFacade" />
-#if ($tableMap.suppressBehaviorGen != 'true')
+    <component name="cacheTtl">provider.config().getKvsCache${manager.initCap($data.kvs.schema)}TtlAsInteger()</component>
+    <component name="${manager.initUncap($data.kvs.kvsCacheFacadeImpl.className)}" class="${data.kvs.kvsCacheFacadeImpl.package}.${data.kvs.kvsCacheFacadeImpl.className}" />
+#if (!$data.kvs.suppressBehaviorGen)
 
     <!-- The components of Behavior. -->
-#foreach ($table in $request.tableList)
-    <component name="kvs$!{tableMap.schemaPrefix}${table.camelizedName}Bhv" class="${request.package}.${tableMap.schema}.exbhv.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Bhv"/>
+#foreach ($exBehavior in $data.exBehaviorList)
+    <component name="${manager.initUncap($exBehavior.className)}" class="${exBehavior.package}.${exBehavior.className}"/>
 #end
 #end
 </components>

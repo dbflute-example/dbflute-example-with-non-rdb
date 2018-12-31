@@ -125,7 +125,7 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
     // ===================================================================================
     //                                                                         List Select
     //                                                                         ===========
-    // TODO #c7a pri.C selectList、selectPageのときにpage系の設定のアサートをする。 by p1us2er0 (2018/06/14)
+    // #hope #c7a pri.C p1us2er0 selectList, selectPage asserts the setting of page type. (2018/06/14)
     public List<ENTITY> selectList(Consumer<CB> cbLambda) {
         CB cb = newConditionBean();
         cbLambda.accept(cb);
@@ -146,6 +146,7 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         CB cb = newConditionBean();
         cbLambda.accept(cb);
         Statement select = cb.buildSelect();
+
         logger.debug("#c7a cql={}", select.toString());
         C7aPagingResultBean<ENTITY> pagingResultBean = execute(mapper -> {
             ResultSet resultSet = mapper.getManager().getSession().execute(select);
@@ -160,7 +161,6 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
                 list.add(entity);
                 remaining--;
             }
-            // TODO set allRecordCount、pageSize、currentPageNumber by p1us2er0 (2018/08/01)
             C7aPagingResultBean<ENTITY> bean = new C7aPagingResultBean<ENTITY>();
             bean.setSelectedList(list);
             if (nextPage != null) {
@@ -172,13 +172,20 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         pagingResultBean.setTableDbName(cb.asTableDbName());
         pagingResultBean.setPageSize(cb.getFetchSize());
         if (cb.canPagingCount()) {
-            int allRecordCount = selectCount(cbLambda);
-            pagingResultBean.setAllRecordCount(allRecordCount);
+            if (cb.getPagingState() == null && pagingResultBean.size() < cb.getFetchSize()) {
+                pagingResultBean.setAllRecordCount(pagingResultBean.size());
+            } else {
+                int allRecordCount = selectCount(cbLambda);
+                pagingResultBean.setAllRecordCount(allRecordCount);
+            }
         }
 
         return pagingResultBean;
     }
 
+    // ===================================================================================
+    //                                                                              Insert
+    //                                                                              ======
     public void insert(ENTITY entity) {
         varyingInsert(entity, op -> {});
     }
@@ -208,7 +215,8 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         option.getTtl().ifPresent(ttl -> insert.using(QueryBuilder.ttl(ttl)));
         option.getTimestamp().ifPresent(timestamp -> insert.using(QueryBuilder.timestamp(timestamp)));
         option.getConsistencyLevel().ifPresent(consistencyLevel -> insert.setConsistencyLevel(consistencyLevel));
-        logger.debug("#c7a cql={}", insert.getQueryString());
+
+        logger.debug("#c7a cql={}", insert.toString());
         ResultSet resultSet = execute(mapper -> mapper.getManager().getSession().execute(insert));
         Row one = resultSet.one();
         if (one != null && !one.getBool(0)) {
@@ -216,6 +224,9 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         }
     }
 
+    // ===================================================================================
+    //                                                                              Update
+    //                                                                              ======
     public void update(ENTITY entity) {
         varyingUpdate(entity, op -> {});
     }
@@ -234,6 +245,7 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
 
     protected void doUpdate(ENTITY entity, Consumer<UpdateOption> op, boolean nonStrict) {
         Update update = QueryBuilder.update(entity.asTableDbName());
+
         DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(entity.getClass());
         C7aDBMeta dbMeta = entity.asDBMeta();
         if (!nonStrict && dbMeta.hasVersionNo()) {
@@ -268,7 +280,8 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         option.getTtl().ifPresent(ttl -> update.using(QueryBuilder.ttl(ttl)));
         option.getTimestamp().ifPresent(timestamp -> update.using(QueryBuilder.timestamp(timestamp)));
         option.getConsistencyLevel().ifPresent(consistencyLevel -> update.setConsistencyLevel(consistencyLevel));
-        logger.debug("#c7a cql={}", update.getQueryString());
+
+        logger.debug("#c7a cql={}", update.toString());
         ResultSet resultSet = execute(mapper -> mapper.getManager().getSession().execute(update));
         Row one = resultSet.one();
         if (one != null && !one.getBool(0)) {
@@ -276,6 +289,53 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         }
     }
 
+    // ===================================================================================
+    //                                                                        Query Update
+    //                                                                        ============
+    public void queryUpdate(ENTITY entity, Consumer<CB> cbLambda) {
+        doQueryUpdate(entity, cbLambda, op -> {});
+    }
+
+    public void varyingQueryUpdate(ENTITY entity, Consumer<CB> cbLambda, Consumer<UpdateOption> op) {
+        doQueryUpdate(entity, cbLambda, op);
+    }
+
+    protected void doQueryUpdate(ENTITY entity, Consumer<CB> cbLambda, Consumer<UpdateOption> op) {
+        CB cb = newConditionBean();
+        cbLambda.accept(cb);
+        Update update = cb.buildQueryUpdate();
+
+        handleCommonColumnOfUpdateIfNeeds(entity);
+        filterEntityOfUpdate(entity);
+
+        DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(entity.getClass());
+        beanDesc.getProppertyNameList().stream().map(proppertyName -> beanDesc.getPropertyDesc(proppertyName)).forEach(propertyDesc -> {
+            PartitionKey partitionKey = propertyDesc.getField().getAnnotation(PartitionKey.class);
+            ClusteringColumn clusteringColumn = propertyDesc.getField().getAnnotation(ClusteringColumn.class);
+            Column column = propertyDesc.getField().getAnnotation(Column.class);
+            Object value = propertyDesc.getValue(entity);
+            if (value != null && partitionKey == null || clusteringColumn == null && column != null
+                    && entity.mymodifiedProperties().contains(propertyDesc.getPropertyName())) {
+                update.with().and(QueryBuilder.set(column.name(), value));
+            }
+        });
+
+        UpdateOption option = new UpdateOption();
+        op.accept(option);
+        option.getTtl().ifPresent(ttl -> update.using(QueryBuilder.ttl(ttl)));
+        option.getTimestamp().ifPresent(timestamp -> update.using(QueryBuilder.timestamp(timestamp)));
+        option.getConsistencyLevel().ifPresent(consistencyLevel -> update.setConsistencyLevel(consistencyLevel));
+
+        logger.debug("#c7a cql={}", update.toString());
+        execute(mapper -> mapper.getManager().getSession().execute(update));
+        // p1us2er0 Reason why there is no return value (2018/10/28)
+        // https://docs.datastax.com/en/cql/3.3/cql/cql_reference/cqlUpdate.html
+        // The UPDATE command does not return any result unless it includes IF EXISTS.
+    }
+
+    // ===================================================================================
+    //                                                                    Insert or Update
+    //                                                                    ================
     public void insertOrUpdate(ENTITY entity) {
         varyingInsertOrUpdate(entity, op -> {});
     }
@@ -304,7 +364,8 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         option.getTtl().ifPresent(ttl -> insert.using(QueryBuilder.ttl(ttl)));
         option.getTimestamp().ifPresent(timestamp -> insert.using(QueryBuilder.timestamp(timestamp)));
         option.getConsistencyLevel().ifPresent(consistencyLevel -> insert.setConsistencyLevel(consistencyLevel));
-        logger.debug("#c7a cql={}", insert.getQueryString());
+
+        logger.debug("#c7a cql={}", insert.toString());
         ResultSet resultSet = execute(mapper -> mapper.getManager().getSession().execute(insert));
         Row one = resultSet.one();
         if (one != null && !one.getBool(0)) {
@@ -312,6 +373,9 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         }
     }
 
+    // ===================================================================================
+    //                                                                              Delete
+    //                                                                              ======
     public void delete(ENTITY entity) {
         varyingDelete(entity, op -> {});
     }
@@ -359,7 +423,7 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         option.getTimestamp().ifPresent(timestamp -> delete.using(QueryBuilder.timestamp(timestamp)));
         option.getConsistencyLevel().ifPresent(consistencyLevel -> delete.setConsistencyLevel(consistencyLevel));
 
-        logger.debug("#c7a cql={}", delete.getQueryString());
+        logger.debug("#c7a cql={}", delete.toString());
         ResultSet resultSet = execute(mapper -> mapper.getManager().getSession().execute(delete));
         Row one = resultSet.one();
         if (one != null && !one.getBool(0)) {
@@ -368,10 +432,39 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         }
     }
 
-    protected BehaviorExceptionThrower createBehaviorExceptionThrower() {
-        return new BehaviorExceptionThrower();
+    // ===================================================================================
+    //                                                                        Query Delete
+    //                                                                        ============
+    public void queryDelete(Consumer<CB> cbLambda) {
+        doQueryDelete(cbLambda, op -> {});
     }
 
+    public void varyingQueryDelete(Consumer<CB> cbLambda, Consumer<DeleteOption> op) {
+        doQueryDelete(cbLambda, op);
+    }
+
+    protected void doQueryDelete(Consumer<CB> cbLambda, Consumer<DeleteOption> op) {
+        CB cb = newConditionBean();
+        cbLambda.accept(cb);
+        Delete delete = cb.buildQueryDelete();
+
+        DeleteOption option = new DeleteOption();
+        op.accept(option);
+        option.getTimestamp().ifPresent(timestamp -> delete.using(QueryBuilder.timestamp(timestamp)));
+        option.getConsistencyLevel().ifPresent(consistencyLevel -> delete.setConsistencyLevel(consistencyLevel));
+
+        logger.debug("#c7a cql={}", delete.toString());
+        execute(mapper -> mapper.getManager().getSession().execute(delete));
+        // p1us2er0 Reason why there is no return value (2018/10/28)
+        // although it is not written in the document of delete, from contents in  the document of update.
+        // https://docs.datastax.com/en/cql/3.3/cql/cql_reference/cqlDelete.html
+        // https://docs.datastax.com/en/cql/3.3/cql/cql_reference/cqlUpdate.html
+        // The UPDATE command does not return any result unless it includes IF EXISTS.
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
     public class InsertOption {
         protected Integer _ttl;
         protected Long _timestamp;
@@ -514,5 +607,12 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
                 throw new IllegalStateException("consistencyLevel is not set.");
             });
         }
+    }
+
+    // ===================================================================================
+    //                                                                               Other
+    //                                                                               =====
+    protected BehaviorExceptionThrower createBehaviorExceptionThrower() {
+        return new BehaviorExceptionThrower();
     }
 }

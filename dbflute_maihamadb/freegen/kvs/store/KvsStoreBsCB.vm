@@ -13,50 +13,47 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.cbean.bs;
+${manager.allClassCopyright}package ${data.package};
 
 import org.dbflute.kvs.store.cbean.KvsStoreConditionBean;
 import org.dbflute.kvs.store.entity.dbmeta.KvsStoreDBMeta;
 
-import ${request.package}.${tableMap.schema}.bsentity.dbmeta.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm;
-import ${request.package}.${tableMap.schema}.cbean.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB;
-import ${request.package}.${tableMap.schema}.cbean.cq.Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CQ;
-#if ($table.hasRefColumn)
-import ${request.package}.${tableMap.schema}.entity.ex.*;
-#end
+import ${data.dbMeta.package}.${data.dbMeta.className};
+import ${data.exConditionBean.package}.${data.exConditionBean.className};
+import ${data.exConditionQuery.package}.${data.exConditionQuery.className};
 
 /**
- * The base condition-bean of (${table.comment})${table.capCamelName}.
+ * The base condition-bean of (${data.comment})${data.tableName}.
  * @author FreeGen
  */
-public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CB implements KvsStoreConditionBean {
+public abstract class ${data.className} implements KvsStoreConditionBean {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CQ _conditionQuery;
+    protected ${data.exConditionQuery.className} _conditionQuery;
 
     // ===================================================================================
     //                                                                               Query
     //                                                                               =====
-    public Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CQ query() {
+    public ${data.exConditionQuery.className} query() {
         return doGetConditionQuery();
     }
 
-    protected Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CQ doGetConditionQuery() {
+    protected ${data.exConditionQuery.className} doGetConditionQuery() {
         if (_conditionQuery == null) {
-            _conditionQuery = new Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CQ();
+            _conditionQuery = new ${data.exConditionQuery.className}();
         }
         return _conditionQuery;
     }
 
     @Override
     public KvsStoreDBMeta asDBMeta() {
-        return Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Dbm.getInstance();
+        return ${data.dbMeta.className}.getInstance();
     }
 
 #set ($acceptPkParameter = "")
-#foreach ($column in $table.columnList)
+#foreach ($column in $data.columnList)
 #if ($column.kvsKey)
 #if ($velocityCount > 1)
 #set ($acceptPkParameter = $acceptPkParameter + ", ")
@@ -64,14 +61,14 @@ public abstract class Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CB imp
 #set ($acceptPkParameter = $acceptPkParameter + $column.type + " " + ${manager.initUncap($column.camelizedName)})
 #end
 #end
-    public Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB acceptPK($acceptPkParameter) {
-        Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}CB cb = this;
-#foreach ($column in $table.columnList)
+    public ${data.exConditionBean.className} acceptPK($acceptPkParameter) {
+        ${data.exConditionBean.bs.className} cb = this;
+#foreach ($column in $data.columnList)
 #if ($column.kvsKey)
         cb.query().set${column.camelizedName}_Equal(${manager.initUncap($column.camelizedName)});
 #end
 #end
 
-        return (Kvs$!{tableMap.schemaPrefix}${table.camelizedName}CB) this;
+        return (${data.exConditionBean.className}) this;
     }
 }

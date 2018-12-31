@@ -13,8 +13,8 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-#if ($request.tableList && $request.tableList.size() > 0)
-<h2 id="kvscache-${tableMap.schema}">kvscache (${tableMap.schema})</h2>
+#if ($data.exBehaviorList && $data.exBehaviorList.size() > 0)
+<h2 id="kvscache-${data.kvs.schema}">kvscache (${data.kvs.schema})</h2>
 <table>
     <thead>
     <tr>
@@ -22,11 +22,11 @@
         <th>class</th>
     </tr>
     </thead>
-    <tbody id="kvscache-${tableMap.schema}-list-body">
-#foreach ($table in $request.tableList)
+    <tbody id="kvscache-${data.kvs.schema}-list-body">
+#foreach ($exBehavior in $data.exBehaviorList)
     <tr>
         <td class="rowcellnum">${foreach.count}</td>
-        <td class="rowcell">Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Bhv</td>
+        <td class="rowcell">${exBehavior.className}</td>
     </tr>
 #end
     </tbody>

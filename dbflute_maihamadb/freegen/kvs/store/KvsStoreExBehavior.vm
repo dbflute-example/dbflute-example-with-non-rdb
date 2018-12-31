@@ -13,13 +13,13 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${manager.allClassCopyright}package ${request.package}.${tableMap.schema}.exbhv;
+${manager.allClassCopyright}package ${data.package};
 
-import ${request.package}.${tableMap.schema}.bsbhv.Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv;
+import ${data.bs.package}.${data.bs.className};
 
 /**
- * The behavior of (${table.comment})${table.capCamelName}.
+ * The behavior of (${data.comment})${data.tableName}.
  * @author FreeGen
  */
-public class Kvs$!{tableMap.schemaPrefix}${table.camelizedName}Bhv extends Kvs$!{tableMap.schemaPrefix}Bs${table.camelizedName}Bhv {
+public class ${data.className} extends ${data.bs.className} {
 }

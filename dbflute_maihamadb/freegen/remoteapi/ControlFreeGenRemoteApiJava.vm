@@ -13,13 +13,14 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
+#set ($scriptEngine = $manager.createJavaScriptEngine())
+$scriptEngine.put('scriptEngine', $scriptEngine)
+$scriptEngine.put('generator', $generator)
+$scriptEngine.put('manager', $manager)
+$scriptEngine.eval('load("./freegen/remoteapi/ControlFreeGenRemoteApiJava.js");')
 #foreach($request in $requestList)
     #if ($request.isResourceTypeSwagger())
-        #set ($scriptEngine = $manager.createJavaScriptEngine())
-        $scriptEngine.put('scriptEngine', $scriptEngine)
-        $scriptEngine.put('generator', $generator)
-        $scriptEngine.put('manager', $manager)
-        $scriptEngine.eval('load("./freegen/remoteapi/ControlFreeGenRemoteApiJava.js");')
+        #set ($scriptEngine = $scriptEngine)
         $scriptEngine.invokeFunction('process', $request)
     #end
 #end

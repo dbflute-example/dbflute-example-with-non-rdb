@@ -50,7 +50,7 @@ public abstract class KvsEgBsStoreExampleCQ {
      */
     public void setEgkey_Equal(String egkey) {
         KvsAssertion.assertNullQuery("egkey", _egkey);
-        KvsAssertion.assertNullQuery("egkey", _egkeyList);
+        KvsAssertion.assertNullQuery("egkeyList", _egkeyList);
         _egkey = egkey;
     }
 
@@ -58,9 +58,9 @@ public abstract class KvsEgBsStoreExampleCQ {
         return _egkeyList;
     }
 
-    public void setEgkey_inScope(Collection<String> egkeyList) {
+    public void setEgkey_InScope(Collection<String> egkeyList) {
         KvsAssertion.assertNullQuery("egkey", _egkey);
-        KvsAssertion.assertNullQuery("egkey", _egkeyList);
+        KvsAssertion.assertNullQuery("egkeyList", _egkeyList);
         _egkeyList = egkeyList;
     }
 
