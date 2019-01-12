@@ -63,6 +63,7 @@ public class SolrBs${tableMap.schema}CB extends AbstractSolrConditionBean {
         return this.filterQueryBean;
     }
 
+    @Override
     public HpSpecification specify() {
         this.setSpecified(true);
         if (this.specification == null) {
@@ -129,6 +130,9 @@ public class SolrBs${tableMap.schema}CB extends AbstractSolrConditionBean {
         public void field${column.capCamelName}() {
             this.addSpecifyField(Solr${tableMap.schema}Dbm.${column.capCamelName});
         }
+#if(!${velocityHasNext})
+
+#end
 #end
 #end
     }

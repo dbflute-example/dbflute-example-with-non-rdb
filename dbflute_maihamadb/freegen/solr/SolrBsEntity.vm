@@ -100,6 +100,7 @@ public class SolrBs${tableMap.schema} extends AbstractSolrEntity implements Seri
         sb.append("${column.uncapCamelName}").append("=").append(${column.uncapCamelName}).append(",");
 #end
 #end
+        sb.append("score").append("=").append(score);
         sb.append("]");
         return sb.toString();
     }
