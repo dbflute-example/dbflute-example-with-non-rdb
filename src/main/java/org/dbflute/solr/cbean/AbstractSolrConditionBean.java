@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
-
 import org.dbflute.util.DfStringUtil;
 
 /**
@@ -32,15 +31,15 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Flag indicating whether to select field */
+    /** Flag indicating whether to select field. */
     protected boolean specified;
 
-    /** Flag indicating whether to use fq (filter query) or not */
-    private boolean useFilterQuery;
+    /** Flag indicating whether to use fq (filter query) or not. */
+    protected boolean useFilterQuery;
 
     // ===================================================================================
-    //                                                                           Paging
-    //                                                                           =========
+    //                                                                              Paging
+    //                                                                              ======
     private static final Integer DEFAULT_PAGE_SIZE = 1000;
 
     protected Integer pageSize;
@@ -74,7 +73,7 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
 
     // ===================================================================================
     //                                                                             Routing
-    //                                                                           =========
+    //                                                                             =======
     private static final String SOLR_ROUTER_KEY = "_route_";
     protected String route;
 
@@ -87,8 +86,8 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
     }
 
     // ===================================================================================
-    //                                                                           Abstract
-    //                                                                           =========
+    //                                                                            Abstract
+    //                                                                            ========
     protected abstract SolrQueryBean getQueryBean();
 
     protected abstract SolrFilterQueryBean getFilterQueryBean();
@@ -102,8 +101,8 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
     public abstract String[] getAllFields();
 
     // ===================================================================================
-    //                                                                           Query Info
-    //                                                                           =========
+    //                                                                          Query Info
+    //                                                                          ==========
     public boolean isUseSort() {
         return this.getQueryBean().isUseSort();
     }
@@ -154,6 +153,7 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
         } else {
             query.setFields(this.getAllFields());
         }
+        query.setIncludeScore(this.specify().isScoreEnable());
         if (this.isUseFilterQuery()) {
             query.setQuery(this.getMinimumQuery());
             query.setFilterQueries(this.getQueryArray());
@@ -195,8 +195,8 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
     }
 
     // ===================================================================================
-    //                                                                           Accessor
-    //                                                                           =========
+    //                                                                            Accessor
+    //                                                                            ========
     protected void setSpecified(boolean specified) {
         this.specified = specified;
     }

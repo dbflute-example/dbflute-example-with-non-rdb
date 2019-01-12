@@ -23,8 +23,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 public interface SolrConditionBean {
 
     // ===================================================================================
-    //                                                                           Paging
-    //                                                                           =========
+    //                                                                              Paging
+    //                                                                              ======
     void paging(Integer pageSize, Integer pageNumber);
 
     Integer getPageNumer();
@@ -34,6 +34,8 @@ public interface SolrConditionBean {
     // ===================================================================================
     //                                                                        Specify Info
     //                                                                        ============
+    SolrSpecification specify();
+
     boolean isSpecified();
 
     String[] getSpecifyPropertys();

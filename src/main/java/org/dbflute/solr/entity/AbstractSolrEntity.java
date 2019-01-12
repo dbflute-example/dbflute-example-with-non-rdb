@@ -17,6 +17,7 @@ package org.dbflute.solr.entity;
 
 import java.util.Arrays;
 
+import org.apache.solr.client.solrj.beans.Field;
 import org.dbflute.dbmeta.accessory.EntityModifiedProperties;
 import org.dbflute.exception.NonSpecifiedColumnAccessException;
 import org.dbflute.helper.message.ExceptionMessageBuilder;
@@ -26,6 +27,9 @@ import org.dbflute.helper.message.ExceptionMessageBuilder;
  */
 public abstract class AbstractSolrEntity implements SolrEntity {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** The modified properties for this entity. (NotNull) */
     protected final EntityModifiedProperties __modifiedProperties = newModifiedProperties();
 
@@ -35,21 +39,17 @@ public abstract class AbstractSolrEntity implements SolrEntity {
     /** Is the entity created by DBFlute select process? */
     protected boolean __createdBySelect;
 
+    /** score. */
+    @Field("score")
+    protected Float score;
+
+    // ===================================================================================
+    //                                                                           Solr Meta
+    //                                                                           =========
+    // -----------------------------------------------------
+    //                                             Specified
+    //                                             ---------
     @Override
-    public void markAsSelect() {
-        __createdBySelect = true;
-    }
-
-    @Override
-    public boolean createdBySelect() {
-        return __createdBySelect;
-    }
-
-    protected void registerModifiedProperty(String propertyName) {
-        __modifiedProperties.addPropertyName(propertyName);
-        registerSpecifiedProperty(propertyName); // synchronize if exists, basically for user's manual call
-    }
-
     public void modifiedToSpecified(String[] specifyPropertys) {
         __specifiedProperties = newModifiedProperties();
         if (!__modifiedProperties.isEmpty()) {
@@ -63,6 +63,11 @@ public abstract class AbstractSolrEntity implements SolrEntity {
                 }
             });
         }
+    }
+
+    protected void registerModifiedProperty(String propertyName) {
+        __modifiedProperties.addPropertyName(propertyName);
+        registerSpecifiedProperty(propertyName); // synchronize if exists, basically for user's manual call
     }
 
     protected EntityModifiedProperties newModifiedProperties() {
@@ -133,5 +138,39 @@ public abstract class AbstractSolrEntity implements SolrEntity {
     protected static void buildExceptionTableInfo(ExceptionMessageBuilder br, SolrEntity entity) {
         br.addItem("Schema");
         br.addElement(entity.asSchemaName());
+    }
+
+    // ===================================================================================
+    //                                                                     Birthplace Mark
+    //                                                                     ===============
+    @Override
+    public void markAsSelect() {
+        __createdBySelect = true;
+    }
+
+    @Override
+    public boolean createdBySelect() {
+        return __createdBySelect;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    /**
+     * Get the value of score.
+     * @return score. (NullAllowed)
+     */
+    public Float getScore() {
+        checkSpecifiedProperty("score");
+        return score;
+    }
+
+    /**
+     * Set the value of score.
+     * @param score score. (NullAllowed)
+     */
+    public void setScore(Float score) {
+        registerModifiedProperty("score");
+        this.score = score;
     }
 }

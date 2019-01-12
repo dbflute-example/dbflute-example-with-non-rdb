@@ -259,6 +259,7 @@ public class SolrBsExample extends AbstractSolrEntity implements Serializable {
         sb.append("regularPrice").append("=").append(regularPrice).append(",");
         sb.append("updateDatetime").append("=").append(updateDatetime).append(",");
         sb.append("updateUser").append("=").append(updateUser).append(",");
+        sb.append("score").append("=").append(score);
         sb.append("]");
         return sb.toString();
     }

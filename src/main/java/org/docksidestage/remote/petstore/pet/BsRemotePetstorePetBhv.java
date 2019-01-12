@@ -74,7 +74,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
     protected void doRequestPost(Consumer<RemotePetPostParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         RemotePetPostParam param = new RemotePetPostParam();
         paramLambda.accept(param);
-        doRequestPost(void.class, "/pet", noMoreUrl(), param, rule -> {
+         doRequestPost(void.class, "/pet", noMoreUrl(), param, rule -> {
             ruleOfPost(rule);
             ruleLambda.accept(rule);
         });
@@ -111,7 +111,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
     protected void doRequestPut(Consumer<RemotePetPutParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         RemotePetPutParam param = new RemotePetPutParam();
         paramLambda.accept(param);
-        doRequestPut(void.class, "/pet", noMoreUrl(), param, rule -> {
+         doRequestPut(void.class, "/pet", noMoreUrl(), param, rule -> {
             ruleOfPut(rule);
             ruleLambda.accept(rule);
         });
@@ -150,7 +150,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
     protected java.util.List<RemotePetFindbystatusReturn> doRequestFindbystatus(Consumer<RemotePetFindbystatusParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         RemotePetFindbystatusParam param = new RemotePetFindbystatusParam();
         paramLambda.accept(param);
-        return doRequestGet(new org.lastaflute.di.helper.misc.ParameterizedRef<java.util.List<RemotePetFindbystatusReturn>>() {
+         return doRequestGet(new org.lastaflute.di.helper.misc.ParameterizedRef<java.util.List<RemotePetFindbystatusReturn>>() {
         }.getType(), "/pet/findByStatus", noMoreUrl(), query(param), rule -> {
             ruleOfFindbystatus(rule);
             ruleLambda.accept(rule);
@@ -190,7 +190,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
     protected java.util.List<RemotePetFindbytagsReturn> doRequestFindbytags(Consumer<RemotePetFindbytagsParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         RemotePetFindbytagsParam param = new RemotePetFindbytagsParam();
         paramLambda.accept(param);
-        return doRequestGet(new org.lastaflute.di.helper.misc.ParameterizedRef<java.util.List<RemotePetFindbytagsReturn>>() {
+         return doRequestGet(new org.lastaflute.di.helper.misc.ParameterizedRef<java.util.List<RemotePetFindbytagsReturn>>() {
         }.getType(), "/pet/findByTags", noMoreUrl(), query(param), rule -> {
             ruleOfFindbytags(rule);
             ruleLambda.accept(rule);
@@ -228,7 +228,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @return The bean object as return type, receiving response body. (NotNull)
      */
     protected RemotePetGetReturn doRequestGet(Long petId, Consumer<FlutyRemoteApiRule> ruleLambda) {
-        return doRequestGet(RemotePetGetReturn.class, "/pet/{petId}", moreUrl(petId), noQuery(), rule -> {
+         return doRequestGet(RemotePetGetReturn.class, "/pet/{petId}", moreUrl(petId), noQuery(), rule -> {
             ruleOfGetPetId(rule);
             ruleLambda.accept(rule);
         });
@@ -267,7 +267,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
     protected void doRequestPost(Long petId, Consumer<RemotePetPetidPostParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         RemotePetPetidPostParam param = new RemotePetPetidPostParam();
         paramLambda.accept(param);
-        doRequestPost(void.class, "/pet/{petId}", moreUrl(petId), param, rule -> {
+         doRequestPost(void.class, "/pet/{petId}", moreUrl(petId), param, rule -> {
             rule.sendBodyBy(
                     new org.lastaflute.remoteapi.sender.body.LaFormSender(new org.dbflute.remoteapi.mapping.FlVacantMappingPolicy()));
             ruleOfPostPetId(rule);
@@ -304,7 +304,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      */
     protected void doRequestDelete(Long petId, Consumer<FlutyRemoteApiRule> ruleLambda) {
-        doRequestDelete(void.class, "/pet/{petId}", moreUrl(petId), noQuery(), rule -> {
+         doRequestDelete(void.class, "/pet/{petId}", moreUrl(petId), noQuery(), rule -> {
             ruleOfDeletePetId(rule);
             ruleLambda.accept(rule);
         });
@@ -345,7 +345,7 @@ public abstract class BsRemotePetstorePetBhv extends AbstractRemotePetstoreBhv {
     protected RemotePetUploadimageReturn doRequestUploadimage(Long petId, Consumer<RemotePetUploadimageParam> paramLambda, Consumer<FlutyRemoteApiRule> ruleLambda) {
         RemotePetUploadimageParam param = new RemotePetUploadimageParam();
         paramLambda.accept(param);
-        return doRequestPost(RemotePetUploadimageReturn.class, "/pet/{petId}/uploadImage", moreUrl(petId), param, rule -> {
+         return doRequestPost(RemotePetUploadimageReturn.class, "/pet/{petId}/uploadImage", moreUrl(petId), param, rule -> {
             rule.sendBodyBy(
                     new org.lastaflute.remoteapi.sender.body.LaFormSender(new org.dbflute.remoteapi.mapping.FlVacantMappingPolicy()));
             ruleOfUploadimagePetId(rule);

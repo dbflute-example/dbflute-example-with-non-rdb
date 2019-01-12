@@ -23,4 +23,6 @@ public interface SolrSpecification {
     String[] getSpecifyPropertys();
 
     String[] getSpecifyFields();
+
+    boolean isScoreEnable();
 }

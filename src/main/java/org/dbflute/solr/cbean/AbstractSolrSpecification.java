@@ -28,6 +28,8 @@ public abstract class AbstractSolrSpecification implements SolrSpecification {
 
     private final List<SolrDBMeta> spcifyFieldList = new ArrayList<SolrDBMeta>();
 
+    protected boolean _scoreEnabled;
+
     protected void addSpecifyField(SolrDBMeta solrMeta) {
         this.spcifyFieldList.add(solrMeta);
     }
@@ -46,11 +48,30 @@ public abstract class AbstractSolrSpecification implements SolrSpecification {
         return spcifyFieldList.stream().map(spcifyField -> spcifyField.fieldName()).toArray(String[]::new);
     }
 
+    public void enableScore() {
+        _scoreEnabled = true;
+    }
+
+    public void disableScore() {
+        _scoreEnabled = false;
+    }
+
+    @Override
+    public boolean isScoreEnable() {
+        return _scoreEnabled;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(" { ");
         sb.append(spcifyFieldList.stream().map(solrDBMeta -> solrDBMeta.toString()).collect(Collectors.joining(",")));
+        if (this.isScoreEnable()) {
+            if (!spcifyFieldList.isEmpty()) {
+                sb.append(",");
+            }
+            sb.append("score");
+        }
         sb.append(" } ");
 
         return sb.toString();

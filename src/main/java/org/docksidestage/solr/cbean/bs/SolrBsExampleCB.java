@@ -63,6 +63,7 @@ public class SolrBsExampleCB extends AbstractSolrConditionBean {
         return this.filterQueryBean;
     }
 
+    @Override
     public HpSpecification specify() {
         this.setSpecified(true);
         if (this.specification == null) {
@@ -163,5 +164,6 @@ public class SolrBsExampleCB extends AbstractSolrConditionBean {
         public void fieldUpdateUser() {
             this.addSpecifyField(SolrExampleDbm.UpdateUser);
         }
+
     }
 }
