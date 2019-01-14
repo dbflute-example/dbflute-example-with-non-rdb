@@ -17,7 +17,6 @@ ${manager.allClassCopyright}package ${request.package}.cbean.bs;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.dbflute.solr.cbean.AbstractSolrConditionBean;
 import org.dbflute.solr.cbean.AbstractSolrSpecification;
@@ -65,16 +64,10 @@ public class SolrBs${tableMap.schema}CB extends AbstractSolrConditionBean {
 
     @Override
     public HpSpecification specify() {
-        this.setSpecified(true);
         if (this.specification == null) {
             this.specification = new HpSpecification();
         }
         return this.specification;
-    }
-
-    @Override
-    public String[] getAllFields() {
-        return Stream.of(Solr${tableMap.schema}Dbm.values()).map(dbm -> dbm.fieldName()).toArray(count -> new String[count]);
     }
 
     @Override
@@ -130,7 +123,7 @@ public class SolrBs${tableMap.schema}CB extends AbstractSolrConditionBean {
         public void field${column.capCamelName}() {
             this.addSpecifyField(Solr${tableMap.schema}Dbm.${column.capCamelName});
         }
-#if(!${velocityHasNext})
+#if(${velocityHasNext})
 
 #end
 #end

@@ -31,21 +31,30 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** Flag indicating whether to select field. */
-    protected boolean specified;
-
-    /** Flag indicating whether to use fq (filter query) or not. */
-    protected boolean useFilterQuery;
-
-    // ===================================================================================
-    //                                                                              Paging
-    //                                                                              ======
     private static final Integer DEFAULT_PAGE_SIZE = 1000;
 
     protected Integer pageSize;
 
     protected Integer pageNumber;
 
+    private static final String SOLR_QUERY_OPERATOR_KEY = "q.op";
+
+    protected QueryOperator queryOperator;
+
+    public enum QueryOperator {
+        AND, OR
+    }
+
+    /** Flag indicating whether to use fq (filter query) or not. */
+    protected boolean useFilterQuery;
+
+    private static final String SOLR_ROUTER_KEY = "_route_";
+
+    protected String route;
+
+    // ===================================================================================
+    //                                                                              Paging
+    //                                                                              ======
     public void paging(Integer pageSize, Integer pageNumber) {
         this.pageSize = pageSize;
         this.pageNumber = pageNumber;
@@ -72,11 +81,15 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
     }
 
     // ===================================================================================
+    //                                                                       QueryOperator
+    //                                                                       =============
+    public void setQueryOperator(QueryOperator queryOperator) {
+        this.queryOperator = queryOperator;
+    }
+
+    // ===================================================================================
     //                                                                             Routing
     //                                                                             =======
-    private static final String SOLR_ROUTER_KEY = "_route_";
-    protected String route;
-
     public void setRoute(String route) {
         this.route = route;
     }
@@ -97,8 +110,6 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
     protected abstract List<? extends SolrQueryBean> getFacetQueryList();
 
     protected abstract SolrSpecification getFacetSpecification();
-
-    public abstract String[] getAllFields();
 
     // ===================================================================================
     //                                                                          Query Info
@@ -147,11 +158,11 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
     @Override
     public SolrQuery buildSolrQuery() {
         SolrQuery query = new SolrQuery();
-
-        if (this.isSpecified()) {
+        if (queryOperator != null) {
+            query.add(SOLR_QUERY_OPERATOR_KEY, queryOperator.name());
+        }
+        if (this.specify().isSpecify()) {
             query.setFields(this.getSpecifyFields());
-        } else {
-            query.setFields(this.getAllFields());
         }
         query.setIncludeScore(this.specify().isScoreEnable());
         if (this.isUseFilterQuery()) {
@@ -197,15 +208,6 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    protected void setSpecified(boolean specified) {
-        this.specified = specified;
-    }
-
-    @Override
-    public boolean isSpecified() {
-        return specified;
-    }
-
     public boolean isUseFilterQuery() {
         return useFilterQuery;
     }

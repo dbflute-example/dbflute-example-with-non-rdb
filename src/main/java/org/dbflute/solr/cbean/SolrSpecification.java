@@ -20,6 +20,8 @@ package org.dbflute.solr.cbean;
  */
 public interface SolrSpecification {
 
+    boolean isSpecify();
+
     String[] getSpecifyPropertys();
 
     String[] getSpecifyFields();

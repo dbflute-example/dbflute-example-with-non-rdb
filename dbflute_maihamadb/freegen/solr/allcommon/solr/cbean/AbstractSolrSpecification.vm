@@ -39,6 +39,11 @@ public abstract class AbstractSolrSpecification implements SolrSpecification {
     }
 
     @Override
+    public boolean isSpecify() {
+        return !spcifyFieldList.isEmpty();
+    }
+
+    @Override
     public String[] getSpecifyPropertys() {
         return spcifyFieldList.stream().map(spcifyField -> spcifyField.propertyName()).toArray(String[]::new);
     }

@@ -17,7 +17,6 @@ package org.docksidestage.solr.cbean.bs;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.dbflute.solr.cbean.AbstractSolrConditionBean;
 import org.dbflute.solr.cbean.AbstractSolrSpecification;
@@ -65,16 +64,10 @@ public class SolrBsExampleCB extends AbstractSolrConditionBean {
 
     @Override
     public HpSpecification specify() {
-        this.setSpecified(true);
         if (this.specification == null) {
             this.specification = new HpSpecification();
         }
         return this.specification;
-    }
-
-    @Override
-    public String[] getAllFields() {
-        return Stream.of(SolrExampleDbm.values()).map(dbm -> dbm.fieldName()).toArray(count -> new String[count]);
     }
 
     @Override
@@ -128,42 +121,53 @@ public class SolrBsExampleCB extends AbstractSolrConditionBean {
         public void fieldLatestPurchaseDate() {
             this.addSpecifyField(SolrExampleDbm.LatestPurchaseDate);
         }
+
         public void fieldProductCategory() {
             this.addSpecifyField(SolrExampleDbm.ProductCategory);
         }
+
         public void fieldProductCategoryCode() {
             this.addSpecifyField(SolrExampleDbm.ProductCategoryCode);
         }
+
         public void fieldProductDescription() {
             this.addSpecifyField(SolrExampleDbm.ProductDescription);
         }
+
         public void fieldProductHandleCode() {
             this.addSpecifyField(SolrExampleDbm.ProductHandleCode);
         }
+
         public void fieldProductName() {
             this.addSpecifyField(SolrExampleDbm.ProductName);
         }
+
         public void fieldProductStatus() {
             this.addSpecifyField(SolrExampleDbm.ProductStatus);
         }
+
         public void fieldProductStatusCode() {
             this.addSpecifyField(SolrExampleDbm.ProductStatusCode);
         }
+
         public void fieldRegisterDatetime() {
             this.addSpecifyField(SolrExampleDbm.RegisterDatetime);
         }
+
         public void fieldRegisterUser() {
             this.addSpecifyField(SolrExampleDbm.RegisterUser);
         }
+
         public void fieldRegularPrice() {
             this.addSpecifyField(SolrExampleDbm.RegularPrice);
         }
+
         public void fieldUpdateDatetime() {
             this.addSpecifyField(SolrExampleDbm.UpdateDatetime);
         }
+
         public void fieldUpdateUser() {
             this.addSpecifyField(SolrExampleDbm.UpdateUser);
         }
-
     }
 }

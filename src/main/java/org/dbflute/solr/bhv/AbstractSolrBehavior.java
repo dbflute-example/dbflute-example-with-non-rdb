@@ -137,7 +137,7 @@ public abstract class AbstractSolrBehavior<ENTITY extends SolrEntity, INDEX exte
                 beans.forEach(bean -> {
                     SolrEntity entity = (SolrEntity) bean;
                     entity.markAsSelect();
-                    if (cb.isSpecified()) {
+                    if (cb.specify().isSpecify()) {
                         entity.modifiedToSpecified(cb.getSpecifyPropertys());
                     }
                 });

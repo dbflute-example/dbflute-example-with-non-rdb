@@ -36,8 +36,6 @@ public interface SolrConditionBean {
     //                                                                        ============
     SolrSpecification specify();
 
-    boolean isSpecified();
-
     String[] getSpecifyPropertys();
 
     // ===================================================================================

@@ -26,9 +26,11 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.HostDistance;
 import com.datastax.driver.core.PoolingOptions;
 import com.datastax.driver.core.TypeCodec;
+import com.datastax.driver.core.policies.LoadBalancingPolicy;
 import com.datastax.driver.core.policies.RoundRobinPolicy;
 import com.datastax.driver.extras.codecs.MappingCodec;
 import com.datastax.driver.extras.codecs.jdk8.LocalDateCodec;
@@ -48,9 +50,17 @@ public class C7aPool {
 
     protected Map<String, MappingManager> mappingManagers;
 
+    private ConsistencyLevel consistencyLevel;
+
+    private LoadBalancingPolicy loadBalancingPolicy;
+
     private String host;
 
     private Integer port;
+
+    private String user;
+
+    private String password;
 
     // ===================================================================================
     //                                                                          Definition
@@ -78,14 +88,18 @@ public class C7aPool {
                 .setMaxRequestsPerConnection(HostDistance.LOCAL, MAX_REQUEST_PER_CONNECTION_LOCAL)
                 .setMaxRequestsPerConnection(HostDistance.REMOTE, MAX_REQUEST_PER_CONNECTION_REMOTE);
 
+        if (this.loadBalancingPolicy == null) {
+            this.loadBalancingPolicy = new RoundRobinPolicy(); // default
+        }
+
         cluster = Cluster.builder()
                 .addContactPoints(host.split(","))
                 .withPort(port)
                 .withPoolingOptions(poolingOptions)
-                // #hope #c7a pri.C p1us2er0 change according to DC. (2018/07/25)
+                .withCredentials(user, password)
                 // RoundRobinPolicy : This works well for simple deployments. If you have multiple datacenters, it will be inefficient and you probably want to switch to a DC-aware policy.
                 // https://docs.datastax.com/en/developer/java-driver/3.5/manual/load_balancing/
-                .withLoadBalancingPolicy(new RoundRobinPolicy())
+                .withLoadBalancingPolicy(this.loadBalancingPolicy)
                 .build();
 
         cluster.getConfiguration().getCodecRegistry().register(LocalDateCodec.instance);
@@ -97,7 +111,9 @@ public class C7aPool {
         // https://docs.datastax.com/ja/cassandra-jajp/3.0/cassandra/dml/dmlConfigConsistency.html
         // #hope #c7a pri.C p1us2er0 want to set for each table, read, write. (2018/07/24)
         // http://oranie.hatenablog.com/entry/20130723/1374555729
-        // cluster.getConfiguration().getQueryOptions().setConsistencyLevel(ConsistencyLevel.QUORUM);
+        if (this.consistencyLevel != null) {
+            cluster.getConfiguration().getQueryOptions().setConsistencyLevel(this.consistencyLevel);
+        }
 
         // #hope #c7a pri.C p1us2er0 the first DB access (before Connection is established) after tomcat start is slow, so it may be better to select once at tomcat startup (2018/07/26)
     }
@@ -138,11 +154,27 @@ public class C7aPool {
         cluster.close();
     }
 
+    public void setConsistencyLevel(ConsistencyLevel level) {
+        this.consistencyLevel = level;
+    }
+
+    public void setLoadBalancingPolicy(LoadBalancingPolicy policy) {
+        this.loadBalancingPolicy = policy;
+    }
+
     public void setHost(String host) {
         this.host = host;
     }
 
     public void setPort(Integer port) {
         this.port = port;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
