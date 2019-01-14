@@ -33,7 +33,9 @@ ${manager.allClassCopyright}package ${data.package};
 #set($added = $importList.add('org.lastaflute.web.validation.Required'))
 #end
 #end
-#analyzeImports($importList, $definitionMap, $property)
+#set ($tempDefinitionMap = {})
+#set ($put = $tempDefinitionMap.putAll($definitionMap))
+#analyzeImports($importList, $tempDefinitionMap, $property)
 #end
 #generateImports($importList, $data.package, $scriptEngine.invokeMethod($rule, 'importOrderList'))
 
@@ -78,8 +80,12 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
 #end
 #end
 #end
+#if ($definitionMap.containsKey($nestType))
+#set ($definition = $definitionMap[$nestType])
+#set ($remove = $tempDefinitionMap.remove($nestType))
 #foreach($nestPropertyEntry in $definitionMap[$nestType].properties.entrySet())
 #analyzeImports($importList, $definitionMap, $nestPropertyEntry.value)
+#end
 #end
 #end
 #set ($nestType = '')

@@ -210,7 +210,7 @@ public abstract class ${data.className} extends ${data.abstractBehavior.classNam
 #if ($method.api.httpMethod == 'delete' && $method.paramBean.in == 'json')
 #set($doRequestSuffix = 'Enclosing')
 #end
-        #if ($returnBeanClassName != 'void') return#end doRequest$manager.initCap($method.api.httpMethod)$doRequestSuffix($returnType, "${method.api.url}", $moreUrl, $param, rule -> {
+        #if ($returnBeanClassName != 'void')return #{end}doRequest$manager.initCap($method.api.httpMethod)$doRequestSuffix($returnType, "${method.api.url}", $moreUrl, $param, rule -> {
 #if ($method.paramBean.in == 'formData')
             rule.sendBodyBy(
                     new org.lastaflute.remoteapi.sender.body.LaFormSender(new org.dbflute.remoteapi.mapping.FlVacantMappingPolicy()));
