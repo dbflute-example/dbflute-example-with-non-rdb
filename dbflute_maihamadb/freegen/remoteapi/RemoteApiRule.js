@@ -113,7 +113,7 @@ var baseRule = {
      * @return {string} sub package. (NotNull)
      */
     subPackage: function(api) {
-        return api.url.replace(/(_|^\/|\/$)/g, '').replace(/\/\{.*?\}/g, '').replace(/\..+$/g, '').replace(/\//g, '.').toLowerCase();
+        return api.url.replace(/(_|-|^\/|\/$)/g, '').replace(/\/\{.*?\}/g, '').replace(/\..+$/g, '').replace(/\//g, '.').toLowerCase();
     },
 
     // ===================================================================================
@@ -220,7 +220,7 @@ var baseRule = {
      * @return {string} beanClassName. (NotNull)
      */
     beanClassName: function(api, detail) {
-        var namePart = detail ? api.url.replace(/(_|^\/|\/$|\{|\})/g, '').replace(/\//g, '_').toLowerCase(): this.subPackage(api);
+        var namePart = detail ? api.url.replace(/(_|-|^\/|\/$|\{|\})/g, '').replace(/\//g, '_').toLowerCase(): this.subPackage(api);
         return 'Remote' + manager.initCap(manager.camelize(namePart.replace(/\./g, '_'))) + (api.multipleHttpMethod ? manager.initCap(api.httpMethod): '');
     },
 
