@@ -65,8 +65,8 @@ function processRemoteApi(request) {
             api.package = request.package;
             api.url = pathKey;
             api.httpMethod = methodKey;
-            api.consumes = method.consumes;
-            api.produces = method.produces;
+            api.consumes = method.consumes || optionMap.jsonMap['consumes'];
+            api.produces = method.produces || optionMap.jsonMap['produces'];
             api.methodBean = method;
             if (commonParameters && !commonParameters.equals(api.methodBean)) {
                 if (api.methodBean.parameters) {
