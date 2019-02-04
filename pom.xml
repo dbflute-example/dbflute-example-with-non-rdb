@@ -15,9 +15,9 @@
 	<properties>
 		<!-- Main Framework -->
 		<dbflute.version>1.1.9</dbflute.version>
-		<lastaflute.version>1.1.0</lastaflute.version>
-		<lasta.thymeleaf.version>0.3.1</lasta.thymeleaf.version>
-		<lasta.remoteapi.version>0.4.1</lasta.remoteapi.version>
+		<lastaflute.version>1.1.1</lastaflute.version>
+		<lasta.thymeleaf.version>0.4.0</lasta.thymeleaf.version>
+		<lasta.remoteapi.version>0.4.2</lasta.remoteapi.version>
 
 		<!-- Library for Extension -->
 		<elasticsearch.version>6.1.1</elasticsearch.version>
@@ -39,7 +39,7 @@
 
 		<!-- Testing -->
 		<junit.version>4.8.2</junit.version> <!-- is latest version without hamcrest -->
-		<utflute.version>0.8.9</utflute.version>
+		<utflute.version>0.9.0</utflute.version>
 		<es.cluster.runner.version>6.1.1.0</es.cluster.runner.version>
 	</properties>
 
