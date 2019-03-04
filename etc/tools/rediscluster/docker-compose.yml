@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+  redis:
+    container_name: ${DOKER_NAME_PREFIX}redis-cluster
+    image: tommy351/redis-cluster:5.0
+    environment:
+      - CLUSTER_ANNOUNCE_IP=127.0.0.1
+    ports:
+      - "6379:7000"
+      - "7000:7000"
+      - "7001:7001"
+      - "7002:7002"
+      - "7003:7003"
+      - "7004:7004"
+      - "7005:7005" 

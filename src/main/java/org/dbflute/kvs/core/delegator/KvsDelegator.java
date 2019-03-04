@@ -26,15 +26,6 @@ import java.util.Set;
 public interface KvsDelegator {
 
     // ===================================================================================
-    //                                                                                Pool
-    //                                                                                ====
-    /**
-     * Set kvs redis pool.
-     * @param kvsRedisPool kvs redis pool (NotNull)
-     */
-    void setKvsRedisPool(KvsRedisPool kvsRedisPool);
-
-    // ===================================================================================
     //                                                                                 Get
     //                                                                                 ===
     // -----------------------------------------------------

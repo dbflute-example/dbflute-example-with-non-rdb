@@ -42,14 +42,6 @@ public class KvsLocalMapDelegator implements KvsDelegator {
     private static final Map<String, LocalDateTime> KEY_EXPIRE_DATE_TIME_MAP = new ConcurrentHashMap<String, LocalDateTime>();
 
     // ===================================================================================
-    //                                                                                Set
-    //                                                                               =====
-    @Override
-    public void setKvsRedisPool(KvsRedisPool kvsRedisPool) {
-        // dummy
-    }
-
-    // ===================================================================================
     //                                                                                Get
     //                                                                               =====
     // -----------------------------------------------------

@@ -42,14 +42,20 @@ function process(request) {
  * @param {Request} request - request (NotNull)
  */
 function processKvsCore(request) {
+    var rule = scriptEngine.get('kvsRule');
     if (!genKvsCore) {
         genKvsCore = true;
-        generate('./kvs/allcommon/core/delegator/AbstractKvsRedisDelegator.vm', 'org/dbflute/kvs/core/delegator/AbstractKvsRedisDelegator.java', null, true);
-        generate('./kvs/allcommon/core/delegator/KvsDelegator.vm', 'org/dbflute/kvs/core/delegator/KvsDelegator.java', null, true);
-        generate('./kvs/allcommon/core/delegator/KvsLocalMapDelegator.vm', 'org/dbflute/kvs/core/delegator/KvsLocalMapDelegator.java', null, true);
-        generate('./kvs/allcommon/core/delegator/KvsRedisPool.vm', 'org/dbflute/kvs/core/delegator/KvsRedisPool.java', null, true);
-        generate('./kvs/allcommon/core/exception/KvsException.vm', 'org/dbflute/kvs/core/exception/KvsException.java', null, true);
         generate('./kvs/allcommon/core/assertion/KvsAssertion.vm', 'org/dbflute/kvs/core/assertion/KvsAssertion.java', null, true);
+        generate('./kvs/allcommon/core/exception/KvsException.vm', 'org/dbflute/kvs/core/exception/KvsException.java', null, true);
+        generate('./kvs/allcommon/core/delegator/KvsDelegator.vm', 'org/dbflute/kvs/core/delegator/KvsDelegator.java', null, true);
+        if (rule['cluster']) {
+            generate('./kvs/allcommon/core/delegator/cluster/AbstractKvsRedisDelegator.vm', 'org/dbflute/kvs/core/delegator/AbstractKvsRedisDelegator.java', null, true);
+            generate('./kvs/allcommon/core/delegator/cluster/KvsRedisPool.vm', 'org/dbflute/kvs/core/delegator/KvsRedisPool.java', null, true);
+        } else {
+            generate('./kvs/allcommon/core/delegator/AbstractKvsRedisDelegator.vm', 'org/dbflute/kvs/core/delegator/AbstractKvsRedisDelegator.java', null, true);
+            generate('./kvs/allcommon/core/delegator/KvsRedisPool.vm', 'org/dbflute/kvs/core/delegator/KvsRedisPool.java', null, true);        
+        }
+        generate('./kvs/allcommon/core/delegator/KvsLocalMapDelegator.vm', 'org/dbflute/kvs/core/delegator/KvsLocalMapDelegator.java', null, true);
     }
 
     if (request.requestName.startsWith("KvsCache") && !genKvsCache) {

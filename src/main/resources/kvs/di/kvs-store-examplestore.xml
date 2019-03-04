@@ -11,7 +11,6 @@
         provider.config().isKvsMock()
                 ? new org.dbflute.kvs.core.delegator.KvsLocalMapDelegator()
                 : new org.dbflute.kvs.store.delegator.KvsStoreRedisDelegator()
-        <property name="kvsRedisPool">kvsRedisPool</property>
     </component>
 
     <component name="examplestoreKvsStoreFacade" class="org.docksidestage.kvs.store.examplestore.facade.ExamplestoreKvsStoreFacade" />

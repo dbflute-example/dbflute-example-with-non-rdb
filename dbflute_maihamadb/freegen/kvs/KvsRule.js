@@ -56,9 +56,14 @@ var baseRule = {
         };
     },
 
+	
+    /** true for cluster. */
+    cluster : false,
+
     // ===================================================================================
     //                                                                                 Doc
     //                                                                                 ===
+    /** true for automatically generating doc. */
     docGeneration : true
 };
 
