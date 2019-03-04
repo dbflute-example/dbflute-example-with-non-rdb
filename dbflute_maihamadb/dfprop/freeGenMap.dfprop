@@ -34,6 +34,7 @@
         }
         ; tableMap = map:{
             ; tablePath = map
+            ; ruleJsPath = ../src/main/resources/kvs/schema/kvs_pool_rule.js
         }
     }
     # ==========================================================================
