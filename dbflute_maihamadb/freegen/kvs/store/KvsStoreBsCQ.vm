@@ -36,11 +36,7 @@ public abstract class ${data.className} {
     //                                                                           =========
 #foreach ($column in $data.columnList)
 #if ($column.kvsKey)
-#if ($column.isNormalColumn)
 #set ($javaNative = ${column.type})
-#elseif ($column.isRefColumn)
-#set ($javaNative = ${column.camelizedName})
-#end
     /** ${column.name}: ${column.comment} */
 #if ($column.default)
     protected ${javaNative} _${column.uncapCamelName} = ${column.default};
@@ -63,11 +59,7 @@ public abstract class ${data.className} {
     //                                                                            ========
 #foreach ($column in $data.columnList)
 #if ($column.kvsKey)
-#if ($column.isNormalColumn)
 #set ($javaNative = ${column.type})
-#elseif ($column.isRefColumn)
-#set ($javaNative = ${column.camelizedName})
-#end
     /**
      * ${column.comment}を返す。
      * @return ${column.comment}
@@ -120,11 +112,7 @@ public abstract class ${data.className} {
         //                                                                           =========
 #foreach ($column in $data.columnList)
 #if ($column.kvsKey)
-#if ($column.isNormalColumn)
 #set ($javaNative = ${column.type})
-#elseif ($column.isRefColumn)
-#set ($javaNative = ${column.camelizedName})
-#end
         /** ${column.name}: ${column.comment} */
 #if ($column.default)
         protected ${javaNative} _${column.uncapCamelName} = ${column.default};
@@ -139,11 +127,7 @@ public abstract class ${data.className} {
         //                                                                            ========
 #foreach ($column in $data.columnList)
 #if ($column.kvsKey)
-#if ($column.isNormalColumn)
 #set ($javaNative = ${column.type})
-#elseif ($column.isRefColumn)
-#set ($javaNative = ${column.camelizedName})
-#end
         /**
          * ${column.comment}を返す。
          * @return ${column.comment}

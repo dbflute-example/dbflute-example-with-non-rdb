@@ -13,14 +13,14 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
+#set ($rule = $scriptEngine.get('kvsRule'))
+#set ($importList = [])
+#set($added = $importList.add("${data.dbMeta.package}.${data.dbMeta.className}"))
+#set($added = $importList.add('java.io.Serializable'))
+#set($added = $importList.add('org.dbflute.kvs.store.entity.KvsStoreEntity'))
+#set($added = $importList.add('org.dbflute.kvs.store.entity.dbmeta.KvsStoreDBMeta'))
 ${manager.allClassCopyright}package ${data.package};
-
-import java.io.Serializable;
-
-import org.dbflute.kvs.store.entity.KvsStoreEntity;
-import org.dbflute.kvs.store.entity.dbmeta.KvsStoreDBMeta;
-
-import ${data.dbMeta.package}.${data.dbMeta.className};
+#generateImports($importList, $data.package, $scriptEngine.invokeMethod($rule, 'importOrderList'))
 
 /**
  * The entity of (${data.comment})${data.tableName}.
@@ -35,11 +35,7 @@ public abstract class ${data.className} implements KvsStoreEntity, Serializable 
     //                                                                           Attribute
     //                                                                           =========
 #foreach ($column in $data.columnList)
-#if ($column.isNormalColumn)
 #set ($javaNative = ${column.type})
-#elseif ($column.isRefColumn)
-#set ($javaNative = ${column.camelizedName})
-#end
     /** ${column.name}: ${column.comment} */
 #if ($column.default)
     protected ${javaNative} _${column.uncapCamelName} = ${column.default};
@@ -48,20 +44,12 @@ public abstract class ${data.className} implements KvsStoreEntity, Serializable 
 #end
 
 #end
-    // [Referrers] *comment only
-#foreach ($referrer in $data.referrerList)
-    // o ${referrer.name}
-#end
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
 #foreach ($column in $data.columnList)
-#if ($column.isNormalColumn)
 #set ($javaNative = ${column.type})
-#elseif ($column.isRefColumn)
-#set ($javaNative = ${column.camelizedName})
-#end
     /**
      * ${column.comment}を返す。
      * @return ${column.comment}

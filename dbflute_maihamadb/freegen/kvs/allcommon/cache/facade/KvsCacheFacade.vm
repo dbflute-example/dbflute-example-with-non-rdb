@@ -54,10 +54,11 @@ public interface KvsCacheFacade {
      * @param cb CB that specifies query condition (NotNull)
      * @param expireDateTimeLambda The callback for Time To Live (NotNull, MayReturnNull: then use server-config)
      * @param <ENTITY> Entity of DBFlute
+     * @param kvsCacheAsyncReflectionEnabled config of async or sync (NotNull)
      * @return The entity associated with the assigned search key-list (NotNull)
      */
     <ENTITY extends Entity> OptionalEntity<ENTITY> findEntity(List<Object> searchKeyList, ConditionBean cb,
-            Function<ENTITY, LocalDateTime> expireDateTimeLambda);
+            Function<ENTITY, LocalDateTime> expireDateTimeLambda, boolean kvsCacheAsyncReflectionEnabled);
 
     /**
      * Retrieve a list of entities corresponding to the assigned search key-list,
@@ -78,10 +79,11 @@ public interface KvsCacheFacade {
      * @param cb CB that specifies query condition (NotNull)
      * @param expireDateTimeLambda The callback for Time To Live (NotNull, MayReturnNull: then use server-config)
      * @param <ENTITY> Entity of DBFlute
+     * @param kvsCacheAsyncReflectionEnabled config of async or sync (NotNull)
      * @return The list of entities associated with the search key-list (NotNull)
      */
     <ENTITY extends Entity> List<ENTITY> findList(List<Object> searchKeyList, ConditionBean cb,
-            Function<List<ENTITY>, LocalDateTime> expireDateTimeLambda);
+            Function<List<ENTITY>, LocalDateTime> expireDateTimeLambda, boolean kvsCacheAsyncReflectionEnabled);
 
     // ===================================================================================
     //                                                    Insert OR Update (For KVS Cache)
@@ -92,8 +94,9 @@ public interface KvsCacheFacade {
      * @param searchKeyList A list of keys for search (NotNull)
      * @param entity The entity to be inserted or updated (NotNull)
      * @param <ENTITY> Entity of DBFlute
+     * @param kvsCacheAsyncReflectionEnabled config of async or sync (NotNull)
      */
-    <ENTITY extends Entity> void insertOrUpdate(List<Object> searchKeyList, ENTITY entity);
+    <ENTITY extends Entity> void insertOrUpdate(List<Object> searchKeyList, ENTITY entity, boolean kvsCacheAsyncReflectionEnabled);
 
     // ===================================================================================
     //                                                              Delete (For KVS Cache)
@@ -104,9 +107,10 @@ public interface KvsCacheFacade {
      * @param searchKeyList A list of keys for search (NotNull)
      * @param entity The entity to be deleted (NotNull)
      * @param <ENTITY> Entity of DBFlute
+     * @param kvsCacheAsyncReflectionEnabled config of async or sync (NotNull)
      * @return The number of entity that has been deleted
      */
-    <ENTITY extends Entity> int delete(List<Object> searchKeyList, ENTITY entity);
+    <ENTITY extends Entity> int delete(List<Object> searchKeyList, ENTITY entity, boolean kvsCacheAsyncReflectionEnabled);
 
     /**
      * Delete row(s) in RDB corresponding to the query condition specified by CB,
@@ -135,10 +139,11 @@ public interface KvsCacheFacade {
      * @param dbmeta A DBmeta of the corresponding table (NotNull)
      * @param specifiedColumnInfoSet A set of column information for column(s) to be selected (NotNull)
      * @param expireDateTimeLambda The callback for Time To Live (NotNull, MayReturnNull: then use server-config)
+     * @param kvsCacheAsyncReflectionEnabled config of async or sync (NotNull)
      * @return The entity retrieved by the specified ID (NotNull)
      */
     <ENTITY extends Entity> OptionalEntity<ENTITY> findEntityById(Object id, DBMeta dbmeta, Set<ColumnInfo> specifiedColumnInfoSet,
-            Function<ENTITY, LocalDateTime> expireDateTimeLambda);
+            Function<ENTITY, LocalDateTime> expireDateTimeLambda, boolean kvsCacheAsyncReflectionEnabled);
 
     /**
      * Retrieve a list of entities associated with the List of specified IDs from DBmeta of the argument,
