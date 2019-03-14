@@ -93,7 +93,7 @@ public abstract class AbstractSolrBehavior<ENTITY extends SolrEntity, INDEX exte
         query.setRows(0);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("cb={}", cb);
+            logger.debug("query={}", query.toQueryString());
         }
 
         try {
@@ -125,7 +125,7 @@ public abstract class AbstractSolrBehavior<ENTITY extends SolrEntity, INDEX exte
         SolrQuery query = cb.buildSolrQuery();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("\n" + cb);
+            logger.debug("query={}", query.toQueryString());
         }
 
         try {
@@ -144,10 +144,10 @@ public abstract class AbstractSolrBehavior<ENTITY extends SolrEntity, INDEX exte
             }
 
             pagingResult.setSelectedList(beans);
-            pagingResult.setPageSize(cb.getPageSize());
+            int numFound = (int) rsp.getResults().getNumFound();
+            pagingResult.setAllRecordCount(numFound);
+            pagingResult.setPageSize(cb.getFetchSize() == null ? numFound : cb.getFetchSize());
             pagingResult.setCurrentPageNumber(cb.getPageNumer());
-            long numFound = rsp.getResults().getNumFound();
-            pagingResult.setAllRecordCount((int) numFound);
             pagingResult.setQueryTime(rsp.getQTime());
             pagingResult.setQueryString(query.toString());
             return pagingResult;
@@ -175,10 +175,10 @@ public abstract class AbstractSolrBehavior<ENTITY extends SolrEntity, INDEX exte
     public <RESULT_BEAN> OptionalEntity<RESULT_BEAN> selectFirst(SolrCBCall<CB> cbLambda, Class<RESULT_BEAN> clazz) {
         return createOptionalEntity(selectPage(cb -> {
             cbLambda.callback(cb);
-            cb.paging(1, 1);
+            cb.fetchFirst(1);
         }, clazz).stream().findFirst().orElse(null), createCB(cb -> {
             cbLambda.callback(cb);
-            cb.paging(1, 1);
+            cb.fetchFirst(1);
         }));
     }
 
@@ -187,24 +187,36 @@ public abstract class AbstractSolrBehavior<ENTITY extends SolrEntity, INDEX exte
      * @param cbLambda ConditionBean callback function
      * @return List of faceted search result (NotNull)
      */
-    public SolrFacetResultBean selectFacetQuery(SolrCBCall<CB> cbLambda) {
+    public SolrFacetResultBean<ENTITY> selectFacetQuery(SolrCBCall<CB> cbLambda) {
         CB cb = createCB(cbLambda);
         SolrQuery query = cb.buildSolrQuery();
-        query.setStart(0);
-        query.setRows(0);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("cb={}", cb);
+            logger.debug("query={}", query.toQueryString());
         }
 
         try {
             QueryResponse rsp = getSlaveSolrClient().query(query, METHOD.POST);
 
-            SolrFacetResultBean resultBean = new SolrFacetResultBean();
-            resultBean.setFacetResult(rsp.getFacetQuery());
-            resultBean.setFacetFieldList(rsp.getFacetFields());
+            List<ENTITY> beans = rsp.getBeans(getEntityClass());
+            beans.forEach(bean -> {
+                bean.markAsSelect();
+                if (cb.specify().isSpecify()) {
+                    bean.modifiedToSpecified(cb.getSpecifyPropertys());
+                }
+            });
+            SolrFacetResultBean<ENTITY> resultBean = new SolrFacetResultBean<ENTITY>();
+            resultBean.setSelectedList(beans);
+            int numFound = (int) rsp.getResults().getNumFound();
+            resultBean.setAllRecordCount(numFound);
+            resultBean.setPageSize(cb.getFetchSize() == null ? numFound : cb.getFetchSize());
+            resultBean.setCurrentPageNumber(cb.getPageNumer());
             resultBean.setQueryString(query.toString());
             resultBean.setQueryTime(rsp.getQTime());
+
+            resultBean.setFacetResult(rsp.getFacetQuery());
+            resultBean.setFacetFieldList(rsp.getFacetFields());
+
             return resultBean;
         } catch (SolrServerException | IOException e) {
             throw new SolrException("Failed to Solr of access.", e);
