@@ -47,12 +47,27 @@ public class KvsRedisPoolFactory {
         jedisPoolConfig.setMaxIdle(config.getKvsExamplekvsMaxIdleAsInteger());
         jedisPoolConfig.setMinIdle(config.getKvsExamplekvsMinIdleAsInteger());
 
-        KvsRedisPool kvsRedisPool = new KvsRedisPool();
+        KvsRedisPool kvsRedisPool = createKvsRedisPool(config.isKvsMock());
         kvsRedisPool.setJedisPoolConfig(jedisPoolConfig);
         kvsRedisPool.setHost(config.getKvsExamplekvsHost());
         kvsRedisPool.setPort(config.getKvsExamplekvsPortAsInteger());
         kvsRedisPool.setTimeout(config.getKvsExamplekvsTimeoutAsInteger());
 
+        return kvsRedisPool;
+    }
+
+    protected static KvsRedisPool createKvsRedisPool(boolean mock) {
+        KvsRedisPool kvsRedisPool;
+        // TODO p1us2er0 Do not process in case of mock, because cluster configuration is checked in case of JedisCluster (2019/03/14)
+        if (mock) {
+            kvsRedisPool = new KvsRedisPool() {
+                @Override
+                public void init() {
+                }
+            };
+        } else {
+            kvsRedisPool = new KvsRedisPool();
+        }
         return kvsRedisPool;
     }
 }

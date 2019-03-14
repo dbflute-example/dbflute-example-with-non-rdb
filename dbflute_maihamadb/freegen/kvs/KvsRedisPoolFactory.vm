@@ -30,8 +30,8 @@ import redis.clients.jedis.JedisPoolConfig;
  * @author FreeGen
  */
 public class KvsRedisPoolFactory {
-
 #foreach ($table in $request.tableList)
+
     /**
      * create ${table.uncapCamelName}(${table.comment}) pool.
      * @return ${table.uncapCamelName}(${table.comment}) pool
@@ -53,7 +53,7 @@ public class KvsRedisPoolFactory {
         jedisPoolConfig.setMaxIdle(config.getKvs${table.camelizedName}MaxIdleAsInteger());
         jedisPoolConfig.setMinIdle(config.getKvs${table.camelizedName}MinIdleAsInteger());
 
-        KvsRedisPool kvsRedisPool = new KvsRedisPool();
+        KvsRedisPool kvsRedisPool = createKvsRedisPool(config.isKvsMock());
         kvsRedisPool.setJedisPoolConfig(jedisPoolConfig);
         kvsRedisPool.setHost(config.getKvs${table.camelizedName}Host());
         kvsRedisPool.setPort(config.getKvs${table.camelizedName}PortAsInteger());
@@ -62,4 +62,19 @@ public class KvsRedisPoolFactory {
         return kvsRedisPool;
     }
 #end
+
+    protected static KvsRedisPool createKvsRedisPool(boolean mock) {
+        KvsRedisPool kvsRedisPool;
+        // TODO p1us2er0 Do not process in case of mock, because cluster configuration is checked in case of JedisCluster (2019/03/14)
+        if (mock) {
+            kvsRedisPool = new KvsRedisPool() {
+                @Override
+                public void init() {
+                }
+            };
+        } else {
+            kvsRedisPool = new KvsRedisPool();
+        }
+        return kvsRedisPool;
+    }
 }
