@@ -51,6 +51,7 @@ var baseRule = {
     // ===================================================================================
     //                                                                               Const
     //                                                                               =====
+    /** field naming. */
     FIELD_NAMING: {
         CAMEL_TO_LOWER_SNAKE: 'CAMEL_TO_LOWER_SNAKE'
     },
@@ -108,9 +109,9 @@ var baseRule = {
     url: function(api) { return api.url; },
 
     /**
-     * Return sub package.
+     * Return subPackage.
      * @param {Api} api - API. (NotNull)
-     * @return {string} sub package. (NotNull)
+     * @return {string} subPackage. (NotNull)
      */
     subPackage: function(api) {
         return api.url.replace(/(_|-|^\/|\/$)/g, '').replace(/\/\{.*?\}/g, '').replace(/\..+$/g, '').replace(/\//g, '.').toLowerCase();
@@ -119,66 +120,85 @@ var baseRule = {
     // ===================================================================================
     //                                                                               DiXml
     //                                                                               =====
+    /**
+     * Return di xml path for target container lasta di.
+     * @param {string} schema - schema. (NotNull)
+     * @return {string} di xml path for target container lasta di. (NotNull)
+     */
     diXmlPath: function(schema, resourceFilePath) {
         return '../resources/remoteapi/di/remoteapi_' + this.schemaPackage(schema).replace(/\./g, '-') + '.xml';
     },
 
+    /**
+     * Return dicon path for target container seasar.
+     * @param {string} schema - schema. (NotNull)
+     * @return {string} dicon path for target container seasar. (NotNull)
+     */
     diconPath: function(schema, resourceFilePath) {
         return '../resources/remoteapi/di/remoteapi_' + this.schemaPackage(schema).replace(/\./g, '-') + '.dicon';
     },
 
-    javaConfigClassName: function(schema, resourceFilePath) {
+    /**
+     * Return java config class name for target container spring.
+     * @param {string} schema - schema. (NotNull)
+     * @return {string} java config class name for target container spring. (NotNull)
+     */
+    javaConfigClassName: function(schema) {
         return 'Remote' + schema + 'BeansJavaConfig';
     },
 
     // ===================================================================================
     //                                                                            Behavior
     //                                                                            ========
+    /** true for automatically generating behavior classes. */
     behaviorClassGeneration: true,
+    /** true for automatically generating behavior methods. */
     behaviorMethodGeneration: true,
+    /** behavior method access modifier. */
     behaviorMethodAccessModifier: 'public',
+    /** framework behavior class. */
     frameworkBehaviorClass: 'org.lastaflute.remoteapi.LastaRemoteBehavior',
 
     /**
-     * Return abstractBehaviorClassName.
+     * Return abstract behavior class name.
      * @param {string} schema - schema. (NotNull)
-     * @return {string} abstractBehaviorClassName. (NotNull)
+     * @return {string} abstract behavior class name. (NotNull)
      */
     abstractBehaviorClassName: function(schema) {
         return 'AbstractRemote' + schema + 'Bhv';
     },
 
     /**
-     * Return filtered Behavior SubPackage.
+     * Return filtered behavior subPackage.
      * @param {Api} api - API. (NotNull)
-     * @return {string} filtered Behavior SubPackage. (NotNull)
+     * @return {string} filtered behavior subPackage. (NotNull)
      */
     behaviorSubPackage: function(api) {
         return this.subPackage(api).replace(/^([^.]*)\.(.+)/, '$1');
     },
 
     /**
-     * Return bsBehaviorClassName.
+     * Return bsBehavior class name.
      * @param {Api} api - API. (NotNull)
-     * @return {string} bsBehaviorClassName. (NotNull)
+     * @return {string} bsBehavior class name. (NotNull)
      */
     bsBehaviorClassName: function(api) {
         return 'BsRemote' + api.schema + manager.initCap(manager.camelize(this.behaviorSubPackage(api).replace(/\./g, '_'))) + 'Bhv';
     },
 
     /**
-     * Return exBehaviorClassName.
+     * Return exBehavior class name.
      * @param {Api} api - API. (NotNull)
-     * @return {string} exBehaviorClassName. (NotNull)
+     * @return {string} exBehavior class name. (NotNull)
      */
     exBehaviorClassName: function(api) {
         return 'Remote' + api.schema + manager.initCap(manager.camelize(this.behaviorSubPackage(api).replace(/\./g, '_'))) + 'Bhv';
     },
 
     /**
-     * Return behaviorRequestMethodName.
+     * Return behavior request method name.
      * @param {Api} api - API. (NotNull)
-     * @return {string} behaviorRequestMethodName. (NotNull)
+     * @return {string} behavior request method name. (NotNull)
      */
     behaviorRequestMethodName: function(api) {
         var methodPart = manager.camelize(this.subPackage(api).replace(this.behaviorSubPackage(api), '').replace(/\./g, '_'));
@@ -186,9 +206,9 @@ var baseRule = {
     },
 
     /**
-     * Return behaviorRuleMethodName.
+     * Return behavior rule method name.
      * @param {Api} api - API. (NotNull)
-     * @return {string} behaviorRuleMethodName. (NotNull)
+     * @return {string} behavior rule method name. (NotNull)
      */
     behaviorRuleMethodName: function(api) {
         var methodPart = manager.camelize(this.subPackage(api).replace(this.behaviorSubPackage(api), '').replace(/\./g, '_'));
@@ -199,9 +219,9 @@ var baseRule = {
     //                                                                        Param/Return
     //                                                                        ============
     /**
-     * Return filtered Bean SubPackage.
+     * Return filtered bean subPackage.
      * @param {Api} api - API. (NotNull)
-     * @return {string} filtered Bean SubPackage. (NotNull)
+     * @return {string} filtered bean subPackage. (NotNull)
      */
     beanSubPackage: function(api) {
         var package = this.subPackage(api);
@@ -210,14 +230,28 @@ var baseRule = {
         }
         return package;
     },
+
+    /**
+     * Return filterd definition key.
+     * e.g. Filter common header pattern class.
+     * @param {string} definitionKey - definition key. (NotNull)
+     * @return {string} filterd definition key. (NotNull)
+     */
     definitionKey: function(definitionKey) { return definitionKey; },
+
+    /**
+     * Returns definition key before filtering from the filtered definition key.
+     * e.g. Restore the class of the filtered common header pattern.
+     * @param {string} definitionKey - filterd definition key. (NotNull)
+     * @return {string} definition key before filtering from the filtered definition key. (NotNull)
+     */
     unDefinitionKey: function(definitionKey) { return definitionKey; },
 
     /**
-     * Return beanClassName.
+     * Return bean class name.
      * @param {Api} api - API. (NotNull)
      * @param {boolean} detail - detail. (NotNull)
-     * @return {string} beanClassName. (NotNull)
+     * @return {string} bean class name. (NotNull)
      */
     beanClassName: function(api, detail) {
         var namePart = detail ? api.url.replace(/(_|-|^\/|\/$|\{|\})/g, '').replace(/\//g, '_').toLowerCase(): this.subPackage(api);
@@ -225,50 +259,50 @@ var baseRule = {
     },
 
     /**
-     * Return paramExtendsClass.
+     * Return param extends class.
      * @param {Api} api - API. (NotNull)
      * @param {Object} properties - properties. (NotNull)
-     * @return {string} paramExtendsClass. (NullAllowed)
+     * @return {string} param extends class. (NullAllowed)
      */
     paramExtendsClass: function(api, properties) {
         return null;
     },
 
     /**
-     * Return paramImplementsClasses.
+     * Return param implements classes.
      * @param {Api} api - API. (NotNull)
      * @param {Object} properties - properties. (NotNull)
-     * @return {string} paramImplementsClasses. (NullAllowed)
+     * @return {string} param implements classes. (NullAllowed)
      */
     paramImplementsClasses: function(api, properties) {
         return null;
     },
 
     /**
-     * Return paramClassName.
+     * Return param class name.
      * @param {Api} api - API. (NotNull)
      * @param {boolean} detail - detail. (NotNull)
-     * @return {string} paramClassName. (NotNull)
+     * @return {string} param class name. (NotNull)
      */
     paramClassName: function(api, detail) {
         return this.beanClassName(api, detail) + 'Param';
     },
 
     /**
-     * Return returnExtendsClass.
+     * Return return extends class.
      * @param {Api} api - API. (NotNull)
      * @param {Object} properties - properties. (NotNull)
-     * @return {string} returnExtendsClass. (NullAllowed)
+     * @return {string} return extends class. (NullAllowed)
      */
     returnExtendsClass: function(api, properties) {
         return null;
     },
 
     /**
-     * Return returnImplementsClasses.
+     * Return return implements classes.
      * @param {Api} api - API. (NotNull)
      * @param {Object} properties - properties. (NotNull)
-     * @return {string} returnImplementsClasses. (NullAllowed)
+     * @return {string} return implements classes. (NullAllowed)
      */
     returnImplementsClasses: function(api, properties) {
         return null;
@@ -285,20 +319,20 @@ var baseRule = {
     },
 
     /**
-     * Return nestClassName.
+     * Return nest class name.
      * @param {Api} api - API. (NotNull)
-     * @param {string} className - className. (NotNull)
-     * @return {string} nestClassName. (NotNull)
+     * @param {string} className - class name. (NotNull)
+     * @return {string} nest class name. (NotNull)
      */
     nestClassName: function(api, className) {
         return className.replace(/(Part|Result|Model|Bean)$/, '') + 'Part';
     },
 
     /**
-     * Return fieldName.
+     * Return field name.
      * @param {Api} api - API. (NotNull)
-     * @param {string} fieldName - fieldName. (NotNull)
-     * @return {string} fieldName. (NotNull)
+     * @param {string} fieldName - field name. (NotNull)
+     * @return {string} field name. (NotNull)
      */
     fieldName: function(api, bean, fieldName) {
         var fieldNaming = this.fieldNamingMapping()[bean.in];
@@ -311,6 +345,7 @@ var baseRule = {
     // ===================================================================================
     //                                                                                 Doc
     //                                                                                 ===
+    /** true for automatically generating doc. */
     docGeneration: true,
 
     // ===================================================================================
@@ -362,42 +397,42 @@ var baseRule = {
     },
 
     /**
-     * Return pathVariableManualMappingClass.
+     * Return path variable manual mapping class.
      * @param {Api} api - API. (NotNull)
-     * @param {PathVariable} pathVariable - pathVariable. (NotNull)
-     * @return {string} pathVariableManualMappingClass. (NullAllowed)
+     * @param {PathVariable} pathVariable - path variable. (NotNull)
+     * @return {string} path variable manual mapping class. (NullAllowed)
      */
     pathVariableManualMappingClass: function(api, pathVariable) {
         return null;
     },
 
     /**
-     * Return pathVariableManualMappingClass.
+     * Return bean property manual mapping class.
      * @param {Api} api - API. (NotNull)
-     * @param {string} beanClassName - beanClassName. (NotNull)
+     * @param {string} beanClassName - bean class name. (NotNull)
      * @param {Property} property - property. (NotNull)
-     * @return {string} pathVariableManualMappingClass. (NullAllowed)
+     * @return {string} bean property manual mapping class. (NullAllowed)
      */
     beanPropertyManualMappingClass: function(api, beanClassName, property) {
         return null;
     },
 
     /**
-     * Return pathVariableManualMappingDescription.
+     * Return path variable manual mapping description.
      * @param {Api} api - API. (NotNull)
-     * @param {PathVariable} pathVariable - pathVariable. (NotNull)
-     * @return {string} pathVariableManualMappingClass. (NullAllowed)
+     * @param {PathVariable} pathVariable - path variable. (NotNull)
+     * @return {string} path variable manual mapping description. (NullAllowed)
      */
     pathVariableManualMappingDescription: function(api, pathVariable) {
         return null;
     },
 
     /**
-     * Return beanPropertyManualMappingDescription.
+     * Return bean property manual mapping description.
      * @param {Api} api - API. (NotNull)
-     * @param {string} beanClassName - beanClassName. (NotNull)
+     * @param {string} beanClassName - bean class name. (NotNull)
      * @param {Property} property - property. (NotNull)
-     * @return {string} beanPropertyManualMappingDescription. (NullAllowed)
+     * @return {string} bean property manual mapping description. (NullAllowed)
      */
     beanPropertyManualMappingDescription: function(api, beanClassName, property) {
         return null;
@@ -405,7 +440,7 @@ var baseRule = {
 
     /**
      * Return delete target.
-     * @param {Request} request - Request. (NotNull)
+     * @param {Request} request - rquest. (NotNull)
      * @return {File} file. (NotNull)
      * @return {boolean} delete target. (NotNull)
      */
