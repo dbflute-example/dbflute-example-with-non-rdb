@@ -15,7 +15,6 @@
 ##
 ${manager.allClassCopyright}package org.dbflute.kvs.core.delegator;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.dbflute.helper.HandyDate;
-import org.dbflute.kvs.core.exception.KvsException;
 import org.dbflute.util.DfCollectionUtil;
 
 import redis.clients.jedis.Jedis;
@@ -46,7 +44,6 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
     // ===================================================================================
     //                                                                                Set
     //                                                                               =====
-    @Override
     public void setKvsRedisPool(KvsRedisPool kvsRedisPool) {
         this.kvsRedisPool = kvsRedisPool;
     }
@@ -92,8 +89,6 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
         try (Jedis jedis = kvsRedisPool.getResource(); Pipeline pipeline = jedis.pipelined()) {
             list = keyList.stream().map(key -> pipeline.lrange(key, 0, -1)).collect(Collectors.toList());
             pipeline.sync();
-        } catch (IOException e) {
-            throw new KvsException("kvs error.", e);
         }
 
         return list.stream().map(response -> response.get().stream().distinct().collect(Collectors.toList())).collect(Collectors.toList());
@@ -123,8 +118,6 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
         try (Jedis jedis = kvsRedisPool.getResource(); Pipeline pipeline = jedis.pipelined()) {
             list = keyList.stream().map(key -> pipeline.hmget(key, fieldList.toArray(new String[] {}))).collect(Collectors.toList());
             pipeline.sync();
-        } catch (IOException e) {
-            throw new KvsException("kvs error.", e);
         }
 
         return list.stream().map(response -> {
@@ -154,8 +147,6 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
                 pipeline.set(key, value);
                 expireAt(pipeline, key, expireDateTime);
                 pipeline.sync();
-            } catch (IOException e) {
-                throw new KvsException("kvs error.", e);
             }
         }
     }
@@ -187,8 +178,6 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
                 pipeline.mset(keysValues);
                 keyValueMap.keySet().stream().forEach(key -> expireAt(pipeline, key, expireDateTime));
                 pipeline.sync();
-            } catch (IOException e) {
-                throw new KvsException("kvs error.", e);
             }
         }
     }
@@ -214,8 +203,6 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
                 expireAt(pipeline, key, expireDateTime);
             }
             pipeline.sync();
-        } catch (IOException e) {
-            throw new KvsException("kvs error.", e);
         }
     }
 
@@ -238,8 +225,6 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
                 }
             });
             pipeline.sync();
-        } catch (IOException e) {
-            throw new KvsException("kvs error.", e);
         }
     }
 
@@ -261,8 +246,6 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
                 expireAt(pipeline, key, expireDateTime);
             }
             pipeline.sync();
-        } catch (IOException e) {
-            throw new KvsException("kvs error.", e);
         }
     }
 
@@ -302,8 +285,6 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
                 }
             });
             pipeline.sync();
-        } catch (IOException e) {
-            throw new KvsException("kvs error.", e);
         }
     }
 
@@ -358,8 +339,6 @@ public abstract class AbstractKvsRedisDelegator implements KvsDelegator {
     public void expireAt(String key, LocalDateTime expireDateTime) {
         try (Jedis jedis = kvsRedisPool.getResource(); Pipeline pipeline = jedis.pipelined()) {
             expireAt(pipeline, key, expireDateTime);
-        } catch (final IOException e) {
-            throw new KvsException("kvs error.", e);
         }
     }
 

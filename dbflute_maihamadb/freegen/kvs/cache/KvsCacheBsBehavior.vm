@@ -102,7 +102,8 @@ public abstract class ${data.className} extends ${data.extendsClassName} {
         ${data.dbflute.exConditionBean.className} cb = adjustKvsConditionBeanOf${column.capCamelName}(kvsCB);
 
         OptionalEntity<${data.dbflute.exEntity.className}> optEntity =
-                ${data.kvs.schema}KvsCacheFacade.findEntity(createKvsKeyListOf${column.capCamelName}(kvsCB), cb, expireDateTimeLambdaOf${column.capCamelName}());
+                ${data.kvs.schema}KvsCacheFacade.findEntity(createKvsKeyListOf${column.capCamelName}(kvsCB), cb,
+                expireDateTimeLambdaOf${column.capCamelName}(), kvsCB.isKvsCacheAsyncReflectionEnabled());
 
         return Stream.of(optEntity)
                 .filter(OptionalEntity::isPresent)
@@ -188,8 +189,8 @@ public abstract class ${data.className} extends ${data.extendsClassName} {
         ${data.exConditionBean.className} kvsCB = createCB(cbLambda);
         ${data.dbflute.exConditionBean.className} cb = adjustKvsConditionBeanOf${column.capCamelName}(kvsCB);
 
-        List<${data.dbflute.exEntity.className}> list =
-                ${data.kvs.schema}KvsCacheFacade.findList(createKvsKeyListOf${column.capCamelName}(kvsCB), cb, expireDateTimeLambdaOf${column.capCamelName}());
+        List<${data.dbflute.exEntity.className}> list = ${data.kvs.schema}KvsCacheFacade.findList(createKvsKeyListOf${column.capCamelName}(kvsCB), cb,
+                expireDateTimeLambdaOf${column.capCamelName}(), kvsCB.isKvsCacheAsyncReflectionEnabled());
 
         Predicate<${data.dbflute.exEntity.className}> filter = kvsCB.query().getWherePredicate();
         Comparator<${data.dbflute.exEntity.className}> sorted = kvsCB.query().getOrderByComparator();
@@ -351,8 +352,34 @@ public abstract class ${data.className} extends ${data.extendsClassName} {
      * @return The Entity used to insert/update with automatically-set column value (NotNull)
      */
     public ${data.dbflute.exEntity.className} insertOrUpdateBy${column.capCamelName}(Supplier<${data.dbflute.exEntity.className}> entityLambda) {
+        return varyingInsertOrUpdateBy${column.capCamelName}(entityLambda, op -> {});
+    }
+
+    /**
+     * Insert or update the entity.
+     * <pre>
+     * <span style="color: #0000C0">kvsSakuhinBhv</span>.<span style="color: #CC4747">insertOrUpdateBySakuhinId</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     Sakuhin sakuhin = <span style="color: #70226C">new</span> Sakuhin();
+     *     <span style="color: #3F7E5E">// If you are going to update or the KVS-key which is not primary key in RDB is specified, set key-column(s)</span>
+     *     <span style="color: #3F7E5E">// e.g.) sakuhin.setProductionYear(year);</span>
+     *     <span style="color: #3F7E5E">// Set value for insert/update</span>
+     *     sakuhin.set...;
+     *     ...
+     *     <span style="color: #70226C">return</span> sakuhin;
+     * });
+     * </pre>
+     * @param entityLambda The handler of entity row of ${data.dbflute.exEntity.className} (NotNull)
+     * @param op Option (NotNull)
+     * @return The Entity used to insert/update with automatically-set column value (NotNull)
+     */
+    public ${data.dbflute.exEntity.className} varyingInsertOrUpdateBy${column.capCamelName}(Supplier<${data.dbflute.exEntity.className}> entityLambda, Consumer<InsertOrUpdateOption> op) {
         ${data.dbflute.exEntity.className} ${manager.initUncap($data.tableName)} = entityLambda.get();
-        ${data.kvs.schema}KvsCacheFacade.insertOrUpdate(createKvsKeyListOf${column.capCamelName}(${manager.initUncap($data.tableName)}), ${manager.initUncap($data.tableName)});
+        InsertOrUpdateOption option = new InsertOrUpdateOption();
+        op.accept(option);
+        ${data.kvs.schema}KvsCacheFacade.insertOrUpdate(
+                createKvsKeyListOf${column.capCamelName}(${manager.initUncap($data.tableName)}),
+                ${manager.initUncap($data.tableName)},
+                option.isKvsCacheAsyncReflectionEnabled());
 
         return ${manager.initUncap($data.tableName)};
     }
@@ -368,13 +395,32 @@ public abstract class ${data.className} extends ${data.extendsClassName} {
      * });
      * </pre>
      * @param entityLambda The handler of entity row of ${data.dbflute.exEntity.className} (NotNull)
-     * @return The Entity used to delete (NotNull)
      */
-    public ${data.dbflute.exEntity.className} deleteBy${column.capCamelName}(Supplier<${data.dbflute.exEntity.className}> entityLambda) {
-        ${data.dbflute.exEntity.className} ${manager.initUncap($data.tableName)} = entityLambda.get();
-        ${data.kvs.schema}KvsCacheFacade.delete(createKvsKeyListOf${column.capCamelName}(${manager.initUncap($data.tableName)}), ${manager.initUncap($data.tableName)});
+    public void deleteBy${column.capCamelName}(Supplier<${data.dbflute.exEntity.className}> entityLambda) {
+        varyingDeleteBy${column.capCamelName}(entityLambda, op -> {});
+    }
 
-        return ${manager.initUncap($data.tableName)};
+    /**
+     * Delete the entity.
+     * <pre>
+     * <span style="color: #0000C0">kvsSakuhinBhv</span>.<span style="color: #CC4747">deleteBySakuhinId</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     Sakuhin sakuhin = <span style="color: #70226C">new</span> Sakuhin();
+     *     <span style="color: #3F7E5E">// Set KVS-key(s)</span>
+     *     sakuhin.setSakuhinId(<span style="color: #553000">sakuhinId</span>);
+     *     <span style="color: #70226C">return</span> sakuhin;
+     * });
+     * </pre>
+     * @param entityLambda The handler of entity row of ${data.dbflute.exEntity.className} (NotNull)
+     * @param op Option (NotNull)
+     */
+    public void varyingDeleteBy${column.capCamelName}(Supplier<${data.dbflute.exEntity.className}> entityLambda, Consumer<DeleteOption> op) {
+        ${data.dbflute.exEntity.className} ${manager.initUncap($data.tableName)} = entityLambda.get();
+        DeleteOption option = new DeleteOption();
+        op.accept(option);
+        ${data.kvs.schema}KvsCacheFacade.delete(
+                createKvsKeyListOf${column.capCamelName}(${manager.initUncap($data.tableName)}),
+                ${manager.initUncap($data.tableName)},
+                option.isKvsCacheAsyncReflectionEnabled());
     }
 
     protected List<Object> createKvsKeyListOf${column.capCamelName}(${data.exConditionBean.className} kvsCB) {

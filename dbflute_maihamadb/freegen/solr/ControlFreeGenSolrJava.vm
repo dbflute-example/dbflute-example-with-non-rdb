@@ -21,6 +21,12 @@ $request.enableOutputDirectory()
 $manager.makeDirectory($request.generateDirPath)
 
 #if ($request.isResourceTypeSolr() && ($manager.isTargetContainerSeasar() || $manager.isTargetContainerLastaDi()))
+  #set ($scriptEngine = $manager.createJavaScriptEngine())
+  $scriptEngine.put('scriptEngine', $scriptEngine)
+  $scriptEngine.put('generator', $generator)
+  $scriptEngine.put('manager', $manager)
+  $scriptEngine.eval('load("./freegen/solr/ControlFreeGenSolrJava.js");')
+  $scriptEngine.invokeFunction('process', $request)
   #if (!$genSolrCore)
     #set ($genSolrCore = true)
 
@@ -241,12 +247,6 @@ $manager.makeDirectory($request.generateDirPath)
     $request.info("parse('${path}')")
     $generator.parse("./solr/allcommon/container/lastadi/SolrDiXml.vm", $path, "", "")
   #end
-  #set ($scriptEngine = $manager.createJavaScriptEngine())
-  $scriptEngine.put('scriptEngine', $scriptEngine)
-  $scriptEngine.put('generator', $generator)
-  $scriptEngine.put('manager', $manager)
-  $scriptEngine.eval('load("./freegen/solr/ControlFreeGenSolrJava.js");')
-  $scriptEngine.invokeFunction('process', $request)
 #end
 #end
 

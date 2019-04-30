@@ -1,0 +1,106 @@
+##
+## Copyright 2014-2018 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${manager.allClassCopyright}package org.dbflute.kvs.core.delegator;
+
+import java.io.Closeable;
+
+#if ($manager.isTargetContainerLastaDi())
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+#end
+#if ($manager.isTargetContainerSeasar())
+import org.seasar.framework.container.annotation.tiger.DestroyMethod;
+import org.seasar.framework.container.annotation.tiger.InitMethod;
+#end
+
+import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.JedisPoolConfig;
+
+/**
+ * @author FreeGen
+ */
+public class KvsRedisPool implements Closeable {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** JedisCluster. */
+    protected JedisCluster jedisCluster;
+
+    private JedisPoolConfig jedisPoolConfig;
+
+    private String host;
+
+    private Integer port;
+
+    private Integer timeout;
+
+    // ===================================================================================
+    //                                                                     Pool Management
+    //                                                                     ===============
+#if ($manager.isTargetContainerLastaDi())
+    @PostConstruct
+#end
+#if ($manager.isTargetContainerSeasar())
+    @InitMethod
+#end
+    public void init() {
+        jedisCluster = new JedisCluster(new HostAndPort(host, port), timeout, jedisPoolConfig);
+    }
+
+    public JedisCluster getResource() {
+        return jedisCluster;
+    }
+
+    public int getNumActive() {
+        return jedisCluster.getClusterNodes().values().stream().mapToInt(pool -> pool.getNumActive()).sum();
+    }
+
+    @Override
+    public void close() {
+        // do nothing.
+    }
+
+#if ($manager.isTargetContainerLastaDi())
+    @PreDestroy
+#end
+#if ($manager.isTargetContainerSeasar())
+    @DestroyMethod
+#end
+    public void destroy() {
+        jedisCluster.close();
+    }
+
+    // ===================================================================================
+    //                                                                     Connection Info
+    //                                                                     ===============
+    public void setJedisPoolConfig(JedisPoolConfig jedisPoolConfig) {
+        this.jedisPoolConfig = jedisPoolConfig;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
+    }
+
+    public void setTimeout(Integer timeout) {
+        this.timeout = timeout;
+    }
+}

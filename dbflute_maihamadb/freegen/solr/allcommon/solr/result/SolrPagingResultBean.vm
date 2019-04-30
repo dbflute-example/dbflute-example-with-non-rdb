@@ -18,7 +18,7 @@ ${manager.allClassCopyright}package org.dbflute.solr.result;
 import org.dbflute.cbean.result.PagingResultBean;
 
 /**
- * Solrの戻り用クラス
+ * The solr result bean of paging.
  * @author FreeGen
  * @param <ENTITY> entity
  */

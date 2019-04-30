@@ -42,14 +42,22 @@ function process(request) {
  * @param {Request} request - request (NotNull)
  */
 function processKvsCore(request) {
+    var rule = scriptEngine.get('kvsRule');
+    var kvs = new java.util.LinkedHashMap();
+    kvs.kvsCacheAsyncReflectionEnabled = scriptEngine.invokeMethod(rule, 'kvsCacheAsyncReflectionEnabled', null);
     if (!genKvsCore) {
         genKvsCore = true;
-        generate('./kvs/allcommon/core/delegator/AbstractKvsRedisDelegator.vm', 'org/dbflute/kvs/core/delegator/AbstractKvsRedisDelegator.java', null, true);
-        generate('./kvs/allcommon/core/delegator/KvsDelegator.vm', 'org/dbflute/kvs/core/delegator/KvsDelegator.java', null, true);
-        generate('./kvs/allcommon/core/delegator/KvsLocalMapDelegator.vm', 'org/dbflute/kvs/core/delegator/KvsLocalMapDelegator.java', null, true);
-        generate('./kvs/allcommon/core/delegator/KvsRedisPool.vm', 'org/dbflute/kvs/core/delegator/KvsRedisPool.java', null, true);
-        generate('./kvs/allcommon/core/exception/KvsException.vm', 'org/dbflute/kvs/core/exception/KvsException.java', null, true);
         generate('./kvs/allcommon/core/assertion/KvsAssertion.vm', 'org/dbflute/kvs/core/assertion/KvsAssertion.java', null, true);
+        generate('./kvs/allcommon/core/exception/KvsException.vm', 'org/dbflute/kvs/core/exception/KvsException.java', null, true);
+        generate('./kvs/allcommon/core/delegator/KvsDelegator.vm', 'org/dbflute/kvs/core/delegator/KvsDelegator.java', null, true);
+        if (rule['cluster']) {
+            generate('./kvs/allcommon/core/delegator/cluster/AbstractKvsRedisDelegator.vm', 'org/dbflute/kvs/core/delegator/AbstractKvsRedisDelegator.java', null, true);
+            generate('./kvs/allcommon/core/delegator/cluster/KvsRedisPool.vm', 'org/dbflute/kvs/core/delegator/KvsRedisPool.java', null, true);
+        } else {
+            generate('./kvs/allcommon/core/delegator/AbstractKvsRedisDelegator.vm', 'org/dbflute/kvs/core/delegator/AbstractKvsRedisDelegator.java', null, true);
+            generate('./kvs/allcommon/core/delegator/KvsRedisPool.vm', 'org/dbflute/kvs/core/delegator/KvsRedisPool.java', null, true);        
+        }
+        generate('./kvs/allcommon/core/delegator/KvsLocalMapDelegator.vm', 'org/dbflute/kvs/core/delegator/KvsLocalMapDelegator.java', null, true);
     }
 
     if (request.requestName.startsWith("KvsCache") && !genKvsCache) {
@@ -57,11 +65,11 @@ function processKvsCore(request) {
         generate('./kvs/allcommon/cache/delegator/KvsCacheRedisDelegator.vm', 'org/dbflute/kvs/cache/delegator/KvsCacheRedisDelegator.java', null, true);
         generate('./kvs/allcommon/cache/facade/KvsCacheFacade.vm', 'org/dbflute/kvs/cache/facade/KvsCacheFacade.java', null, true);
         generate('./kvs/allcommon/cache/facade/AbstractKvsCacheFacade.vm', 'org/dbflute/kvs/cache/facade/AbstractKvsCacheFacade.java', null, true);
-        generate('./kvs/allcommon/cache/KvsCacheBusinessAssist.vm', 'org/dbflute/kvs/cache/KvsCacheBusinessAssist.java', null, true);
+        generate('./kvs/allcommon/cache/KvsCacheBusinessAssist.vm', 'org/dbflute/kvs/cache/KvsCacheBusinessAssist.java', kvs, true);
         generate('./kvs/allcommon/cache/KvsCacheConverterHandler.vm', 'org/dbflute/kvs/cache/KvsCacheConverterHandler.java', null, true);
         generate('./kvs/allcommon/cache/KvsCacheManager.vm', 'org/dbflute/kvs/cache/KvsCacheManager.java', null, true);
         generate('./kvs/allcommon/cache/KvsCacheManagerImpl.vm', 'org/dbflute/kvs/cache/KvsCacheManagerImpl.java', null, true);
-        generate('./kvs/allcommon/cache/bhv/AbstractKvsCacheBehaviorWritable.vm', 'org/dbflute/kvs/cache/bhv/AbstractKvsCacheBehaviorWritable.java', null, true);
+        generate('./kvs/allcommon/cache/bhv/AbstractKvsCacheBehaviorWritable.vm', 'org/dbflute/kvs/cache/bhv/AbstractKvsCacheBehaviorWritable.java', kvs, true);
         generate('./kvs/allcommon/cache/cbean/KvsCacheConditionBean.vm', 'org/dbflute/kvs/cache/cbean/KvsCacheConditionBean.java', null, true);
     }
 
@@ -134,6 +142,7 @@ function processKvsCache(rule, request) {
     var kvs = new java.util.LinkedHashMap();
     kvs.schema = scriptEngine.invokeMethod(rule, 'schema', request);
     kvs.schemaShort = scriptEngine.invokeMethod(rule, 'schemaShort', request);
+    kvs.kvsCacheAsyncReflectionEnabled = scriptEngine.invokeMethod(rule, 'kvsCacheAsyncReflectionEnabled', null);
     kvs.package = request.package + '.' + kvs.schema;
     kvs.kvsCacheFacadeImpl = kvsCacheFacadeImpl;
     kvs.suppressBehaviorGen = tableMap.suppressBehaviorGen === 'true';
@@ -263,14 +272,19 @@ function processKvsStore(rule, request) {
     var exConditionBeanList = [];
     var exBehaviorList = [];
     for each (table in request.tableList) {
+        var variableKvs = new java.util.LinkedHashMap(kvs);
+        if (table.suppressBehaviorGen === true) {
+            variableKvs.suppressBehaviorGen = true;
+        }
+
         var base = new java.util.LinkedHashMap();
         base.tableName = table.capCamelName;
         base.comment = table.comment;
-        base.kvs = kvs;
+        base.kvs = variableKvs;
         base.bs = new java.util.LinkedHashMap();
         base.bs.tableName = table.capCamelName;
         base.bs.comment = table.comment;
-        base.bs.kvs = kvs;
+        base.bs.kvs = variableKvs;
 
         var dbMeta = new java.util.LinkedHashMap(base);
         subPackage = 'bsentity.dbmeta';
@@ -290,66 +304,84 @@ function processKvsStore(rule, request) {
         exEntity.bs.extendsClass = '';
         exEntity.bs.implementsClasses = '';
         exEntity.bs.dbMeta = dbMeta;
+        exEntity.bs.exEntity = exEntity;
         exEntity.bs.columnList = table.columnList;
         exEntityList.push(exEntity);
-
-        var exConditionQuery = new java.util.LinkedHashMap(base);
-        subPackage = 'cbean.cq';
-        exConditionQuery.package = subPackage ? kvs.package + '.' + subPackage : kvs.package;
-        exConditionQuery.className = 'Kvs' + kvs.schemaShort + table.camelizedName + 'CQ';
-        exConditionQuery.bs = new java.util.LinkedHashMap(base.bs);
-        subPackage = 'cbean.cq.bs';
-        exConditionQuery.bs.package = subPackage ? kvs.package + '.' + subPackage : kvs.package;
-        exConditionQuery.bs.className = 'Kvs' + kvs.schemaShort + 'Bs' + table.camelizedName + 'CQ';
-        exConditionQuery.bs.extendsClass = '';
-        exConditionQuery.bs.implementsClasses = '';
-        exConditionQuery.bs.columnList = table.columnList;
-        exConditionQuery.bs.compoundKey = new java.util.LinkedHashMap();
-        exConditionQuery.bs.compoundKey.className = 'Kvs' + kvs.schemaShort + table.camelizedName + 'CompoundKey';
-        exConditionQueryList.push(exConditionQuery);
-
-        dbMeta.exConditionQuery = exConditionQuery;
-
-        var exConditionBean = new java.util.LinkedHashMap(base);
-        subPackage = 'cbean';
-        exConditionBean.package = subPackage ? kvs.package + '.' + subPackage : kvs.package;
-        exConditionBean.className = 'Kvs' + kvs.schemaShort + table.camelizedName + 'CB';
-        exConditionBean.bs = new java.util.LinkedHashMap(base.bs);
-        subPackage = 'cbean.bs';
-        exConditionBean.bs.package = subPackage ? kvs.package + '.' + subPackage : kvs.package;
-        exConditionBean.bs.className = 'Kvs' + kvs.schemaShort + 'Bs' + table.camelizedName + 'CB';
-        exConditionBean.bs.extendsClass = '';
-        exConditionBean.bs.implementsClasses = '';
-        exConditionBean.bs.dbMeta = dbMeta;
-        exConditionBean.bs.exEntity = exEntity;
-        exConditionBean.bs.exConditionQuery = exConditionQuery;
-        exConditionBean.bs.exConditionBean = exConditionBean;
-        exConditionBean.bs.columnList = table.columnList;
-        exConditionBeanList.push(exConditionBean);
-
-        var exBehavior = new java.util.LinkedHashMap(base);
-        subPackage = 'exbhv';
-        exBehavior.package = subPackage ? kvs.package + '.' + subPackage : kvs.package;
-        exBehavior.className = 'Kvs' + kvs.schemaShort + table.camelizedName + 'Bhv';
-        exBehavior.bs = new java.util.LinkedHashMap(base.bs);
-        subPackage = 'bsbhv';
-        exBehavior.bs.package = subPackage ? kvs.package + '.' + subPackage : kvs.package;
-        exBehavior.bs.className = 'Kvs' + kvs.schemaShort + 'Bs' + table.camelizedName + 'Bhv';
-        exBehavior.bs.extendsClassName = 'AbstractKvsStoreBehaviorWritable';
-        exBehavior.bs.extendsClass = 'org.dbflute.kvs.store.bhv.AbstractKvsStoreBehaviorWritable';
-        exBehavior.bs.implementsClasses = '';
-        exBehavior.bs.subClassName = exBehavior.className;
-        exBehavior.bs.dbMeta = dbMeta;
-        exBehavior.bs.exEntity = exEntity;
-        exBehavior.bs.exConditionBean = exConditionBean;
-        exBehavior.bs.suppressBehaviorBasicMethodGen = tableMap.suppressBehaviorBasicMethodGen === 'true';
-        exBehavior.bs.columnList = table.columnList;
-        exBehavior.bs.many = table.many;
-        exBehavior.bs.ttl = table.ttl;
-        exBehaviorList.push(exBehavior);
-
         dbMeta.exEntity = exEntity;
-        dbMeta.exConditionBean = exConditionBean;
+
+        if (!variableKvs.suppressBehaviorGen) {
+            var exConditionQuery = new java.util.LinkedHashMap(base);
+            subPackage = 'cbean.cq';
+            exConditionQuery.package = subPackage ? kvs.package + '.' + subPackage : kvs.package;
+            exConditionQuery.className = 'Kvs' + kvs.schemaShort + table.camelizedName + 'CQ';
+            exConditionQuery.bs = new java.util.LinkedHashMap(base.bs);
+            subPackage = 'cbean.cq.bs';
+            exConditionQuery.bs.package = subPackage ? kvs.package + '.' + subPackage : kvs.package;
+            exConditionQuery.bs.className = 'Kvs' + kvs.schemaShort + 'Bs' + table.camelizedName + 'CQ';
+            exConditionQuery.bs.extendsClass = '';
+            exConditionQuery.bs.implementsClasses = '';
+            exConditionQuery.bs.columnList = table.columnList;
+            exConditionQuery.bs.compoundKey = new java.util.LinkedHashMap();
+            exConditionQuery.bs.compoundKey.className = 'Kvs' + kvs.schemaShort + table.camelizedName + 'CompoundKey';
+            exConditionQueryList.push(exConditionQuery);
+
+            dbMeta.exConditionQuery = exConditionQuery;
+
+            var exConditionBean = new java.util.LinkedHashMap(base);
+            subPackage = 'cbean';
+            exConditionBean.package = subPackage ? kvs.package + '.' + subPackage : kvs.package;
+            exConditionBean.className = 'Kvs' + kvs.schemaShort + table.camelizedName + 'CB';
+            exConditionBean.bs = new java.util.LinkedHashMap(base.bs);
+            subPackage = 'cbean.bs';
+            exConditionBean.bs.package = subPackage ? kvs.package + '.' + subPackage : kvs.package;
+            exConditionBean.bs.className = 'Kvs' + kvs.schemaShort + 'Bs' + table.camelizedName + 'CB';
+            exConditionBean.bs.extendsClass = '';
+            exConditionBean.bs.implementsClasses = '';
+            exConditionBean.bs.dbMeta = dbMeta;
+            exConditionBean.bs.exEntity = exEntity;
+            exConditionBean.bs.exConditionQuery = exConditionQuery;
+            exConditionBean.bs.exConditionBean = exConditionBean;
+            exConditionBean.bs.columnList = table.columnList;
+            exConditionBeanList.push(exConditionBean);
+            dbMeta.exConditionBean = exConditionBean;
+
+            var exBehavior = new java.util.LinkedHashMap(base);
+            subPackage = 'exbhv';
+            exBehavior.package = subPackage ? kvs.package + '.' + subPackage : kvs.package;
+            exBehavior.className = 'Kvs' + kvs.schemaShort + table.camelizedName + 'Bhv';
+            exBehavior.bs = new java.util.LinkedHashMap(base.bs);
+            subPackage = 'bsbhv';
+            exBehavior.bs.package = subPackage ? kvs.package + '.' + subPackage : kvs.package;
+            exBehavior.bs.className = 'Kvs' + kvs.schemaShort + 'Bs' + table.camelizedName + 'Bhv';
+            exBehavior.bs.extendsClassName = 'AbstractKvsStoreBehaviorWritable';
+            exBehavior.bs.extendsClass = 'org.dbflute.kvs.store.bhv.AbstractKvsStoreBehaviorWritable';
+            exBehavior.bs.implementsClasses = '';
+            exBehavior.bs.subClassName = exBehavior.className;
+            exBehavior.bs.dbMeta = dbMeta;
+            exBehavior.bs.exEntity = exEntity;
+            exBehavior.bs.exConditionBean = exConditionBean;
+            exBehavior.bs.suppressBehaviorBasicMethodGen = tableMap.suppressBehaviorBasicMethodGen === 'true';
+            exBehavior.bs.columnList = table.columnList;
+            exBehavior.bs.many = table.many;
+            exBehavior.bs.ttl = table.ttl;
+            exBehaviorList.push(exBehavior);
+        }
+    }
+    for each (table in request.tableList) {
+        for each (column in table.columnList) {
+            column.isEntity = column.type && column.type.contains('@');
+            if (column.isEntity) {
+                column.type = column.type.replace(/@.*?@/g, function(str) {
+                    var type = 'Kvs' + kvs.schemaShort + manager.camelize(str.substring(1, str.length - 1));
+                    for each (dbMeta in dbMetaList) {
+                        if (type + 'Dbm' == dbMeta.className) {
+                            column.dbMeta = dbMeta;
+                        }
+                    }
+                    return exEntity.package + '.' + type;
+                });
+            }
+        }
     }
     processVm(rule, dbMetaList, null, './kvs/store/KvsStoreDBMeta.vm');
     processVm(rule, exEntityList, './kvs/store/KvsStoreBsEntity.vm', './kvs/store/KvsStoreExEntity.vm');

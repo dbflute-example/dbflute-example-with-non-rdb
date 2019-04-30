@@ -22,7 +22,7 @@
 		<!-- Library for Extension -->
 		<elasticsearch.version>6.1.1</elasticsearch.version>
 		<solrj.version>6.3.0</solrj.version>
-		<kvs.redis.version>2.9.0</kvs.redis.version>
+		<kvs.redis.version>3.0.1</kvs.redis.version>
 
 		<!-- Partner Library -->
 		<h2.jdbc.version>1.4.193</h2.jdbc.version>

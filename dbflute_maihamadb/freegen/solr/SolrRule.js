@@ -8,6 +8,16 @@ var baseRule = {
     //                                                                                 Doc
     //                                                                                 ===
     docGeneration : true,
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    defaultValueMap: function() {
+        return {
+            'fetchSize': 1000,
+            'facetFetchSize': null
+        };
+    }
 };
 
 var solrRule = {};

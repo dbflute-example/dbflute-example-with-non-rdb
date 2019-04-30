@@ -56,9 +56,22 @@ var baseRule = {
         };
     },
 
+	
+    /** true for cluster. */
+    cluster : false,
+
+    /**
+     * Return kvs cache async reflection enabled.
+     * @return kvs cache async reflection enabled (NotNull)
+     */
+    kvsCacheAsyncReflectionEnabled: function () {
+        return true;
+    },
+
     // ===================================================================================
     //                                                                                 Doc
     //                                                                                 ===
+    /** true for automatically generating doc. */
     docGeneration : true
 };
 

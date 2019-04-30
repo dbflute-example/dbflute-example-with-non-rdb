@@ -21,57 +21,19 @@ import java.util.Map;
 import org.apache.solr.client.solrj.response.FacetField;
 
 /**
+ * The solr facet result bean of paging.
  * @author FreeGen
+ * @param <ENTITY> entity
  */
-public class SolrFacetResultBean implements SolrResultBean {
+public class SolrFacetResultBean<ENTITY> extends SolrPagingResultBean<ENTITY> implements SolrResultBean {
 
-    /** クエリー実行時間 */
-    private long queryTime;
+    private static final long serialVersionUID = 1L;
 
-    /** 実際に発行されたクエリー文字列 */
-    private String query;
-
-    /** ファセット結果 */
+    /** facet result */
     private Map<String, Integer> facetResult;
 
-    /** ファセット結果 */
+    /** facet field list */
     private List<FacetField> facetFieldList;
-
-    /**
-     * クエリー実行時間を取得します。
-     * @return クエリー実行時間
-     */
-    @Override
-    public long getQueryTime() {
-        return queryTime;
-    }
-
-    /**
-     * クエリー実行時間を設定します。
-     * @param qtime クエリー実行時間
-     */
-    @Override
-    public void setQueryTime(long qtime) {
-        this.queryTime = qtime;
-    }
-
-    /**
-     * 実際に発行されたクエリー文字列を取得します。
-     * @return 実際に発行されたクエリー文字列
-     */
-    @Override
-    public String getQueryString() {
-        return query;
-    }
-
-    /**
-     * 実際に発行されたクエリー文字列を設定します。
-     * @param query 実際に発行されたクエリー文字列
-     */
-    @Override
-    public void setQueryString(String query) {
-        this.query = query;
-    }
 
     /**
      * ファセット結果を取得します。
