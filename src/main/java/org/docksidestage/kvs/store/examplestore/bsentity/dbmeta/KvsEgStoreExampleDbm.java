@@ -73,33 +73,41 @@ public class KvsEgStoreExampleDbm extends AbstractKvsStoreDBMeta {
 
     @Override
     public void acceptAllColumnMap(KvsStoreEntity entity, Map<String, ? extends Object> map) {
+        if (map == null) {
+            return;
+        }
+
         KvsEgStoreExample storeExample = (KvsEgStoreExample) entity;
-        storeExample.setEgkey((String) map.get("egkey"));
-        storeExample.setEgId(org.dbflute.util.DfTypeUtil.toInteger(map.get("egId")));
-        storeExample.setEgName((String) map.get("egName"));
-        storeExample.setExpireDatetime(parseLocalDateTime((String) map.get("expireDatetime")));
+        storeExample.setEgkey(toAnalyzedTypeValue(String.class, map.get("egkey")));
+        storeExample.setEgId(toAnalyzedTypeValue(Integer.class, map.get("egId")));
+        storeExample.setEgName(toAnalyzedTypeValue(String.class, map.get("egName")));
+        storeExample.setExpireDatetime(toAnalyzedTypeValue(java.time.LocalDateTime.class, map.get("expireDatetime")));
     }
 
     @Override
     public List<Object> extractKeyList(KvsStoreConditionBean cb) {
+        List<Object> keyList = new ArrayList<Object>();
         KvsEgStoreExampleCB storeExampleCB = (KvsEgStoreExampleCB) cb;
 
-        List<Object> keyList = new ArrayList<Object>();
         keyList.add(storeExampleCB.query().getEgkey_Equal());
         return keyList;
     }
 
     @Override
     public List<Object> extractKeyList(KvsStoreEntity entity) {
+        List<Object> keyList = new ArrayList<Object>();
         KvsEgStoreExample storeExample = (KvsEgStoreExample) entity;
 
-        List<Object> keyList = new ArrayList<Object>();
         keyList.add(storeExample.getEgkey());
         return keyList;
     }
 
     @Override
     public Map<String, Object> extractAllColumnMap(KvsStoreEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+
         KvsEgStoreExample storeExample = (KvsEgStoreExample) entity;
 
         Map<String, Object> map = new LinkedHashMap<String, Object>();
@@ -126,6 +134,10 @@ public class KvsEgStoreExampleDbm extends AbstractKvsStoreDBMeta {
 
     @Override
     public void validateAllColumn(KvsStoreEntity entity) {
+        if (entity == null) {
+             return;
+        }
+
         KvsEgStoreExample storeExample = (KvsEgStoreExample) entity;
 
         DfAssertUtil.assertStringNotNullAndNotTrimmedEmpty("egkey", storeExample.getEgkey());

@@ -63,40 +63,44 @@ public abstract class AbstractKvsCacheFacade implements KvsCacheFacade {
     //                                                                ====================
     @Override
     public <ENTITY extends Entity> OptionalEntity<ENTITY> findEntity(List<Object> searchKeyList, ConditionBean cb) {
-        return findEntity(searchKeyList, cb, entity -> calcExpireDateTime(cacheTtl()));
+        return findEntity(searchKeyList, cb, entity -> calcExpireDateTime(cacheTtl()), false);
     }
 
     @Override
     public <ENTITY extends Entity> OptionalEntity<ENTITY> findEntity(List<Object> searchKeyList, ConditionBean cb,
-            Function<ENTITY, LocalDateTime> expireDateTimeLambda) {
-        return kvsCacheBusinessAssist.findEntity(mySelector(), cb.asDBMeta().getProjectName(), searchKeyList, cb, expireDateTimeLambda);
+            Function<ENTITY, LocalDateTime> expireDateTimeLambda, boolean kvsCacheAsyncReflectionEnabled) {
+        return kvsCacheBusinessAssist.findEntity(mySelector(), cb.asDBMeta().getProjectName(), searchKeyList, cb, expireDateTimeLambda,
+                kvsCacheAsyncReflectionEnabled);
     }
 
     @Override
     public <ENTITY extends Entity> List<ENTITY> findList(List<Object> searchKeyList, ConditionBean cb) {
-        return findList(searchKeyList, cb, entity -> calcExpireDateTime(cacheTtl()));
+        return findList(searchKeyList, cb, entity -> calcExpireDateTime(cacheTtl()), false);
     }
 
     @Override
     public <ENTITY extends Entity> List<ENTITY> findList(List<Object> searchKeyList, ConditionBean cb,
-            Function<List<ENTITY>, LocalDateTime> expireDateTimeLambda) {
-        return kvsCacheBusinessAssist.findList(mySelector(), cb.asDBMeta().getProjectName(), searchKeyList, cb, expireDateTimeLambda);
+            Function<List<ENTITY>, LocalDateTime> expireDateTimeLambda, boolean kvsCacheAsyncReflectionEnabled) {
+        return kvsCacheBusinessAssist.findList(mySelector(), cb.asDBMeta().getProjectName(), searchKeyList, cb, expireDateTimeLambda,
+                kvsCacheAsyncReflectionEnabled);
     }
 
     // ===================================================================================
     //                                                    Insert OR Update (For KVS Cache)
     //                                                    ================================
     @Override
-    public <ENTITY extends Entity> void insertOrUpdate(List<Object> searchKeyList, ENTITY entity) {
-        kvsCacheBusinessAssist.insertOrUpdate(mySelector(), entity.asDBMeta().getProjectName(), searchKeyList, entity);
+    public <ENTITY extends Entity> void insertOrUpdate(List<Object> searchKeyList, ENTITY entity, boolean kvsCacheAsyncReflectionEnabled) {
+        kvsCacheBusinessAssist.insertOrUpdate(mySelector(), entity.asDBMeta().getProjectName(), searchKeyList, entity,
+                kvsCacheAsyncReflectionEnabled);
     }
 
     // ===================================================================================
     //                                                              Delete (For KVS Cache)
     //                                                              ======================
     @Override
-    public <ENTITY extends Entity> int delete(List<Object> searchKeyList, ENTITY entity) {
-        return kvsCacheBusinessAssist.delete(mySelector(), entity.asDBMeta().getProjectName(), searchKeyList, entity);
+    public <ENTITY extends Entity> int delete(List<Object> searchKeyList, ENTITY entity, boolean kvsCacheAsyncReflectionEnabled) {
+        return kvsCacheBusinessAssist.delete(mySelector(), entity.asDBMeta().getProjectName(), searchKeyList, entity,
+                kvsCacheAsyncReflectionEnabled);
     }
 
     @Override
@@ -109,12 +113,12 @@ public abstract class AbstractKvsCacheFacade implements KvsCacheFacade {
     //                                                        ============================
     @Override
     public <ENTITY extends Entity> OptionalEntity<ENTITY> findEntityById(Object id, DBMeta dbmeta, Set<ColumnInfo> specifiedColumnInfoSet) {
-        return findEntityById(id, dbmeta, specifiedColumnInfoSet, entity -> calcExpireDateTime(cacheTtl()));
+        return findEntityById(id, dbmeta, specifiedColumnInfoSet, entity -> calcExpireDateTime(cacheTtl()), false);
     }
 
     @Override
     public <ENTITY extends Entity> OptionalEntity<ENTITY> findEntityById(Object id, DBMeta dbmeta, Set<ColumnInfo> specifiedColumnInfoSet,
-            Function<ENTITY, LocalDateTime> expireDateTimeLambda) {
+            Function<ENTITY, LocalDateTime> expireDateTimeLambda, boolean kvsCacheAsyncReflectionEnabled) {
         final List<Object> searchKeyList = new ArrayList<Object>(1);
         searchKeyList.add(id);
         final BehaviorReadable readable = behaviorSelector.byName(dbmeta.getTableDbName());
@@ -125,7 +129,7 @@ public abstract class AbstractKvsCacheFacade implements KvsCacheFacade {
         primaryKeyMap.put(primaryInfo.getFirstColumn().getColumnDbName(), id);
         cb.acceptPrimaryKeyMap(primaryKeyMap);
         return kvsCacheBusinessAssist.findEntity(mySelector(), cb.asDBMeta().getProjectName(), searchKeyList, cb,
-                entity -> calcExpireDateTime(cacheTtl()), specifiedColumnInfoSet);
+                entity -> calcExpireDateTime(cacheTtl()), specifiedColumnInfoSet, kvsCacheAsyncReflectionEnabled);
     }
 
     @Override

@@ -25,11 +25,18 @@ public interface SolrConditionBean {
     // ===================================================================================
     //                                                                              Paging
     //                                                                              ======
-    void paging(Integer pageSize, Integer pageNumber);
+    void fetchFirst(Integer fetchSize);
 
     Integer getPageNumer();
 
-    Integer getPageSize();
+    Integer getFetchSize();
+
+    // ===================================================================================
+    //                                                                        Fetch Paging
+    //                                                                        ============
+    Integer getFacetPageNumer();
+
+    Integer getFacetFetchSize();
 
     // ===================================================================================
     //                                                                        Specify Info

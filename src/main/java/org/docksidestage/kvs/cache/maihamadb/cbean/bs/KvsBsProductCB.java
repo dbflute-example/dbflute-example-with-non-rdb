@@ -36,6 +36,7 @@ public abstract class KvsBsProductCB implements KvsCacheConditionBean {
     //                                                                           Attribute
     //                                                                           =========
     protected KvsProductCQ _conditionQuery;
+    protected boolean kvsCacheAsyncReflectionEnabled = true;
 
     // ===================================================================================
     //                                                                               Query
@@ -84,5 +85,20 @@ public abstract class KvsBsProductCB implements KvsCacheConditionBean {
         xgetFetchFirst().ifPresent(fetchSize -> cb.fetchFirst(fetchSize));
 
         return cb;
+    }
+
+    // ===================================================================================
+    //                                                                          Sync/Async
+    //                                                                          ==========
+    public void enableKvsCacheAsyncReflection() {
+        kvsCacheAsyncReflectionEnabled = true;
+    }
+
+    public void disableKvsCacheAsyncReflection() {
+        kvsCacheAsyncReflectionEnabled = false;
+    }
+
+    public boolean isKvsCacheAsyncReflectionEnabled() {
+        return kvsCacheAsyncReflectionEnabled;
     }
 }

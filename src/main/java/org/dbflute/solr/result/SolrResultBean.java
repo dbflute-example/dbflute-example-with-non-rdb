@@ -16,6 +16,7 @@
 package org.dbflute.solr.result;
 
 /**
+ * The solr result bean.
  * @author FreeGen
  */
 public interface SolrResultBean {

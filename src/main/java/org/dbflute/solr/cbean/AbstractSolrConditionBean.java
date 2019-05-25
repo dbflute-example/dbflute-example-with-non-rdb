@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
+import org.apache.solr.common.params.FacetParams;
 import org.dbflute.util.DfStringUtil;
 
 /**
@@ -31,53 +32,90 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private static final Integer DEFAULT_PAGE_SIZE = 1000;
+    private static final String SOLR_QUERY_OPERATOR_KEY = "q.op";
 
-    protected Integer pageSize;
+    private static final String SOLR_ROUTER_KEY = "_route_";
+
+    private static final Integer DEFAULT_FETCH_SIZE = 1000;
+
+    private static final Integer DEFAULT_FACET_FETCH_SIZE = null;
+
+    protected Integer fetchSize;
 
     protected Integer pageNumber;
 
-    private static final String SOLR_QUERY_OPERATOR_KEY = "q.op";
+    protected Integer facetFetchSize;
+
+    protected Integer facetPageNumber;
 
     protected QueryOperator queryOperator;
+
+    /** Flag indicating whether to use fq (filter query) or not. */
+    protected boolean useFilterQuery;
+
+    protected String route;
 
     public enum QueryOperator {
         AND, OR
     }
 
-    /** Flag indicating whether to use fq (filter query) or not. */
-    protected boolean useFilterQuery;
-
-    private static final String SOLR_ROUTER_KEY = "_route_";
-
-    protected String route;
-
     // ===================================================================================
     //                                                                              Paging
     //                                                                              ======
+    @Override
+    public void fetchFirst(Integer fetchSize) {
+        this.fetchSize = fetchSize;
+    }
+
     public void paging(Integer pageSize, Integer pageNumber) {
-        this.pageSize = pageSize;
+        this.fetchSize = pageSize;
         this.pageNumber = pageNumber;
     }
 
     @Override
     public Integer getPageNumer() {
-        if (pageNumber != null) {
-            return pageNumber;
-        }
-        return 1;
-    }
-
-    public Integer getPageStart() {
-        return getPageSize() * (getPageNumer() - 1);
+        return pageNumber != null ? pageNumber : 1;
     }
 
     @Override
-    public Integer getPageSize() {
-        if (pageSize != null) {
-            return pageSize;
+    public Integer getFetchSize() {
+        return fetchSize != null ? fetchSize : DEFAULT_FETCH_SIZE;
+    }
+
+    public Integer getOffset() {
+        if (getFetchSize() == null) {
+            return null;
         }
-        return DEFAULT_PAGE_SIZE;
+        return getFetchSize() * (getPageNumer() - 1);
+    }
+
+    // ===================================================================================
+    //                                                                        Fetch Paging
+    //                                                                        ============
+    public void facetFetchFirst(Integer fetchSize) {
+        this.facetFetchSize = fetchSize;
+    }
+
+    public void facetPaging(Integer pageSize, Integer pageNumber) {
+        this.facetFetchSize = pageSize;
+        this.facetPageNumber = pageNumber;
+    }
+
+    @Override
+    public Integer getFacetPageNumer() {
+        return facetPageNumber != null ? facetPageNumber : 1;
+    }
+
+    @Override
+    public Integer getFacetFetchSize() {
+        return facetFetchSize != null ? facetFetchSize : DEFAULT_FACET_FETCH_SIZE;
+    }
+
+    public Integer getFacetOffset() {
+        if (getFacetFetchSize() == null) {
+            return null;
+        }
+        return getFacetFetchSize() * (getFacetPageNumer() - 1);
     }
 
     // ===================================================================================
@@ -194,8 +232,19 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
             query.add(SOLR_ROUTER_KEY, route);
         }
 
-        query.setStart(this.getPageStart());
-        query.setRows(this.getPageSize());
+        if (this.getOffset() != null && !this.getOffset().equals(0)) {
+            query.setStart(this.getOffset());
+        }
+        query.setRows(this.getFetchSize());
+
+        if (Boolean.parseBoolean(query.get(FacetParams.FACET))) {
+            if (this.getFacetOffset() != null && !this.getFacetOffset().equals(0)) {
+                query.set(FacetParams.FACET_OFFSET, this.getFacetOffset());
+            }
+            if (this.getFacetFetchSize() != null) {
+                query.setFacetLimit(this.getFacetFetchSize());
+            }
+        }
 
         return query;
     }

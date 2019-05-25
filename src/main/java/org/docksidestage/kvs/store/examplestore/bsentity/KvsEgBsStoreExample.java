@@ -19,7 +19,6 @@ import java.io.Serializable;
 
 import org.dbflute.kvs.store.entity.KvsStoreEntity;
 import org.dbflute.kvs.store.entity.dbmeta.KvsStoreDBMeta;
-
 import org.docksidestage.kvs.store.examplestore.bsentity.dbmeta.KvsEgStoreExampleDbm;
 
 /**
@@ -46,7 +45,6 @@ public abstract class KvsEgBsStoreExample implements KvsStoreEntity, Serializabl
     /** expireDatetime: time to live */
     protected java.time.LocalDateTime _expireDatetime;
 
-    // [Referrers] *comment only
 
     // ===================================================================================
     //                                                                            Accessor

@@ -87,7 +87,8 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
         ProductCB cb = adjustKvsConditionBeanOfProductId(kvsCB);
 
         OptionalEntity<Product> optEntity =
-                maihamadbKvsCacheFacade.findEntity(createKvsKeyListOfProductId(kvsCB), cb, expireDateTimeLambdaOfProductId());
+                maihamadbKvsCacheFacade.findEntity(createKvsKeyListOfProductId(kvsCB), cb,
+                expireDateTimeLambdaOfProductId(), kvsCB.isKvsCacheAsyncReflectionEnabled());
 
         return Stream.of(optEntity)
                 .filter(OptionalEntity::isPresent)
@@ -176,8 +177,34 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
      * @return The Entity used to insert/update with automatically-set column value (NotNull)
      */
     public Product insertOrUpdateByProductId(Supplier<Product> entityLambda) {
+        return varyingInsertOrUpdateByProductId(entityLambda, op -> {});
+    }
+
+    /**
+     * Insert or update the entity.
+     * <pre>
+     * <span style="color: #0000C0">kvsSakuhinBhv</span>.<span style="color: #CC4747">insertOrUpdateBySakuhinId</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     Sakuhin sakuhin = <span style="color: #70226C">new</span> Sakuhin();
+     *     <span style="color: #3F7E5E">// If you are going to update or the KVS-key which is not primary key in RDB is specified, set key-column(s)</span>
+     *     <span style="color: #3F7E5E">// e.g.) sakuhin.setProductionYear(year);</span>
+     *     <span style="color: #3F7E5E">// Set value for insert/update</span>
+     *     sakuhin.set...;
+     *     ...
+     *     <span style="color: #70226C">return</span> sakuhin;
+     * });
+     * </pre>
+     * @param entityLambda The handler of entity row of Product (NotNull)
+     * @param op Option (NotNull)
+     * @return The Entity used to insert/update with automatically-set column value (NotNull)
+     */
+    public Product varyingInsertOrUpdateByProductId(Supplier<Product> entityLambda, Consumer<InsertOrUpdateOption> op) {
         Product product = entityLambda.get();
-        maihamadbKvsCacheFacade.insertOrUpdate(createKvsKeyListOfProductId(product), product);
+        InsertOrUpdateOption option = new InsertOrUpdateOption();
+        op.accept(option);
+        maihamadbKvsCacheFacade.insertOrUpdate(
+                createKvsKeyListOfProductId(product),
+                product,
+                option.isKvsCacheAsyncReflectionEnabled());
 
         return product;
     }
@@ -193,13 +220,32 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
      * });
      * </pre>
      * @param entityLambda The handler of entity row of Product (NotNull)
-     * @return The Entity used to delete (NotNull)
      */
-    public Product deleteByProductId(Supplier<Product> entityLambda) {
-        Product product = entityLambda.get();
-        maihamadbKvsCacheFacade.delete(createKvsKeyListOfProductId(product), product);
+    public void deleteByProductId(Supplier<Product> entityLambda) {
+        varyingDeleteByProductId(entityLambda, op -> {});
+    }
 
-        return product;
+    /**
+     * Delete the entity.
+     * <pre>
+     * <span style="color: #0000C0">kvsSakuhinBhv</span>.<span style="color: #CC4747">deleteBySakuhinId</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     Sakuhin sakuhin = <span style="color: #70226C">new</span> Sakuhin();
+     *     <span style="color: #3F7E5E">// Set KVS-key(s)</span>
+     *     sakuhin.setSakuhinId(<span style="color: #553000">sakuhinId</span>);
+     *     <span style="color: #70226C">return</span> sakuhin;
+     * });
+     * </pre>
+     * @param entityLambda The handler of entity row of Product (NotNull)
+     * @param op Option (NotNull)
+     */
+    public void varyingDeleteByProductId(Supplier<Product> entityLambda, Consumer<DeleteOption> op) {
+        Product product = entityLambda.get();
+        DeleteOption option = new DeleteOption();
+        op.accept(option);
+        maihamadbKvsCacheFacade.delete(
+                createKvsKeyListOfProductId(product),
+                product,
+                option.isKvsCacheAsyncReflectionEnabled());
     }
 
     protected List<Object> createKvsKeyListOfProductId(KvsProductCB kvsCB) {
@@ -247,8 +293,8 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
         KvsProductCB kvsCB = createCB(cbLambda);
         ProductCB cb = adjustKvsConditionBeanOfCategoryCode(kvsCB);
 
-        List<Product> list =
-                maihamadbKvsCacheFacade.findList(createKvsKeyListOfCategoryCode(kvsCB), cb, expireDateTimeLambdaOfCategoryCode());
+        List<Product> list = maihamadbKvsCacheFacade.findList(createKvsKeyListOfCategoryCode(kvsCB), cb,
+                expireDateTimeLambdaOfCategoryCode(), kvsCB.isKvsCacheAsyncReflectionEnabled());
 
         Predicate<Product> filter = kvsCB.query().getWherePredicate();
         Comparator<Product> sorted = kvsCB.query().getOrderByComparator();
@@ -361,8 +407,34 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
      * @return The Entity used to insert/update with automatically-set column value (NotNull)
      */
     public Product insertOrUpdateByCategoryCode(Supplier<Product> entityLambda) {
+        return varyingInsertOrUpdateByCategoryCode(entityLambda, op -> {});
+    }
+
+    /**
+     * Insert or update the entity.
+     * <pre>
+     * <span style="color: #0000C0">kvsSakuhinBhv</span>.<span style="color: #CC4747">insertOrUpdateBySakuhinId</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     Sakuhin sakuhin = <span style="color: #70226C">new</span> Sakuhin();
+     *     <span style="color: #3F7E5E">// If you are going to update or the KVS-key which is not primary key in RDB is specified, set key-column(s)</span>
+     *     <span style="color: #3F7E5E">// e.g.) sakuhin.setProductionYear(year);</span>
+     *     <span style="color: #3F7E5E">// Set value for insert/update</span>
+     *     sakuhin.set...;
+     *     ...
+     *     <span style="color: #70226C">return</span> sakuhin;
+     * });
+     * </pre>
+     * @param entityLambda The handler of entity row of Product (NotNull)
+     * @param op Option (NotNull)
+     * @return The Entity used to insert/update with automatically-set column value (NotNull)
+     */
+    public Product varyingInsertOrUpdateByCategoryCode(Supplier<Product> entityLambda, Consumer<InsertOrUpdateOption> op) {
         Product product = entityLambda.get();
-        maihamadbKvsCacheFacade.insertOrUpdate(createKvsKeyListOfCategoryCode(product), product);
+        InsertOrUpdateOption option = new InsertOrUpdateOption();
+        op.accept(option);
+        maihamadbKvsCacheFacade.insertOrUpdate(
+                createKvsKeyListOfCategoryCode(product),
+                product,
+                option.isKvsCacheAsyncReflectionEnabled());
 
         return product;
     }
@@ -378,13 +450,32 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
      * });
      * </pre>
      * @param entityLambda The handler of entity row of Product (NotNull)
-     * @return The Entity used to delete (NotNull)
      */
-    public Product deleteByCategoryCode(Supplier<Product> entityLambda) {
-        Product product = entityLambda.get();
-        maihamadbKvsCacheFacade.delete(createKvsKeyListOfCategoryCode(product), product);
+    public void deleteByCategoryCode(Supplier<Product> entityLambda) {
+        varyingDeleteByCategoryCode(entityLambda, op -> {});
+    }
 
-        return product;
+    /**
+     * Delete the entity.
+     * <pre>
+     * <span style="color: #0000C0">kvsSakuhinBhv</span>.<span style="color: #CC4747">deleteBySakuhinId</span>(() <span style="color: #90226C; font-weight: bold"><span style="font-size: 120%">-</span>&gt;</span> {
+     *     Sakuhin sakuhin = <span style="color: #70226C">new</span> Sakuhin();
+     *     <span style="color: #3F7E5E">// Set KVS-key(s)</span>
+     *     sakuhin.setSakuhinId(<span style="color: #553000">sakuhinId</span>);
+     *     <span style="color: #70226C">return</span> sakuhin;
+     * });
+     * </pre>
+     * @param entityLambda The handler of entity row of Product (NotNull)
+     * @param op Option (NotNull)
+     */
+    public void varyingDeleteByCategoryCode(Supplier<Product> entityLambda, Consumer<DeleteOption> op) {
+        Product product = entityLambda.get();
+        DeleteOption option = new DeleteOption();
+        op.accept(option);
+        maihamadbKvsCacheFacade.delete(
+                createKvsKeyListOfCategoryCode(product),
+                product,
+                option.isKvsCacheAsyncReflectionEnabled());
     }
 
     protected List<Object> createKvsKeyListOfCategoryCode(KvsProductCB kvsCB) {
