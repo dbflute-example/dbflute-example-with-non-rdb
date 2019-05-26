@@ -18,12 +18,7 @@ $scriptEngine.put('scriptEngine', $scriptEngine)
 $scriptEngine.put('generator', $generator)
 $scriptEngine.put('manager', $manager)
 $scriptEngine.eval('load("./freegen/remoteapi/ControlFreeGenRemoteApiJava.js");')
-#foreach($request in $requestList)
-    #if ($request.isResourceTypeSwagger())
-        #set ($scriptEngine = $scriptEngine)
-        $scriptEngine.invokeFunction('process', $request)
-    #end
-#end
+$scriptEngine.invokeFunction('process', $requestList)
 
 ## _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 ## generate indent.

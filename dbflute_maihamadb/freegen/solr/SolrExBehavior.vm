@@ -13,14 +13,14 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${manager.allClassCopyright}package ${request.package}.exbhv;
+${manager.allClassCopyright}package ${data.solr.package}.exbhv;
 
-import ${request.package}.bsbhv.SolrBs${tableMap.schema}Bhv;
+import ${data.solr.package}.bsbhv.SolrBs${data.solr.tableMap.schema}Bhv;
 
 /**
- * Behavior class of Solr schema "${tableMap.schema}."
+ * Behavior class of Solr schema "${data.solr.tableMap.schema}."
  * @author FreeGen
  */
-public class Solr${tableMap.schema}Bhv extends SolrBs${tableMap.schema}Bhv {
+public class Solr${data.solr.tableMap.schema}Bhv extends SolrBs${data.solr.tableMap.schema}Bhv {
 
 }

@@ -1,45 +1,51 @@
+var genType = 'remoteapi';
+var srcPathList = [];
+
 /**
  * process.
- * @param {Request} request - request (NotNull)
+ * @param {Request[]} requestList - requestList (NotNull)
  */
-function process(request) {
-    try {
-        processRemoteApi(request);
-    } catch (e) {
-        var message = '/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n';
-        message += 'Error in remote API generation.\n';
-        message += '\n';
-        message += '[Advice]\n';
-        message += '1. Upgrade version of dbflute engine to 1.1.6 or later.\n';
-        message += '2. If you can not upgrade the version, you may be able to avoid errors by chang setting.\n';
-        message += '3. Still if you do not improve it, there is a possibility of a bug.\n';
-        message += '_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/\n';
-        print(message);
-        throw e;
+function process(requestList) {
+    for each (var request in requestList) {
+        if (!request.isResourceTypeSwagger()) {
+            continue;
+        }
+        manager.info('...Generating ' + genType + ': ' + request.requestName);
+        try {
+            request.enableOutputDirectory();
+            manager.makeDirectory(request.generateDirPath);
+            var optionMap = request.optionMap;
+            scriptEngine.eval('load("./freegen/' + genType + '/' + 'RemoteApiRule.js");');
+            if (optionMap.ruleJsPath && optionMap.ruleJsPath != '') {
+                // load application rule settings if exists
+                scriptEngine.eval('load("' + optionMap.ruleJsPath + '");');
+            }
+            processHull(request);
+        } catch (e) {
+            var message = '/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n';
+            message += 'Error in ' + genType + ' generation.\n';
+            message += '\n';
+            message += '[Advice]\n';
+            message += '1. Upgrade version of dbflute engine to 1.1.6 or later.\n';
+            message += '2. If you can not upgrade the version, you may be able to avoid errors by chang setting.\n';
+            message += '3. Still if you do not improve it, there is a possibility of a bug.\n';
+            message += '_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/\n';
+            print(message);
+            throw e;
+        }
     }
+    clean(null, null, '../resources/' + genType + '/di', srcPathList);
 }
 
 /**
- * process remote api.
+ * process hull.
  * @param {Request} request - request (NotNull)
  */
-function processRemoteApi(request) {
-    var optionMap = request.optionMap;
-    request.enableOutputDirectory();
-    manager.makeDirectory(request.generateDirPath);
-
-    scriptEngine.eval('load("./freegen/remoteapi/RemoteApiRule.js");');
-    if (optionMap.ruleJsPath && optionMap.ruleJsPath != '') {
-        // load application rule settings if exists
-        scriptEngine.eval('load("' + optionMap.ruleJsPath + '");');
-    }
+function processHull(request) {
     var rule = scriptEngine.get('remoteApiRule');
 
     // load java property type mapping
     var typeMap = scriptEngine.invokeMethod(rule, 'typeMap');
-
-    // only remote api requests here
-    manager.info('...Generating remote api: ' + request.requestName);
 
     // schema name is from part of FreeGen request name e.g. RemoteApiSeaLand => SeaLand
     var schema = scriptEngine.invokeMethod(rule, 'schema', request);
@@ -48,6 +54,7 @@ function processRemoteApi(request) {
     // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
     // swagger.json's key
     // _/_/_/_/_/_/_/_/_/_/
+    var optionMap = request.optionMap;
     var pathMap = optionMap.jsonMap['paths'];
     var definitionMap = optionMap.jsonMap['definitions'];
 
@@ -135,7 +142,7 @@ function processRemoteApi(request) {
                         bodyProperties[bodyPropertyKey].required = required.contains(bodyPropertyKey);
                     }
                 }
-                var remoteApiBean = createRemoteApiBean(rule, 'param', api, bodyProperties);
+                var remoteApiBean = createBean(rule, 'param', api, bodyProperties, definitionMap);
                 remoteApiBean.in = api.consumes && api.consumes.indexOf('application/xml') !== -1 ? 'xml' : 'json';
                 remoteApiBean.array = parameter.schema.type === 'array';
                 paramBean = remoteApiBean;
@@ -144,13 +151,13 @@ function processRemoteApi(request) {
         }
 
         if (!queryProperties.isEmpty()) {
-            var remoteApiBean = createRemoteApiBean(rule, 'param', api, queryProperties);
+            var remoteApiBean = createBean(rule, 'param', api, queryProperties, definitionMap);
             remoteApiBean.in = 'query';
             paramBean = remoteApiBean;
             remoteApiBeanList.push(paramBean);
         }
         if (!formDataProperties.isEmpty()) {
-            var remoteApiBean = createRemoteApiBean(rule, 'param', api, formDataProperties);
+            var remoteApiBean = createBean(rule, 'param', api, formDataProperties, definitionMap);
             remoteApiBean.in = 'formData';
             paramBean = remoteApiBean;
             remoteApiBeanList.push(paramBean);
@@ -195,7 +202,7 @@ function processRemoteApi(request) {
                                     returnPropertyValue.required = required.contains(returnPropertyKey);
                                 }
                             }
-                            var remoteApiBean = createRemoteApiBean(rule, 'return', api, returnProperties);
+                            var remoteApiBean = createBean(rule, 'return', api, returnProperties, definitionMap);
                             remoteApiBean.array = array;
                             returnBean = remoteApiBean;
                             remoteApiBeanList.push(returnBean);
@@ -205,23 +212,23 @@ function processRemoteApi(request) {
                 returnBean.in = api.produces.indexOf('application/xml') !== -1 ? 'xml' : 'json';
             }
         }
-        keepRemoteApiBehavior(rule, api, pathVariables, paramBean, returnBean, exBehaviorMap);
+        keepBehavior(rule, api, pathVariables, paramBean, returnBean, exBehaviorMap);
     }
-    var remoteApiBeanPathList = processRemoteApiBean(rule, remoteApiBeanList);
-    var remoteApiBhvPathList = processRemoteApiBhv(rule, request, exBehaviorMap);
-    var remoteApiSrcPathList = remoteApiBeanPathList.concat(remoteApiBhvPathList);
-    processRemoteApiDoc(rule, request, exBehaviorMap);
-    clean(rule, request, remoteApiSrcPathList);
+    processBean(rule, remoteApiBeanList);
+    processBhv(rule, request, exBehaviorMap);
+    processDoc(rule, request, exBehaviorMap);
+    clean(rule, request, api.package.replace(/\./g, '/'), srcPathList);
 }
 
 /**
- * Keep information of remote api bean.
+ * Keep information of bean.
  * @param {Rule} rule - rrule. (NotNull)
  * @param {string} beanPurposeType - The bean role type. e.g. param, return (NotNull)
  * @param {Api} api - The information of api. (NotNull)
  * @param {Properties} properties - The information of property for the bean. (NotNull)
+ * @param {DefinitionMap} definitionMap - The information of definition map. (NotNull)
  */
-function createRemoteApiBean(rule, beanPurposeType, api, properties) {
+function createBean(rule, beanPurposeType, api, properties, definitionMap) {
     var schemaPackage = scriptEngine.invokeMethod(rule, 'schemaPackage', api.schema);
     var subPackage = scriptEngine.invokeMethod(rule, 'beanSubPackage', api);
     var package = api.package + '.' + schemaPackage;
@@ -238,11 +245,12 @@ function createRemoteApiBean(rule, beanPurposeType, api, properties) {
     remoteApiBean.properties = properties;
     remoteApiBean.beanPurposeType = beanPurposeType;
     remoteApiBean.remoteApiExp = api.httpMethod.toUpperCase() + ' ' + api.url;
+    remoteApiBean.definitionMap = definitionMap;
     return remoteApiBean;
 }
 
 /**
- * Keep information of remote api behavior.
+ * Keep information of behavior.
  * @param {Rule} rule - rule. (NotNull)
  * @param {Api} api - The information of api. (NotNull)
  * @param {PathVariables} pathVariables - The array of path variables. (NotNull)
@@ -250,7 +258,7 @@ function createRemoteApiBean(rule, beanPurposeType, api, properties) {
  * @param {ReturnBean} returnBean - The information of return bean. (NotNull)
  * @param {ExBehaviorMap} exBehaviorMap - The map of behavior information. (NotNull)
  */
-function keepRemoteApiBehavior(rule, api, pathVariables, paramBean, returnBean, exBehaviorMap) {
+function keepBehavior(rule, api, pathVariables, paramBean, returnBean, exBehaviorMap) {
     var schemaPackage = scriptEngine.invokeMethod(rule, 'schemaPackage', api.schema);
     var subPackage = scriptEngine.invokeMethod(rule, 'behaviorSubPackage', api);
     var package = api.package + '.' + schemaPackage;
@@ -276,11 +284,11 @@ function keepRemoteApiBehavior(rule, api, pathVariables, paramBean, returnBean, 
 }
 
 /**
- * Process remote api bean. (generating class)
+ * Process bean. (generating class)
  * @param {Rule} rule - rule. (NotNull)
  * @param {RemoteApiBeanList} remoteApiBeanList - remoteApiBeanList. (NotNull)
  */
-function processRemoteApiBean(rule, remoteApiBeanList) {
+function processBean(rule, remoteApiBeanList) {
     var sortRemoteApiBeanMap = new java.util.TreeMap();
     for (remoteApiBeanListIndex in remoteApiBeanList) {
         var remoteApiBean = remoteApiBeanList[remoteApiBeanListIndex];
@@ -304,24 +312,21 @@ function processRemoteApiBean(rule, remoteApiBeanList) {
         }
     }
 
-    var remoteApiBeanPathList = [];
     for (remoteApiBeanKey in uniqueRemoteApiBeanMap) {
         var remoteApiBean = uniqueRemoteApiBeanMap[remoteApiBeanKey];
         var path = remoteApiBean.package.replace(/\./g, '/') + '/' + remoteApiBean.className + '.java';
         generate('./remoteapi/RemoteApiBean.vm', path, remoteApiBean, true);
-        remoteApiBeanPathList.push(path);
     }
-    return remoteApiBeanPathList;
 }
 
 /**
- * Process remote api behavior. (generating class)
+ * Process behavior. (generating class)
  * Also generate DI xml.
  * @param {Rule} rule - rule. (NotNull)
  * @param {Request} request - request (NotNull)
  * @param {ExBehaviorMap} exBehaviorMap - The map of behavior information. (NotNull)
  */
-function processRemoteApiBhv(rule, request, exBehaviorMap) {
+function processBhv(rule, request, exBehaviorMap) {
     if (!rule['behaviorClassGeneration']) {
         return [];
     }
@@ -333,9 +338,7 @@ function processRemoteApiBhv(rule, request, exBehaviorMap) {
     abstractBehavior.className = className;
     abstractBehavior.remoteApiExp = request.requestName;
     abstractBehavior.frameworkBehaviorClass = rule['frameworkBehaviorClass'];
-    var remoteApiBhvPathList = [];
     var path = abstractBehavior.package.replace(/\./g, '/') + '/' + abstractBehavior.className + '.java';
-    remoteApiBhvPathList.push(path);
     generate('./remoteapi/RemoteApiAbstractBehavior.vm', path, abstractBehavior, false);
 
     for (exBehaviorKey in exBehaviorMap) {
@@ -344,11 +347,9 @@ function processRemoteApiBhv(rule, request, exBehaviorMap) {
         var bsBehavior = exBehavior.bsBehavior;
         bsBehavior.abstractBehavior = abstractBehavior;
         path = bsBehavior.package.replace(/\./g, '/') + '/' + bsBehavior.className + '.java';
-        remoteApiBhvPathList.push(path);
         generate('./remoteapi/RemoteApiBsBehavior.vm', path, bsBehavior, true);
 
         path = exBehavior.package.replace(/\./g, '/') + '/' + exBehavior.className + '.java';
-        remoteApiBhvPathList.push(path);
         generate('./remoteapi/RemoteApiExBehavior.vm', path, exBehavior, false);
     }
 
@@ -373,17 +374,15 @@ function processRemoteApiBhv(rule, request, exBehaviorMap) {
         path = 'org/lastaflute/spring/LastafluteBeansJavaConfig.java';
         generate('./remoteapi/container/spring/LastafluteBeansJavaConfig.vm', path, javaConfigClass, true);
     }
-
-    return remoteApiBhvPathList;
 }
 
 /**
- * Process remote api doc.
+ * Process doc.
  * @param {Rule} rule - rule. (NotNull)
  * @param {Request} request - request (NotNull)
  * @param {ExBehaviorMap} exBehaviorMap - The map of behavior information. (NotNull)
  */
-function processRemoteApiDoc(rule, request, exBehaviorMap) {
+function processDoc(rule, request, exBehaviorMap) {
     if (!rule['docGeneration']) {
         return;
     }
@@ -391,12 +390,12 @@ function processRemoteApiDoc(rule, request, exBehaviorMap) {
     doc.schema = scriptEngine.invokeMethod(rule, 'schema', request);
     doc.schemaPackage = scriptEngine.invokeMethod(rule, 'schemaPackage', doc.schema);
     doc.exBehaviorMap = exBehaviorMap;
-    var remoteApiDocHtml = generate('./remoteapi/doc/RemoteApiDocHtml.vm', null, doc, true);
+    var docHtml = generate('./' + genType + '/doc/RemoteApiDocHtml.vm', null, doc, true);
     var lastaDocHtmlPathList = manager.getLastaDocHtmlPathList();
     var markNaviLink = manager.getLastaDocHtmlMarkFreeGenDocNaviLink();
     var markBody = manager.getLastaDocHtmlMarkFreeGenDocBody();
-    var naviLinkHtml = '    | <a href="#remoteapi">to remoteapi</a>';
-    var naviLinkDestinationHtml = '<span id="remoteapi"></span>';
+    var naviLinkHtml = '    | <a href="#' + genType + '">to ' + genType + '</a>';
+    var naviLinkDestinationHtml = '<span id="' + genType + '"></span>';
     for (var lastaDocHtmlPathIndex in lastaDocHtmlPathList) {
         var lastaDocHtmlPath = java.nio.file.Paths.get(lastaDocHtmlPathList[lastaDocHtmlPathIndex]);
         var lastaDocHtml = Java.type('java.lang.String').join('\n', java.nio.file.Files.readAllLines(lastaDocHtmlPath));
@@ -404,27 +403,9 @@ function processRemoteApiDoc(rule, request, exBehaviorMap) {
             lastaDocHtml = lastaDocHtml.replace(markNaviLink, naviLinkHtml + '\n' + markNaviLink);
         }
         if (!lastaDocHtml.contains(naviLinkDestinationHtml)) {
-            remoteApiDocHtml = naviLinkDestinationHtml + remoteApiDocHtml;
+            docHtml = naviLinkDestinationHtml + docHtml;
         }
-        java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, remoteApiDocHtml + '\n' + markBody).getBytes('UTF-8'));
-    }
-}
-
-function clean(rule, request, remoteApiSrcPathList) {
-    var generateAbsolutePathList = [];
-    for (var remoteApiSrcPathIndex in remoteApiSrcPathList) {
-        generateAbsolutePathList.push(new java.io.File(generator.outputPath, remoteApiSrcPathList[remoteApiSrcPathIndex]).getAbsolutePath());
-    }
-    var schema = scriptEngine.invokeMethod(rule, 'schema', request);
-    var schemaPackage = scriptEngine.invokeMethod(rule, 'schemaPackage', schema);
-    var list = listFiles(new java.io.File(generator.outputPath, (request.package + '.' + schemaPackage).replace(/\./g, '/')));
-    for (var index in list) {
-        var file = list[index];
-        if (generateAbsolutePathList.indexOf(file.getAbsolutePath()) === -1
-                && scriptEngine.invokeMethod(rule, 'deleteTarget', request, file)) {
-           print('delete(' + file + ')');
-           file.delete();
-        }
+        java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, docHtml + '\n' + markBody).getBytes('UTF-8'));
     }
 }
 
@@ -442,12 +423,29 @@ function generate(src, dest, data, overwite) {
     if (dest === null) {
         return generator.parse(src, dest, 'data', data);
     }
+    srcPathList.push(dest);
     if (!java.nio.file.Files.exists(java.nio.file.Paths.get(generator.outputPath, dest)) || overwite) {
         manager.makeDirectory(dest);
         print('generate("' + dest + '")');
         return generator.parse(src, dest, 'data', data);
     }
     return '';
+}
+
+function clean(rule, request, genDir, srcPathList) {
+    var generateAbsolutePathList = [];
+    for (var srcPathIndex in srcPathList) {
+        generateAbsolutePathList.push(new java.io.File(generator.outputPath, srcPathList[srcPathIndex]).getAbsolutePath());
+    }
+    var list = listFiles(new java.io.File(generator.outputPath, genDir));
+    for (var index in list) {
+        var file = list[index];
+        if (generateAbsolutePathList.indexOf(file.getAbsolutePath()) === -1
+                && (rule == null || scriptEngine.invokeMethod(rule, 'deleteTarget', request, file))) {
+            print('delete(' + file + ')');
+            file.delete();
+        }
+    }
 }
 
 function listFiles(dir) {

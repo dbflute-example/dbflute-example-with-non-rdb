@@ -1,117 +1,129 @@
-var genKvsCore = false;
-var genKvsStore = false;
-var genKvsCache = false;
-var genKvsCacheColumnNullObject = false;
+var genType = 'kvs';
+var genCore = false;
+var genCoreStore = false;
+var genCoreCache = false;
+var genCoreCacheColumnNullObject = false;
+var srcPathList = [];
 
 /**
  * process.
- * @param {Request} request - request (NotNull)
+ * @param {Request[]} requestList - requestList (NotNull)
  */
-function process(request) {
-    if (!(request.isResourceTypeJsonSchema() && request.requestName.startsWith("Kvs"))) {
-        return;
-    }
-    try {
-        request.enableOutputDirectory();
-        manager.makeDirectory(request.generateDirPath);
-        var optionMap = request.optionMap;
-        scriptEngine.eval('load("./freegen/kvs/KvsRule.js");');
-        if (optionMap.ruleJsPath && optionMap.ruleJsPath != '') {
-            // load application rule settings if exists
-            scriptEngine.eval('load("' + optionMap.ruleJsPath + '");');
+function process(requestList) {
+    for each (var request in requestList) {
+        if (!(request.isResourceTypeJsonSchema() && request.requestName.startsWith("Kvs"))) {
+            continue;
         }
-        processKvsCore(request)
-        processKvs(request);
-    } catch (e) {
-        var message = '/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n';
-        message += 'Error in kvs generation.\n';
-        message += '\n';
-        message += '[Advice]\n';
-        message += '1. Upgrade version of dbflute engine to 1.1.6 or later.\n';
-        message += '2. If you can not upgrade the version, you may be able to avoid errors by chang setting.\n';
-        message += '3. Still if you do not improve it, there is a possibility of a bug.\n';
-        message += '_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/\n';
-        print(message);
-        throw e;
+        manager.info('...Generating ' + genType + ': ' + request.requestName);
+        try {
+            request.enableOutputDirectory();
+            manager.makeDirectory(request.generateDirPath);
+            var optionMap = request.optionMap;
+            scriptEngine.eval('load("./freegen/' + genType + '/' + manager.initCap(genType) + 'Rule.js");');
+            if (optionMap.ruleJsPath && optionMap.ruleJsPath != '') {
+                // load application rule settings if exists
+                scriptEngine.eval('load("' + optionMap.ruleJsPath + '");');
+            }
+            processCore(request);
+            processHull(request);
+        } catch (e) {
+            var message = '/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n';
+            message += 'Error in ' + genType + ' generation.\n';
+            message += '\n';
+            message += '[Advice]\n';
+            message += '1. Upgrade version of dbflute engine to 1.1.6 or later.\n';
+            message += '2. If you can not upgrade the version, you may be able to avoid errors by chang setting.\n';
+            message += '3. Still if you do not improve it, there is a possibility of a bug.\n';
+            message += '_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/\n';
+            print(message);
+            throw e;
+        }
     }
+    clean(null, null, 'org/dbflute/' + genType , srcPathList);
+    clean(null, null, '../resources/' + genType + '/di', srcPathList);
 }
 
 /**
- * Process kvs core.
- * @param {Rule} rule - rule. (NotNull)
+ * process core.
  * @param {Request} request - request (NotNull)
  */
-function processKvsCore(request) {
-    var rule = scriptEngine.get('kvsRule');
+function processCore(request) {
+    var rule = scriptEngine.get(genType + 'Rule');
     var kvs = new java.util.LinkedHashMap();
     kvs.kvsCacheAsyncReflectionEnabled = scriptEngine.invokeMethod(rule, 'kvsCacheAsyncReflectionEnabled', null);
-    if (!genKvsCore) {
-        genKvsCore = true;
-        generate('./kvs/allcommon/core/assertion/KvsAssertion.vm', 'org/dbflute/kvs/core/assertion/KvsAssertion.java', null, true);
-        generate('./kvs/allcommon/core/exception/KvsException.vm', 'org/dbflute/kvs/core/exception/KvsException.java', null, true);
-        generate('./kvs/allcommon/core/delegator/KvsDelegator.vm', 'org/dbflute/kvs/core/delegator/KvsDelegator.java', null, true);
+    var coreVmList = [];
+    if (!genCore) {
+        genCore = true;
+        coreVmList.push('core/assertion/KvsAssertion.vm');
+        coreVmList.push('core/exception/KvsException.vm');
+        coreVmList.push('core/delegator/KvsDelegator.vm');
         if (rule['cluster']) {
-            generate('./kvs/allcommon/core/delegator/cluster/AbstractKvsRedisDelegator.vm', 'org/dbflute/kvs/core/delegator/AbstractKvsRedisDelegator.java', null, true);
-            generate('./kvs/allcommon/core/delegator/cluster/KvsRedisPool.vm', 'org/dbflute/kvs/core/delegator/KvsRedisPool.java', null, true);
-        } else {
-            generate('./kvs/allcommon/core/delegator/AbstractKvsRedisDelegator.vm', 'org/dbflute/kvs/core/delegator/AbstractKvsRedisDelegator.java', null, true);
-            generate('./kvs/allcommon/core/delegator/KvsRedisPool.vm', 'org/dbflute/kvs/core/delegator/KvsRedisPool.java', null, true);        
-        }
-        generate('./kvs/allcommon/core/delegator/KvsLocalMapDelegator.vm', 'org/dbflute/kvs/core/delegator/KvsLocalMapDelegator.java', null, true);
+	        coreVmList.push('core/delegator/cluster/AbstractKvsRedisDelegator.vm');
+	        coreVmList.push('core/delegator/cluster/KvsRedisPool.vm');
+	    } else {
+	        coreVmList.push('core/delegator/AbstractKvsRedisDelegator.vm');
+	        coreVmList.push('core/delegator/KvsRedisPool.vm');
+	    }
+        coreVmList.push('core/delegator/KvsLocalMapDelegator.vm');
     }
 
-    if (request.requestName.startsWith("KvsCache") && !genKvsCache) {
-        genKvsCache = true;
-        generate('./kvs/allcommon/cache/delegator/KvsCacheRedisDelegator.vm', 'org/dbflute/kvs/cache/delegator/KvsCacheRedisDelegator.java', null, true);
-        generate('./kvs/allcommon/cache/facade/KvsCacheFacade.vm', 'org/dbflute/kvs/cache/facade/KvsCacheFacade.java', null, true);
-        generate('./kvs/allcommon/cache/facade/AbstractKvsCacheFacade.vm', 'org/dbflute/kvs/cache/facade/AbstractKvsCacheFacade.java', null, true);
-        generate('./kvs/allcommon/cache/KvsCacheBusinessAssist.vm', 'org/dbflute/kvs/cache/KvsCacheBusinessAssist.java', kvs, true);
-        generate('./kvs/allcommon/cache/KvsCacheConverterHandler.vm', 'org/dbflute/kvs/cache/KvsCacheConverterHandler.java', null, true);
-        generate('./kvs/allcommon/cache/KvsCacheManager.vm', 'org/dbflute/kvs/cache/KvsCacheManager.java', null, true);
-        generate('./kvs/allcommon/cache/KvsCacheManagerImpl.vm', 'org/dbflute/kvs/cache/KvsCacheManagerImpl.java', null, true);
-        generate('./kvs/allcommon/cache/bhv/AbstractKvsCacheBehaviorWritable.vm', 'org/dbflute/kvs/cache/bhv/AbstractKvsCacheBehaviorWritable.java', kvs, true);
-        generate('./kvs/allcommon/cache/cbean/KvsCacheConditionBean.vm', 'org/dbflute/kvs/cache/cbean/KvsCacheConditionBean.java', null, true);
+    if (request.requestName.startsWith("KvsCache") && !genCoreCache) {
+        genCoreCache = true;
+        coreVmList.push('cache/delegator/KvsCacheRedisDelegator.vm');
+        coreVmList.push('cache/facade/KvsCacheFacade.vm');
+        coreVmList.push('cache/facade/AbstractKvsCacheFacade.vm');
+        coreVmList.push('cache/KvsCacheBusinessAssist.vm');
+        coreVmList.push('cache/KvsCacheConverterHandler.vm');
+        coreVmList.push('cache/KvsCacheManager.vm');
+        coreVmList.push('cache/KvsCacheManagerImpl.vm');
+        coreVmList.push('cache/bhv/AbstractKvsCacheBehaviorWritable.vm');
+        coreVmList.push('cache/cbean/KvsCacheConditionBean.vm');
     }
 
-    if (request.requestName.startsWith("KvsStore") && !genKvsStore) {
-        genKvsStore = true;
-        generate('./kvs/allcommon/store/delegator/KvsStoreRedisDelegator.vm', 'org/dbflute/kvs/store/delegator/KvsStoreRedisDelegator.java', null, true);
-        generate('./kvs/allcommon/store/cbean/KvsStoreConditionBean.vm', 'org/dbflute/kvs/store/cbean/KvsStoreConditionBean.java', null, true);
-        generate('./kvs/allcommon/store/entity/dbmeta/KvsStoreDBMeta.vm', 'org/dbflute/kvs/store/entity/dbmeta/KvsStoreDBMeta.java', null, true);
-        generate('./kvs/allcommon/store/entity/dbmeta/AbstractKvsStoreDBMeta.vm', 'org/dbflute/kvs/store/entity/dbmeta/AbstractKvsStoreDBMeta.java', null, true);
-        generate('./kvs/allcommon/store/entity/KvsStoreEntity.vm', 'org/dbflute/kvs/store/entity/KvsStoreEntity.java', null, true);
-        generate('./kvs/allcommon/store/facade/KvsStoreFacade.vm', 'org/dbflute/kvs/store/facade/KvsStoreFacade.java', null, true);
-        generate('./kvs/allcommon/store/facade/AbstractKvsStoreFacade.vm', 'org/dbflute/kvs/store/facade/AbstractKvsStoreFacade.java', null, true);
-        generate('./kvs/allcommon/store/facade/AbstractKvsStoreHashFacade.vm', 'org/dbflute/kvs/store/facade/AbstractKvsStoreHashFacade.java', null, true);
-        generate('./kvs/allcommon/store/KvsStoreConverterHandler.vm', 'org/dbflute/kvs/store/KvsStoreConverterHandler.java', null, true);
-        generate('./kvs/allcommon/store/KvsStoreManager.vm', 'org/dbflute/kvs/store/KvsStoreManager.java', null, true);
-        generate('./kvs/allcommon/store/KvsStoreManagerImpl.vm', 'org/dbflute/kvs/store/KvsStoreManagerImpl.java', null, true);
+    if (request.requestName.startsWith("KvsStore") && !genCoreStore) {
+        genCoreStore = true;
+        coreVmList.push('store/delegator/KvsStoreRedisDelegator.vm');
+        coreVmList.push('store/cbean/KvsStoreConditionBean.vm');
+        coreVmList.push('store/entity/dbmeta/KvsStoreDBMeta.vm');
+        coreVmList.push('store/entity/dbmeta/AbstractKvsStoreDBMeta.vm');
+        coreVmList.push('store/entity/KvsStoreEntity.vm');
+        coreVmList.push('store/facade/KvsStoreFacade.vm');
+        coreVmList.push('store/facade/AbstractKvsStoreFacade.vm');
+        coreVmList.push('store/facade/AbstractKvsStoreHashFacade.vm');
+        coreVmList.push('store/KvsStoreConverterHandler.vm');
+        coreVmList.push('store/KvsStoreManager.vm');
+        coreVmList.push('store/KvsStoreManagerImpl.vm');
+    }
+    for each (var coreVm in coreVmList) {
+        generate('./' + genType + '/allcommon/' + coreVm, 'org/dbflute/' + genType + '/' + coreVm.replaceAll('/cluster/', '/').replaceAll('\.vm$', '.java'), kvs, true);
     }
 }
 
 /**
- * process kvs.
+ * process hull.
  * @param {Request} request - request (NotNull)
  */
-function processKvs(request) {
-    var rule = scriptEngine.get('kvsRule');
-    processKvsPool(rule, request);
-    processKvsCache(rule, request);
-    processKvsStore(rule, request);
+function processHull(request) {
+    var rule = scriptEngine.get(genType + 'Rule');
+    processPool(rule, request);
+    processCache(rule, request);
+    processStore(rule, request);
+    var package = request.package + '.' + scriptEngine.invokeMethod(rule, 'schema', request);
+    clean(rule, request, package.replace(/\./g, '/'), srcPathList);
 }
 
 /**
- * Process kvs pool.
+ * Process pool.
  * @param {Rule} rule - rule. (NotNull)
  * @param {Request} request - request (NotNull)
  */
-function processKvsPool(rule, request) {
+function processPool(rule, request) {
     if (!request.requestName.startsWith("KvsPool")) {
         return;
     }
     var tableMap = request.tableMap;
-    generate('./kvs/KvsRedisPoolFactory.vm', request.generateDirPath + 'KvsRedisPoolFactory.java', null, true);
-    for each (table in request.tableList) {
+    generate('./kvs/KvsRedisPoolFactory.vm', request.generateDirPath + 'KvsRedisPoolFactory.java', request, true);
+    for each (var table in request.tableList) {
         var di = new java.util.LinkedHashMap();
         di.name = table.uncapCamelName;
         di.package = request.package;
@@ -125,11 +137,11 @@ function processKvsPool(rule, request) {
 }
 
 /**
- * Process kvs cache.
+ * Process cache.
  * @param {Rule} rule - rule. (NotNull)
  * @param {Request} request - request (NotNull)
  */
-function processKvsCache(rule, request) {
+function processCache(rule, request) {
     if (!request.requestName.startsWith('KvsCache')) {
         return;
     }
@@ -151,7 +163,7 @@ function processKvsCache(rule, request) {
     var exConditionBeanList = [];
     var exBehaviorList = [];
     if (!kvs.suppressBehaviorGen) {
-        for each (table in request.tableList) {
+        for each (var table in request.tableList) {
             var base = new java.util.LinkedHashMap();
             base.tableName = table.capCamelName;
             base.comment = table.comment;
@@ -216,9 +228,9 @@ function processKvsCache(rule, request) {
             exBehaviorList.push(exBehavior);
         }
     }
-    processVm(rule, exConditionQueryList, './kvs/cache/KvsCacheBsCQ.vm', './kvs/cache/KvsCacheExCQ.vm');
-    processVm(rule, exConditionBeanList, './kvs/cache/KvsCacheBsCB.vm', './kvs/cache/KvsCacheExCB.vm');
-    processVm(rule, exBehaviorList, './kvs/cache/KvsCacheBsBehavior.vm', './kvs/cache/KvsCacheExBehavior.vm');
+    processVm(exConditionQueryList, './kvs/cache/KvsCacheBsCQ.vm', './kvs/cache/KvsCacheExCQ.vm');
+    processVm(exConditionBeanList, './kvs/cache/KvsCacheBsCB.vm', './kvs/cache/KvsCacheExCB.vm');
+    processVm(exBehaviorList, './kvs/cache/KvsCacheBsBehavior.vm', './kvs/cache/KvsCacheExBehavior.vm');
 
     var di = new java.util.LinkedHashMap(base);
     di.kvs = kvs;
@@ -229,26 +241,26 @@ function processKvsCache(rule, request) {
         generate('./kvs/allcommon/container/seasar/KvsCacheDicon.vm', '../resources/kvs/di/kvs-cache-' + tableMap.schema + '.dicon', di, true);
     }
     if (manager.isTargetContainerLastaDi()) {
-          generate('./kvs/allcommon/container/lastadi/KvsCacheDiXml.vm', '../resources/kvs/di/kvs-cache-' + tableMap.schema + '.xml', di, true);
+        generate('./kvs/allcommon/container/lastadi/KvsCacheDiXml.vm', '../resources/kvs/di/kvs-cache-' + tableMap.schema + '.xml', di, true);
     }
 
-    if (!genKvsCacheColumnNullObject) {
-        genKvsCacheColumnNullObject = true;
+    if (!genCoreCacheColumnNullObject) {
+        genCoreCacheColumnNullObject = true;
         generate('./kvs/allcommon/cache/KvsCacheColumnNullObject.vm', 'org/dbflute/kvs/cache/KvsCacheColumnNullObject.java', null, true);
     }
 
     var doc = new java.util.LinkedHashMap();
     doc.kvs = kvs;
     doc.exBehaviorList = exBehaviorList;
-    processKvsCacheDoc(rule, doc);
+    processCacheDoc(rule, doc);
 }
 
 /**
- * Process kvs store.
+ * Process store.
  * @param {Rule} rule - rule. (NotNull)
  * @param {Request} request - request (NotNull)
  */
-function processKvsStore(rule, request) {
+function processStore(rule, request) {
     if (!request.requestName.startsWith('KvsStore')) {
         return;
     }
@@ -271,7 +283,7 @@ function processKvsStore(rule, request) {
     var exConditionQueryList = [];
     var exConditionBeanList = [];
     var exBehaviorList = [];
-    for each (table in request.tableList) {
+    for each (var table in request.tableList) {
         var variableKvs = new java.util.LinkedHashMap(kvs);
         if (table.suppressBehaviorGen === true) {
             variableKvs.suppressBehaviorGen = true;
@@ -367,13 +379,13 @@ function processKvsStore(rule, request) {
             exBehaviorList.push(exBehavior);
         }
     }
-    for each (table in request.tableList) {
-        for each (column in table.columnList) {
+    for each (var table in request.tableList) {
+        for each (var column in table.columnList) {
             column.isEntity = column.type && column.type.contains('@');
             if (column.isEntity) {
                 column.type = column.type.replace(/@.*?@/g, function(str) {
                     var type = 'Kvs' + kvs.schemaShort + manager.camelize(str.substring(1, str.length - 1));
-                    for each (dbMeta in dbMetaList) {
+                    for each (var dbMeta in dbMetaList) {
                         if (type + 'Dbm' == dbMeta.className) {
                             column.dbMeta = dbMeta;
                         }
@@ -383,16 +395,16 @@ function processKvsStore(rule, request) {
             }
         }
     }
-    processVm(rule, dbMetaList, null, './kvs/store/KvsStoreDBMeta.vm');
-    processVm(rule, exEntityList, './kvs/store/KvsStoreBsEntity.vm', './kvs/store/KvsStoreExEntity.vm');
+    processVm(dbMetaList, null, './kvs/store/KvsStoreDBMeta.vm');
+    processVm(exEntityList, './kvs/store/KvsStoreBsEntity.vm', './kvs/store/KvsStoreExEntity.vm');
     if (!kvs.suppressBehaviorGen) {
-        processVm(rule, exConditionQueryList, './kvs/store/KvsStoreBsCQ.vm', './kvs/store/KvsStoreExCQ.vm');
-        processVm(rule, exConditionBeanList, './kvs/store/KvsStoreBsCB.vm', './kvs/store/KvsStoreExCB.vm');
-        processVm(rule, exBehaviorList, './kvs/store/KvsStoreBsBehavior.vm', './kvs/store/KvsStoreExBehavior.vm');
+        processVm(exConditionQueryList, './kvs/store/KvsStoreBsCQ.vm', './kvs/store/KvsStoreExCQ.vm');
+        processVm(exConditionBeanList, './kvs/store/KvsStoreBsCB.vm', './kvs/store/KvsStoreExCB.vm');
+        processVm(exBehaviorList, './kvs/store/KvsStoreBsBehavior.vm', './kvs/store/KvsStoreExBehavior.vm');
         var doc = new java.util.LinkedHashMap();
         doc.kvs = kvs;
         doc.exBehaviorList = exBehaviorList;
-        processKvsStoreDoc(rule, doc);
+        processStoreDoc(rule, doc);
     }
 
     var di = new java.util.LinkedHashMap(base);
@@ -408,15 +420,15 @@ function processKvsStore(rule, request) {
 }
 
 /**
- * Process kvs cache doc.
+ * Process cache doc.
  * @param {Rule} rule - rule. (NotNull)
  * @param {Doc} doc - doc (NotNull)
  */
-function processKvsCacheDoc(rule, doc) {
+function processCacheDoc(rule, doc) {
     if (!rule['docGeneration']) {
         return;
     }
-    var kvsCacheDocHtml = generate('./kvs/doc/KvsCacheDocHtml.vm', null, doc, true);
+    var docHtml = generate('./kvs/doc/KvsCacheDocHtml.vm', null, doc, true);
     var lastaDocHtmlPathList = manager.getLastaDocHtmlPathList();
     var markNaviLink = manager.getLastaDocHtmlMarkFreeGenDocNaviLink();
     var markBody = manager.getLastaDocHtmlMarkFreeGenDocBody();
@@ -429,22 +441,22 @@ function processKvsCacheDoc(rule, doc) {
             lastaDocHtml = lastaDocHtml.replace(markNaviLink, naviLinkHtml + '\n' + markNaviLink);
         }
         if (!lastaDocHtml.contains(naviLinkDestinationHtml)) {
-            kvsCacheDocHtml = naviLinkDestinationHtml + kvsCacheDocHtml;
+            docHtml = naviLinkDestinationHtml + docHtml;
         }
-        java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, kvsCacheDocHtml + '\n' + markBody).getBytes('UTF-8'));
+        java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, docHtml + '\n' + markBody).getBytes('UTF-8'));
     }
 }
 
 /**
- * Process kvs store doc.
+ * Process store doc.
  * @param {Rule} rule - rule. (NotNull)
  * @param {Doc} doc - doc (NotNull)
  */
-function processKvsStoreDoc(rule, doc) {
+function processStoreDoc(rule, doc) {
     if (!rule['docGeneration']) {
         return;
     }
-    var kvsStoreDocHtml = generate('./kvs/doc/KvsStoreDocHtml.vm', null, doc, true);
+    var docHtml = generate('./kvs/doc/KvsStoreDocHtml.vm', null, doc, true);
     var lastaDocHtmlPathList = manager.getLastaDocHtmlPathList();
     var markNaviLink = manager.getLastaDocHtmlMarkFreeGenDocNaviLink();
     var markBody = manager.getLastaDocHtmlMarkFreeGenDocBody();
@@ -457,9 +469,9 @@ function processKvsStoreDoc(rule, doc) {
             lastaDocHtml = lastaDocHtml.replace(markNaviLink, naviLinkHtml + '\n' + markNaviLink);
         }
         if (!lastaDocHtml.contains(naviLinkDestinationHtml)) {
-            kvsStoreDocHtml = naviLinkDestinationHtml + kvsStoreDocHtml;
+            docHtml = naviLinkDestinationHtml + docHtml;
         }
-        java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, kvsStoreDocHtml + '\n' + markBody).getBytes('UTF-8'));
+        java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, docHtml + '\n' + markBody).getBytes('UTF-8'));
     }
 }
 
@@ -477,6 +489,7 @@ function generate(src, dest, data, overwite) {
     if (dest === null) {
         return generator.parse(src, dest, 'data', data);
     }
+    srcPathList.push(dest);
     if (!java.nio.file.Files.exists(java.nio.file.Paths.get(generator.outputPath, dest)) || overwite) {
         manager.makeDirectory(dest);
         print('generate("' + dest + '")');
@@ -485,7 +498,7 @@ function generate(src, dest, data, overwite) {
     return '';
 }
 
-function processVm(rule, exList, bsVm, exVm) {
+function processVm(exList, bsVm, exVm) {
     for each (var ex in exList) {
         var bs = ex.bs;
         if (bsVm != null) {
@@ -497,4 +510,34 @@ function processVm(rule, exList, bsVm, exVm) {
             generate(exVm, path, ex, bsVm == null);
         }
     }
+}
+
+function clean(rule, request, genDir, srcPathList) {
+    var generateAbsolutePathList = [];
+    for (var srcPathIndex in srcPathList) {
+        generateAbsolutePathList.push(new java.io.File(generator.outputPath, srcPathList[srcPathIndex]).getAbsolutePath());
+    }
+    var list = listFiles(new java.io.File(generator.outputPath, genDir));
+    for (var index in list) {
+        var file = list[index];
+        if (generateAbsolutePathList.indexOf(file.getAbsolutePath()) === -1
+                && (rule == null || scriptEngine.invokeMethod(rule, 'deleteTarget', request, file))) {
+            print('delete(' + file + ')');
+            file.delete();
+        }
+    }
+}
+
+function listFiles(dir) {
+    var list = [];
+    var fileList = dir.listFiles();
+    for (var fileIndex in fileList) {
+        var file = fileList[fileIndex];
+        if (file.isDirectory()) {
+            list = list.concat(this.listFiles(file));
+        } else if (file.isFile()) {
+            list.push(file);
+        }
+    }
+    return list;
 }

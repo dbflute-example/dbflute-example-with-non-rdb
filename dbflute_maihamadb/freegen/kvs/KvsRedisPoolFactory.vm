@@ -13,7 +13,7 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${manager.allClassCopyright}package ${request.package};
+${manager.allClassCopyright}package ${data.package};
 
 import org.dbflute.kvs.core.delegator.KvsRedisPool;
 #if ($manager.isTargetContainerSeasar())
@@ -30,7 +30,7 @@ import redis.clients.jedis.JedisPoolConfig;
  * @author FreeGen
  */
 public class KvsRedisPoolFactory {
-#foreach ($table in $request.tableList)
+#foreach ($table in $data.tableList)
 
     /**
      * create ${table.uncapCamelName}(${table.comment}) pool.

@@ -13,7 +13,7 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-<h2 id="solr-${tableMap.schema}">solr (${tableMap.schema})</h2>
+<h2 id="solr-${data.request.tableMap.schema}">solr (${data.request.tableMap.schema})</h2>
 <table>
     <thead>
     <tr>
@@ -21,10 +21,10 @@
         <th>class</th>
     </tr>
     </thead>
-    <tbody id="solr-${tableMap.schema}-list-body">
+    <tbody id="solr-${data.request.tableMap.schema}-list-body">
     <tr>
-        <td class="rowcellnum">${foreach.count}</td>
-        <td class="rowcell">Solr${tableMap.schema}Bhv</td>
+        <td class="rowcellnum">1</td>
+        <td class="rowcell">Solr${data.request.tableMap.schema}Bhv</td>
     </tr>
     </tbody>
 </table>

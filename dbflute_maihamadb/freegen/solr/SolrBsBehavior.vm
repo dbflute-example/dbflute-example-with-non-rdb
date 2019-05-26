@@ -13,7 +13,7 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${manager.allClassCopyright}package ${request.package}.bsbhv;
+${manager.allClassCopyright}package ${data.solr.package}.bsbhv;
 
 #if ($manager.isTargetContainerLastaDi())
 import javax.annotation.PostConstruct;
@@ -29,15 +29,15 @@ import org.lastaflute.core.util.ContainerUtil;
 import org.seasar.framework.container.annotation.tiger.InitMethod;
 #end
 
-import ${request.package}.cbean.Solr${tableMap.schema}CB;
-import ${request.package}.exentity.Solr${tableMap.schema};
-import ${request.package}.exentity.index.Solr${tableMap.schema}Index;
+import ${data.solr.package}.cbean.Solr${data.solr.tableMap.schema}CB;
+import ${data.solr.package}.exentity.Solr${data.solr.tableMap.schema};
+import ${data.solr.package}.exentity.index.Solr${data.solr.tableMap.schema}Index;
 
 /**
- * Base Behavior class of Solr schema "${tableMap.schema}."
+ * Base Behavior class of Solr schema "${data.solr.tableMap.schema}."
  * @author FreeGen
  */
-public abstract class SolrBs${tableMap.schema}Bhv extends AbstractSolrBehavior<Solr${tableMap.schema}, Solr${tableMap.schema}Index, Solr${tableMap.schema}CB> {
+public abstract class SolrBs${data.solr.tableMap.schema}Bhv extends AbstractSolrBehavior<Solr${data.solr.tableMap.schema}, Solr${data.solr.tableMap.schema}Index, Solr${data.solr.tableMap.schema}CB> {
 
 #if ($manager.isTargetContainerLastaDi())
     @PostConstruct
@@ -46,19 +46,19 @@ public abstract class SolrBs${tableMap.schema}Bhv extends AbstractSolrBehavior<S
     @InitMethod
 #end
     public void init() {
-        ${tableMap.configClass} config = getConfig();
-        masterSolrClient = createHttpSolrClient(config.getSolr${manager.initCap($tableMap.schema)}Url());
-        slaveSolrClient = createHttpSolrClient(config.getSolr${manager.initCap($tableMap.schema)}Url());
+        ${data.solr.tableMap.configClass} config = getConfig();
+        masterSolrClient = createHttpSolrClient(config.getSolr${manager.initCap($data.solr.tableMap.schema)}Url());
+        slaveSolrClient = createHttpSolrClient(config.getSolr${manager.initCap($data.solr.tableMap.schema)}Url());
     }
 
     @Override
-    public Solr${tableMap.schema}CB newConditionBean() {
-        return new Solr${tableMap.schema}CB();
+    public Solr${data.solr.tableMap.schema}CB newConditionBean() {
+        return new Solr${data.solr.tableMap.schema}CB();
     }
 
     @Override
-    public Class<Solr${tableMap.schema}> getEntityClass() {
-        return Solr${tableMap.schema}.class;
+    public Class<Solr${data.solr.tableMap.schema}> getEntityClass() {
+        return Solr${data.solr.tableMap.schema}.class;
     }
 
     @Override
@@ -86,7 +86,7 @@ public abstract class SolrBs${tableMap.schema}Bhv extends AbstractSolrBehavior<S
         return getConfig().getSolrAliveCheckIntervalAsInteger();
     }
 
-    protected ${tableMap.configClass} getConfig() {
-        return ContainerUtil.getComponent(${tableMap.configClass}.class);
+    protected ${data.solr.tableMap.configClass} getConfig() {
+        return ContainerUtil.getComponent(${data.solr.tableMap.configClass}.class);
     }
 }

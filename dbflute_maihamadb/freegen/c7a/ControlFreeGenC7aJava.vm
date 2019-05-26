@@ -18,11 +18,7 @@ $scriptEngine.put('scriptEngine', $scriptEngine)
 $scriptEngine.put('generator', $generator)
 $scriptEngine.put('manager', $manager)
 $scriptEngine.eval('load("./freegen/c7a/ControlFreeGenC7aJava.js");')
-#foreach($request in $requestList)
-    #if ($request.isResourceTypeJsonGeneral() && $request.requestName.startsWith("C7a"))
-        $scriptEngine.invokeFunction('process', $request)
-    #end
-#end
+$scriptEngine.invokeFunction('process', $requestList)
 
 ## _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 ## generate indent.

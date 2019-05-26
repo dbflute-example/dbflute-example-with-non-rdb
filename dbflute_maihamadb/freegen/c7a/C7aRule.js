@@ -278,6 +278,16 @@ var baseRule = {
     filterTableName: function(c7a, tableMeta) {
         return null;
     },
+
+    /**
+     * Return delete target.
+     * @param {Request} request - rquest. (NullAllowed)
+     * @return {File} file. (NotNull)
+     * @return {boolean} delete target. (NotNull)
+     */
+    deleteTarget: function(request, file) {
+        return true;
+    }
 };
 
 var c7aRule = {};

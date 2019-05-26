@@ -17,7 +17,6 @@
 ${manager.allClassCopyright}package ${data.package};
 #set ($importList = [])
 #set($added = $importList.add('org.dbflute.c7a.C7aPool'))
-#set($added = $importList.add('org.lastaflute.core.util.ContainerUtil'))
 #generateImports($importList, $data.package, $scriptEngine.invokeMethod($rule, 'importOrderList'))
 
 /**
@@ -27,7 +26,14 @@ ${manager.allClassCopyright}package ${data.package};
 public class ${data.className} {
 
     public static C7aPool create() {
-        C7aPool c7aPool = new C7aPool();
-        return c7aPool;
+        // TODO you #change_set the value and return the pool
+        //XxxConfig config = ContainerUtil.getComponent(XxxConfig.class);
+        //C7aPool c7aPool = new C7aPool();
+        //c7aPool.setHost(config.getC7a${manager.initCap($data.c7a.schema)}Host());
+        //c7aPool.setPort(config.getC7a${manager.initCap($data.c7a.schema)}PortAsInteger());
+        //c7aPool.setUser(config.getC7a${manager.initCap($data.c7a.schema)}User());
+        //c7aPool.setPassword(config.getC7a${manager.initCap($data.c7a.schema)}Password());
+        //return c7aPool;
+        throw new IllegalStateException("the value and return the pool.");
     }
 }

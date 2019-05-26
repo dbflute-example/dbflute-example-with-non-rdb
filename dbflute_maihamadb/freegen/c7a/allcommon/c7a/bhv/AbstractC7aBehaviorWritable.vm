@@ -209,12 +209,18 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
             }
         });
 
-        insert.ifNotExists();
         InsertOption option = new InsertOption();
         op.accept(option);
         option.getTtl().ifPresent(ttl -> insert.using(QueryBuilder.ttl(ttl)));
         option.getTimestamp().ifPresent(timestamp -> insert.using(QueryBuilder.timestamp(timestamp)));
         option.getConsistencyLevel().ifPresent(consistencyLevel -> insert.setConsistencyLevel(consistencyLevel));
+        option.getIgnoreIfExists().ifPresent(ignoreIfExists -> {
+            if (!ignoreIfExists) {
+                insert.ifNotExists();
+            }
+        }).orElse(() -> {
+            insert.ifNotExists();
+        });
 
         logger.debug("#c7a cql={}", insert.toString());
         ResultSet resultSet = execute(mapper -> mapper.getManager().getSession().execute(insert));
@@ -469,6 +475,7 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         protected Integer _ttl;
         protected Long _timestamp;
         protected ConsistencyLevel _consistencyLevel;
+        protected Boolean _ignoreIfExists;
 
         public InsertOption setTtl(Integer ttl) {
             _ttl = ttl;
@@ -500,6 +507,17 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         public OptionalEntity<ConsistencyLevel> getConsistencyLevel() {
             return OptionalEntity.ofNullable(_consistencyLevel, () -> {
                 throw new IllegalStateException("consistencyLevel is not set.");
+            });
+        }
+
+        public InsertOption setIgnoreIfExists(Boolean ignoreIfExists) {
+            _ignoreIfExists = ignoreIfExists;
+            return this;
+        }
+
+        public OptionalEntity<Boolean> getIgnoreIfExists() {
+            return OptionalEntity.ofNullable(_ignoreIfExists, () -> {
+                throw new IllegalStateException("ignoreIfExists is not set.");
             });
         }
     }

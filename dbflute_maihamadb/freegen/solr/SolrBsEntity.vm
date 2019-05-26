@@ -13,7 +13,7 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${manager.allClassCopyright}package ${request.package}.bsentity;
+${manager.allClassCopyright}package ${data.solr.package}.bsentity;
 
 import java.io.Serializable;
 
@@ -21,17 +21,17 @@ import org.apache.solr.client.solrj.beans.Field;
 import org.dbflute.solr.entity.AbstractSolrEntity;
 
 /**
- * Base Entity class of Solr schema "${tableMap.schema}."
+ * Base Entity class of Solr schema "${data.solr.tableMap.schema}."
  * @author FreeGen
  */
-public class SolrBs${tableMap.schema} extends AbstractSolrEntity implements Serializable {
+public class SolrBs${data.solr.tableMap.schema} extends AbstractSolrEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-#foreach ($column in $request.columnList)
+#foreach ($column in $data.solr.columnList)
 #if(${column.stored})
     /** ${column.name} (${column.nativeType}) */
     protected ${column.type} ${column.uncapCamelName};
@@ -43,13 +43,13 @@ public class SolrBs${tableMap.schema} extends AbstractSolrEntity implements Seri
     //                                                                        ============
     @Override
     public String asSchemaName() {
-        return "${tableMap.schema}";
+        return "${data.solr.tableMap.schema}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-#foreach ($column in $request.columnList)
+#foreach ($column in $data.solr.columnList)
 #if(${column.stored})
     public ${column.type} get${column.capCamelName}() {
         checkSpecifiedProperty("${column.uncapCamelName}");
@@ -95,7 +95,7 @@ public class SolrBs${tableMap.schema} extends AbstractSolrEntity implements Seri
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
-#foreach ($column in $request.columnList)
+#foreach ($column in $data.solr.columnList)
 #if(${column.stored})
         sb.append("${column.uncapCamelName}").append("=").append(${column.uncapCamelName}).append(",");
 #end

@@ -17,7 +17,7 @@
 #set ($typeMap = {})
 #set ($put = $typeMap.putAll($scriptEngine.invokeMethod($rule, 'typeMap')))
 #set ($definitionMap = {})
-#set ($definitionMap = $request.optionMap.jsonMap['definitions'])
+#set ($definitionMap = $data.definitionMap)
 ${manager.allClassCopyright}package ${data.package};
 #set ($importList = [])
 #set($added = $importList.add('org.lastaflute.core.util.Lato'))
@@ -82,8 +82,8 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
 #end
 #if ($definitionMap.containsKey($nestType))
 #set ($definition = $definitionMap[$nestType])
-#set ($remove = $tempDefinitionMap.remove($nestType))
-#foreach($nestPropertyEntry in $definitionMap[$nestType].properties.entrySet())
+#set ($remove = $definitionMap.remove($nestType))
+#foreach($nestPropertyEntry in $definition.properties.entrySet())
 #analyzeImports($importList, $definitionMap, $nestPropertyEntry.value)
 #end
 #end

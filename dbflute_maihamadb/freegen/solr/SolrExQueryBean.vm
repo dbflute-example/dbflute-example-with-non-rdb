@@ -13,14 +13,14 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${manager.allClassCopyright}package ${request.package}.cbean.cq;
+${manager.allClassCopyright}package ${data.solr.package}.cbean.cq;
 
-import ${request.package}.cbean.cq.bs.SolrBs${tableMap.schema}CQ;
+import ${data.solr.package}.cbean.cq.bs.SolrBs${data.solr.tableMap.schema}CQ;
 
 /**
- * Query class of Solr schema "${tableMap.schema}."
+ * Query class of Solr schema "${data.solr.tableMap.schema}."
  * @author FreeGen
  */
-public class Solr${tableMap.schema}CQ extends SolrBs${tableMap.schema}CQ {
+public class Solr${data.solr.tableMap.schema}CQ extends SolrBs${data.solr.tableMap.schema}CQ {
 
 }

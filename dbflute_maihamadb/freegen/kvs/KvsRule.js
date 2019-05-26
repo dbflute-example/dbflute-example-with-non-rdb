@@ -34,6 +34,11 @@ var baseRule = {
     //                                                                               =====
 
     // ===================================================================================
+    //                                                                                 Doc
+    //                                                                                 ===
+    docGeneration : true,
+
+    // ===================================================================================
     //                                                                              Option
     //                                                                              ======
     /**
@@ -56,7 +61,6 @@ var baseRule = {
         };
     },
 
-	
     /** true for cluster. */
     cluster : false,
 
@@ -68,11 +72,15 @@ var baseRule = {
         return true;
     },
 
-    // ===================================================================================
-    //                                                                                 Doc
-    //                                                                                 ===
-    /** true for automatically generating doc. */
-    docGeneration : true
+    /**
+     * Return delete target.
+     * @param {Request} request - rquest. (NullAllowed)
+     * @return {File} file. (NotNull)
+     * @return {boolean} delete target. (NotNull)
+     */
+    deleteTarget: function(request, file) {
+        return true;
+    }
 };
 
 var kvsRule = {};

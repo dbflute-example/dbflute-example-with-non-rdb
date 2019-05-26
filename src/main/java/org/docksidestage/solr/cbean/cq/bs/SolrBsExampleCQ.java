@@ -1085,7 +1085,7 @@ public class SolrBsExampleCQ extends AbstractSolrQueryBean {
 
     public void setRegularPrice_InScope(Collection<Long> queryList, SolrQueryLogicalOperator operator) {
         SolrQueryBuilder.assertNullQuery("regular_price", this.regularPriceQuery);
-        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchLongList("regular_price", queryList, operator);
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchList("regular_price", queryList, operator);
         if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
             this.regularPriceQuery = convertedQuery;
         }
@@ -1093,7 +1093,7 @@ public class SolrBsExampleCQ extends AbstractSolrQueryBean {
 
     public void setRegularPrice_NotInScope(Collection<Long> queryList) {
         SolrQueryBuilder.assertNullQuery("regular_price", this.regularPriceQuery);
-        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchLongList("regular_price", queryList, SolrQueryLogicalOperator.NOT);
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchList("regular_price", queryList, SolrQueryLogicalOperator.NOT);
         if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
             this.regularPriceQuery = convertedQuery;
         }

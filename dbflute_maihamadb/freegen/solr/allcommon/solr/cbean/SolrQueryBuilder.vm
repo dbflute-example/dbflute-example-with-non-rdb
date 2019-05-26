@@ -15,7 +15,6 @@
 ##
 ${manager.allClassCopyright}package org.dbflute.solr.cbean;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -271,56 +270,7 @@ public class SolrQueryBuilder {
      * @param to to
      * @return query
      */
-    public static String queryBuilderForRangeSearch(String solrFieldName, BigDecimal from, BigDecimal to) {
-        String toStr = null;
-        String fromStr = null;
-        if (from == null) {
-            fromStr = "*";
-        } else {
-            fromStr = from.toString();
-        }
-
-        if (to == null) {
-            toStr = "*";
-        } else {
-            toStr = to.toString();
-        }
-        return queryBuilderForRangeSearch(solrFieldName, fromStr, toStr);
-    }
-
-    /**
-     * 範囲検索クエリ構築
-     * @param solrFieldName solr field name
-     * @param from from
-     * @param to to
-     * @return query
-     */
-    public static String queryBuilderForRangeSearch(String solrFieldName, Long from, Long to) {
-        String toStr = null;
-        String fromStr = null;
-        if (from == null) {
-            fromStr = "*";
-        } else {
-            fromStr = from.toString();
-        }
-
-        if (to == null) {
-            toStr = "*";
-        } else {
-            toStr = to.toString();
-        }
-        return queryBuilderForRangeSearch(solrFieldName, fromStr, toStr);
-    }
-
-    /**
-     * 範囲検索クエリ構築
-     *
-     * @param solrFieldName solr field name
-     * @param from from
-     * @param to to
-     * @return query
-     */
-    public static String queryBuilderForRangeSearch(String solrFieldName, Integer from, Integer to) {
+    public static String queryBuilderForRangeSearch(String solrFieldName, Number from, Number to) {
         String toStr = null;
         String fromStr = null;
         if (from == null) {
@@ -490,48 +440,12 @@ public class SolrQueryBuilder {
      * @param operator operator
      * @return query
      */
-    public static String queryBuilderForSearchBigDecimalList(String solrFieldName, Collection<BigDecimal> queryList,
+    public static String queryBuilderForSearchList(String solrFieldName, Collection<? extends Number> queryList,
             SolrQueryLogicalOperator operator) {
         List<String> queryStrList = new ArrayList<String>();
         if (isNotEmptyStrict(queryList)) {
-            for (BigDecimal num : queryList) {
+            for (Number num : queryList) {
                 queryStrList.add(num.toString());
-            }
-        }
-        return queryBuilderForSearchWordList(solrFieldName, queryStrList, operator);
-    }
-
-    /**
-     * 検索ワードリストクエリ構築
-     * @param solrFieldName solr field name
-     * @param queryList query list
-     * @param operator operator
-     * @return query
-     */
-    public static String queryBuilderForSearchLongList(String solrFieldName, Collection<Long> queryList,
-            SolrQueryLogicalOperator operator) {
-        List<String> queryStrList = new ArrayList<String>();
-        if (isNotEmptyStrict(queryList)) {
-            for (Long num : queryList) {
-                queryStrList.add(num.toString());
-            }
-        }
-        return queryBuilderForSearchWordList(solrFieldName, queryStrList, operator);
-    }
-
-    /**
-     * 検索ワードリストクエリ構築
-     * @param solrFieldName solr field name
-     * @param queryList query list
-     * @param operator operator
-     * @return query
-     */
-    public static String queryBuilderForSearchIntegerList(String solrFieldName, Collection<Integer> queryList,
-            SolrQueryLogicalOperator operator) {
-        List<String> queryStrList = new ArrayList<String>();
-        if (isNotEmptyStrict(queryList)) {
-            for (Integer integer : queryList) {
-                queryStrList.add(integer.toString());
             }
         }
         return queryBuilderForSearchWordList(solrFieldName, queryStrList, operator);

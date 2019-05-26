@@ -13,7 +13,7 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${manager.allClassCopyright}package ${request.package}.cbean.bs;
+${manager.allClassCopyright}package ${data.solr.package}.cbean.bs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,39 +25,39 @@ import org.dbflute.solr.cbean.SolrQBCall;
 import org.dbflute.solr.cbean.SolrQueryBean;
 import org.dbflute.solr.cbean.SolrSpecification;
 
-import ${request.package}.bsentity.meta.Solr${tableMap.schema}Dbm;
-import ${request.package}.cbean.cfq.Solr${tableMap.schema}CFQ;
-import ${request.package}.cbean.cq.Solr${tableMap.schema}CQ;
+import ${data.solr.package}.bsentity.meta.Solr${data.solr.tableMap.schema}Dbm;
+import ${data.solr.package}.cbean.cfq.Solr${data.solr.tableMap.schema}CFQ;
+import ${data.solr.package}.cbean.cq.Solr${data.solr.tableMap.schema}CQ;
 
 /**
- * Base ConditionBean class of Solr schema "${tableMap.schema}."
+ * Base ConditionBean class of Solr schema "${data.solr.tableMap.schema}."
  * @author FreeGen
  */
-public class SolrBs${tableMap.schema}CB extends AbstractSolrConditionBean {
+public class SolrBs${data.solr.tableMap.schema}CB extends AbstractSolrConditionBean {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected Solr${tableMap.schema}CQ queryBean;
+    protected Solr${data.solr.tableMap.schema}CQ queryBean;
 
-    protected Solr${tableMap.schema}CFQ filterQueryBean;
+    protected Solr${data.solr.tableMap.schema}CFQ filterQueryBean;
 
     protected HpSpecification specification;
 
-    protected List<Solr${tableMap.schema}CQ> facetQueryList;
+    protected List<Solr${data.solr.tableMap.schema}CQ> facetQueryList;
 
     protected HpSpecification facetSpecification;
 
-    public Solr${tableMap.schema}CQ query() {
+    public Solr${data.solr.tableMap.schema}CQ query() {
         if (this.queryBean == null) {
-            this.queryBean = new Solr${tableMap.schema}CQ();
+            this.queryBean = new Solr${data.solr.tableMap.schema}CQ();
         }
         return this.queryBean;
     }
 
-    public Solr${tableMap.schema}CFQ filterQuery() {
+    public Solr${data.solr.tableMap.schema}CFQ filterQuery() {
         if (this.filterQueryBean == null) {
-            this.filterQueryBean = new Solr${tableMap.schema}CFQ();
+            this.filterQueryBean = new Solr${data.solr.tableMap.schema}CFQ();
         }
         return this.filterQueryBean;
     }
@@ -85,11 +85,11 @@ public class SolrBs${tableMap.schema}CB extends AbstractSolrConditionBean {
         return this.specify();
     }
 
-    public void addFacetQuery(SolrQBCall<Solr${tableMap.schema}CQ> qbLambda) {
+    public void addFacetQuery(SolrQBCall<Solr${data.solr.tableMap.schema}CQ> qbLambda) {
         if (this.facetQueryList == null) {
-            this.facetQueryList = new ArrayList<Solr${tableMap.schema}CQ>();
+            this.facetQueryList = new ArrayList<Solr${data.solr.tableMap.schema}CQ>();
         }
-        Solr${tableMap.schema}CQ queryBean = new Solr${tableMap.schema}CQ();
+        Solr${data.solr.tableMap.schema}CQ queryBean = new Solr${data.solr.tableMap.schema}CQ();
         qbLambda.callback(queryBean);
         facetQueryList.add(queryBean);
     }
@@ -97,7 +97,7 @@ public class SolrBs${tableMap.schema}CB extends AbstractSolrConditionBean {
     @Override
     public List<? extends SolrQueryBean> getFacetQueryList() {
         if (this.facetQueryList == null) {
-            this.facetQueryList = new ArrayList<Solr${tableMap.schema}CQ>();
+            this.facetQueryList = new ArrayList<Solr${data.solr.tableMap.schema}CQ>();
         }
         return facetQueryList;
     }
@@ -118,10 +118,10 @@ public class SolrBs${tableMap.schema}CB extends AbstractSolrConditionBean {
         // ===================================================================================
         //                                                                        SpricyColumn
         //                                                                        ============
-#foreach ($column in $request.columnList)
+#foreach ($column in $data.solr.columnList)
 #if(${column.stored})
         public void field${column.capCamelName}() {
-            this.addSpecifyField(Solr${tableMap.schema}Dbm.${column.capCamelName});
+            this.addSpecifyField(Solr${data.solr.tableMap.schema}Dbm.${column.capCamelName});
         }
 #if(${velocityHasNext})
 

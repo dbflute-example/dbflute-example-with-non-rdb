@@ -18,10 +18,16 @@ $scriptEngine.put('scriptEngine', $scriptEngine)
 $scriptEngine.put('generator', $generator)
 $scriptEngine.put('manager', $manager)
 $scriptEngine.eval('load("./freegen/kvs/ControlFreeGenKvsJava.js");')
-#foreach($request in $requestList)
-    $scriptEngine.invokeFunction('process', $request)
-#end
+$scriptEngine.invokeFunction('process', $requestList)
 
+## _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+## generate indent.
+## @param package package (NotNull)
+## @param importList importList (NotNull)
+## _/_/_/_/_/_/_/_/_/_/
+#macro(generateIndent, $indentSize)
+#foreach($nest in [0..$indentSize])    #end
+#end
 ## _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 ## generate imports.
 ## @param importList importList (NotNull)

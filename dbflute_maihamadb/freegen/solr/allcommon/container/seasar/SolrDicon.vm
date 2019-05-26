@@ -16,9 +16,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.4//EN"
     "http://www.seasar.org/dtd/components24.dtd">
-<components namespace="solr-${manager.initUncap($tableMap.schema)}">
+<components namespace="solr-${manager.initUncap($data.solr.tableMap.schema)}">
     <include path="saflute_assist.dicon"/>
     <include path="saflute_core.dicon"/>
 
-    <component name="solr${tableMap.schema}Bhv" class="${request.package}.exbhv.Solr${tableMap.schema}Bhv" />
+    <component name="solr${data.solr.tableMap.schema}Bhv" class="${data.solr.package}.exbhv.Solr${data.solr.tableMap.schema}Bhv" />
 </components>

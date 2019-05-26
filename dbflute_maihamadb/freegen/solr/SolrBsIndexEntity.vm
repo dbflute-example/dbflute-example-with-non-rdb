@@ -13,7 +13,7 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${manager.allClassCopyright}package ${request.package}.bsentity.index;
+${manager.allClassCopyright}package ${data.solr.package}.bsentity.index;
 
 import java.io.Serializable;
 
@@ -22,17 +22,17 @@ import org.apache.solr.client.solrj.beans.Field;
 import org.dbflute.solr.entity.AbstractSolrIndexEntity;
 
 /**
- * Base IndexEntity class of Solr schema "${tableMap.schema}."
+ * Base IndexEntity class of Solr schema "${data.solr.tableMap.schema}."
  * @author FreeGen
  */
-public class SolrBs${tableMap.schema}Index extends AbstractSolrIndexEntity implements Serializable {
+public class SolrBs${data.solr.tableMap.schema}Index extends AbstractSolrIndexEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-#foreach ($column in $request.columnList)
+#foreach ($column in $data.solr.columnList)
 #if($column.multiValued)
     #set($multiTypeElementLength = $column.type.length() - 2)
     #set($elementType = $column.type.substring(0, $multiTypeElementLength))
@@ -49,7 +49,7 @@ public class SolrBs${tableMap.schema}Index extends AbstractSolrIndexEntity imple
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-#foreach ($column in $request.columnList)
+#foreach ($column in $data.solr.columnList)
 #if($column.multiValued)
     #set($multiTypeElementLength = $column.type.length() - 2)
     #set($elementType = $column.type.substring(0, $multiTypeElementLength))

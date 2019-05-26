@@ -13,15 +13,15 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-${manager.allClassCopyright}package ${request.package}.exentity.index;
+${manager.allClassCopyright}package ${data.solr.package}.exentity.index;
 
-import ${request.package}.bsentity.index.SolrBs${tableMap.schema}Index;
+import ${data.solr.package}.bsentity.index.SolrBs${data.solr.tableMap.schema}Index;
 
 /**
- * IndexEntity class of Solr schema "{tableMap.schema}."
+ * IndexEntity class of Solr schema "{data.solr.tableMap.schema}."
  * @author FreeGen
  */
-public class Solr${tableMap.schema}Index extends SolrBs${tableMap.schema}Index {
+public class Solr${data.solr.tableMap.schema}Index extends SolrBs${data.solr.tableMap.schema}Index {
 
     private static final long serialVersionUID = 1L;
 }

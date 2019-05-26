@@ -1,67 +1,76 @@
-var genC7aCore = false;
+var genType = 'c7a';
+var genCore = false;
+var srcPathList = [];
 
 /**
  * process.
+ * @param {Request[]} requestList - requestList (NotNull)
+ */
+function process(requestList) {
+    for each (var request in requestList) {
+        if (!(request.isResourceTypeJsonGeneral() && request.requestName.startsWith("C7a"))) {
+            continue;
+        }
+        manager.info('...Generating ' + genType + ': ' + request.requestName);
+        try {
+            request.enableOutputDirectory();
+            manager.makeDirectory(request.generateDirPath);
+            var optionMap = request.optionMap;
+            scriptEngine.eval('load("./freegen/' + genType + '/' + manager.initCap(genType) + 'Rule.js");');
+            if (optionMap.ruleJsPath && optionMap.ruleJsPath != '') {
+                // load application rule settings if exists
+                scriptEngine.eval('load("' + optionMap.ruleJsPath + '");');
+            }
+            processCore(request);
+            processHull(request);
+        } catch (e) {
+            var message = '/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n';
+            message += 'Error in ' + genType + ' generation.\n';
+            message += '\n';
+            message += '[Advice]\n';
+            message += '1. Upgrade version of dbflute engine to 1.1.6 or later.\n';
+            message += '2. If you can not upgrade the version, you may be able to avoid errors by chang setting.\n';
+            message += '3. Still if you do not improve it, there is a possibility of a bug.\n';
+            message += '_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/\n';
+            print(message);
+            throw e;
+        }
+    }
+    clean(null, null, 'org/dbflute/' + genType, srcPathList);
+    clean(null, null, '../resources/' + genType + '/di', srcPathList);
+}
+
+/**
+ * process core.
  * @param {Request} request - request (NotNull)
  */
-function process(request) {
-    try {
-        request.enableOutputDirectory();
-        manager.makeDirectory(request.generateDirPath);
-        processC7aCore(request);
-        processC7a(request);
-    } catch (e) {
-        var message = '/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n';
-        message += 'Error in C8a generation.\n';
-        message += '\n';
-        message += '[Advice]\n';
-        message += '1. Upgrade version of dbflute engine to 1.1.6 or later.\n';
-        message += '2. If you can not upgrade the version, you may be able to avoid errors by chang setting.\n';
-        message += '3. Still if you do not improve it, there is a possibility of a bug.\n';
-        message += '_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/\n';
-        print(message);
-        throw e;
+function processCore(request) {
+    var coreVmList = [];
+    if (!genCore) {
+        genCore = true;
+        coreVmList.push('C7aPool.vm');
+        coreVmList.push('bhv/AbstractC7aBehaviorWritable.vm');
+        coreVmList.push('entity/C7aEntity.vm');
+        coreVmList.push('entity/AbstractC7aEntity.vm');
+        coreVmList.push('entity/C7aPagingResultBean.vm');
+        coreVmList.push('entity/dbmeta/C7aDBMeta.vm');
+        coreVmList.push('entity/dbmeta/AbstractC7aDBMeta.vm');
+        coreVmList.push('cbean/C7aConditionQuery.vm');
+        coreVmList.push('cbean/AbstractC7aConditionQuery.vm');
+        coreVmList.push('cbean/C7aConditionBean.vm');
+        coreVmList.push('cbean/AbstractC7aConditionBean.vm');
+    }
+    for each (var coreVm in coreVmList) {
+        generate('./' + genType + '/allcommon/' + genType + '/' + coreVm, 'org/dbflute/' + genType + '/' + coreVm.replaceAll('\.vm$', '.java'), '', true);
     }
 }
 
 /**
- * process C8a Core.
+ * process hull.
  * @param {Request} request - request (NotNull)
  */
-function processC7aCore(request) {
-    if (genC7aCore) {
-        return;
-    }
-    genC7aCore = true;
-    generate('./c7a/allcommon/c7a/C7aPool.vm', 'org/dbflute/c7a/C7aPool.java', null, true);
-    generate('./c7a/allcommon/c7a/bhv/AbstractC7aBehaviorWritable.vm', 'org/dbflute/c7a/bhv/AbstractC7aBehaviorWritable.java', null, true);
-    generate('./c7a/allcommon/c7a/entity/C7aEntity.vm', 'org/dbflute/c7a/entity/C7aEntity.java', null, true);
-    generate('./c7a/allcommon/c7a/entity/AbstractC7aEntity.vm', 'org/dbflute/c7a/entity/AbstractC7aEntity.java', null, true);
-    generate('./c7a/allcommon/c7a/entity/C7aPagingResultBean.vm', 'org/dbflute/c7a/entity/C7aPagingResultBean.java', null, true);
-    generate('./c7a/allcommon/c7a/entity/dbmeta/C7aDBMeta.vm', 'org/dbflute/c7a/entity/dbmeta/C7aDBMeta.java', null, true);
-    generate('./c7a/allcommon/c7a/entity/dbmeta/AbstractC7aDBMeta.vm', 'org/dbflute/c7a/entity/dbmeta/AbstractC7aDBMeta.java', null, true);
-    generate('./c7a/allcommon/c7a/cbean/C7aConditionQuery.vm', 'org/dbflute/c7a/cbean/C7aConditionQuery.java', null, true);
-    generate('./c7a/allcommon/c7a/cbean/AbstractC7aConditionQuery.vm', 'org/dbflute/c7a/cbean/AbstractC7aConditionQuery.java', null, true);
-    generate('./c7a/allcommon/c7a/cbean/C7aConditionBean.vm', 'org/dbflute/c7a/cbean/C7aConditionBean.java', null, true);
-    generate('./c7a/allcommon/c7a/cbean/AbstractC7aConditionBean.vm', 'org/dbflute/c7a/cbean/AbstractC7aConditionBean.java', null, true);
-}
-
-/**
- * process C8a.
- * @param {Request} request - request (NotNull)
- */
-function processC7a(request) {
-    var optionMap = request.optionMap;
-
-    scriptEngine.eval('load("./freegen/c7a/C7aRule.js");');
-    if (optionMap.ruleJsPath && optionMap.ruleJsPath != '') {
-        // load application rule settings if exists
-        scriptEngine.eval('load("' + optionMap.ruleJsPath + '");');
-    }
-    var rule = scriptEngine.get('c7aRule');
-
-    // only remote api requests here
-    manager.info('...Generating c7a: ' + request.requestName);
+function processHull(request) {
+    var rule = scriptEngine.get(genType + 'Rule');
 
     var c7a = new java.util.LinkedHashMap();
     c7a.schema = scriptEngine.invokeMethod(rule, 'schema', request);
@@ -77,6 +86,8 @@ function processC7a(request) {
     var exConditionBeanList = [];
     var exConditionQueryList = [];
     var exBehaviorList = [];
+
+    var optionMap = request.optionMap;
     var keyspaceMetaList = optionMap.jsonMap['keyspaceMetaList'];
     for (var keyspaceMetaKey in keyspaceMetaList) {
         var keyspaceMeta = keyspaceMetaList[keyspaceMetaKey];
@@ -192,6 +203,14 @@ function processC7a(request) {
         }
     }
 
+    var poolFactory = new java.util.LinkedHashMap();
+    poolFactory.c7a = c7a;
+    poolFactory.package = c7a.package;
+    poolFactory.className = 'C7a' + manager.initCap(poolFactory.c7a.schema) + 'PoolFactory';
+
+    var path = poolFactory.package.replace(/\./g, '/') + '/' + poolFactory.className.replace(/\./g, '/') + '.java';
+    generate('./c7a/C7aPoolFactory.vm', path, poolFactory, false);
+
     var commonColumn = new java.util.LinkedHashMap();
     commonColumn.c7a = c7a;
     commonColumn.package = c7a.package;
@@ -222,13 +241,14 @@ function processC7a(request) {
         generate('./c7a/allcommon/container/lastadi/C7aDiXml.vm', path, di, true);
     }
 
-    processVm(rule, exUserTypeMap.values(), './c7a/C7aBsUserType.vm', './c7a/C7aExUserType.vm');
-    processVm(rule, exDBMetaList, null, './c7a/C7aDBMeta.vm');
-    processVm(rule, exEntityList, './c7a/C7aBsEntity.vm', './c7a/C7aExEntity.vm');
-    processVm(rule, exConditionQueryList, './c7a/C7aBsConditionQuery.vm', './c7a/C7aExConditionQuery.vm');
-    processVm(rule, exConditionBeanList, './c7a/C7aBsConditionBean.vm', './c7a/C7aExConditionBean.vm');
-    processVm(rule, exBehaviorList, './c7a/C7aBsBehavior.vm', './c7a/C7aExBehavior.vm');
+    processVm(exUserTypeMap.values(), './c7a/C7aBsUserType.vm', './c7a/C7aExUserType.vm');
+    processVm(exDBMetaList, null, './c7a/C7aDBMeta.vm');
+    processVm(exEntityList, './c7a/C7aBsEntity.vm', './c7a/C7aExEntity.vm');
+    processVm(exConditionQueryList, './c7a/C7aBsConditionQuery.vm', './c7a/C7aExConditionQuery.vm');
+    processVm(exConditionBeanList, './c7a/C7aBsConditionBean.vm', './c7a/C7aExConditionBean.vm');
+    processVm(exBehaviorList, './c7a/C7aBsBehavior.vm', './c7a/C7aExBehavior.vm');
     processDoc(rule, c7a, exEntityList);
+    clean(rule, request, c7a.package.replace(/\./g, '/'), srcPathList);
 }
 
 function analyzeProperties(rule, base) {
@@ -313,6 +333,7 @@ function generate(src, dest, data, overwite) {
     if (dest === null) {
         return generator.parse(src, dest, 'data', data);
     }
+    srcPathList.push(dest);
     if (!java.nio.file.Files.exists(java.nio.file.Paths.get(generator.outputPath, dest)) || overwite) {
         manager.makeDirectory(dest);
         print('generate("' + dest + '")');
@@ -321,7 +342,7 @@ function generate(src, dest, data, overwite) {
     return '';
 }
 
-function processVm(rule, exList, bsVm, exVm) {
+function processVm(exList, bsVm, exVm) {
     for each (var ex in exList) {
         var bs = ex.bs;
         if (bsVm != null) {
@@ -333,4 +354,34 @@ function processVm(rule, exList, bsVm, exVm) {
             generate(exVm, path, ex, bsVm == null);
         }
     }
+}
+
+function clean(rule, request, genDir, srcPathList) {
+    var generateAbsolutePathList = [];
+    for (var srcPathIndex in srcPathList) {
+        generateAbsolutePathList.push(new java.io.File(generator.outputPath, srcPathList[srcPathIndex]).getAbsolutePath());
+    }
+    var list = listFiles(new java.io.File(generator.outputPath, genDir));
+    for (var index in list) {
+        var file = list[index];
+        if (generateAbsolutePathList.indexOf(file.getAbsolutePath()) === -1
+                && (rule == null || scriptEngine.invokeMethod(rule, 'deleteTarget', request, file))) {
+            print('delete(' + file + ')');
+            file.delete();
+        }
+    }
+}
+
+function listFiles(dir) {
+    var list = [];
+    var fileList = dir.listFiles();
+    for (var fileIndex in fileList) {
+        var file = fileList[fileIndex];
+        if (file.isDirectory()) {
+            list = list.concat(this.listFiles(file));
+        } else if (file.isFile()) {
+            list.push(file);
+        }
+    }
+    return list;
 }
