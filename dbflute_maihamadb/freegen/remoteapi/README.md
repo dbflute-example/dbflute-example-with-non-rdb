@@ -1,11 +1,11 @@
-# Remote API
+# RemoteApiGen
 Class generator plugin for [DBFlute](http://dbflute.seasar.org/) to access to Remote API.
 
 This plugin generates classes for accessing remote api from the swagger specification file.
 
 [about remote api](http://dbflute.seasar.org/ja/lastaflute/howto/architecture/remoteapicall.html)
 
-## Setup for Remote API
+## Setup for RemoteApiGen
 - Add dependency on [lasta-remoteapi](https://github.com/lastaflute/lasta-remoteapi).
 
   e.g. pom.xml (In the case of maven)
