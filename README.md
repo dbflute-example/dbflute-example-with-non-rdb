@@ -61,7 +61,7 @@ RemoteProductDetailReturn ret = remoteProductBhv.requestDetail(param -> {
 });
 ```
 [How to use RemoteApi](dbflute_maihamadb/freegen/remoteapi/README.md)  
-contributed by U-NEXT: http://video.unext.jp/
+contributed by U-NEXT: http://video.unext.jp/  
 also RemoteApiGen contributed by LUXA: https://luxa.jp/
 
 ## SolrFlute for Solr
