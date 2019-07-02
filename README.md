@@ -54,14 +54,15 @@ OptionalEntity<Product> result = kvsProductBhv.selectEntityByProductId(cb -> {
 [How to use KvsFlute](dbflute_maihamadb/freegen/kvs/README.md)  
 contributed by U-NEXT: http://video.unext.jp/
 
-## RemoFlute
+## RemoteApi (with LastaFlute)
 ```java
 RemoteProductDetailReturn ret = remoteProductBhv.requestDetail(param -> {
     param.productId = productId;
 });
 ```
-[How to use RemoFlute](dbflute_maihamadb/freegen/remoteapi/README.md)  
+[How to use RemoteApi](dbflute_maihamadb/freegen/remoteapi/README.md)  
 contributed by U-NEXT: http://video.unext.jp/
+also RemoteApiGen contributed by LUXA: https://luxa.jp/
 
 ## SolrFlute for Solr
 ```java
