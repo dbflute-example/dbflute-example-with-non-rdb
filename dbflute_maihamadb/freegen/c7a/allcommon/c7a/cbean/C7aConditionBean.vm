@@ -20,8 +20,8 @@ import org.dbflute.optional.OptionalEntity;
 
 import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.Statement;
-import com.datastax.driver.core.querybuilder.Update;
 import com.datastax.driver.core.querybuilder.Delete;
+import com.datastax.driver.core.querybuilder.Update;
 
 /**
  * @author FreeGen
@@ -42,6 +42,11 @@ public interface C7aConditionBean {
      * @return The (fixed) DB name of the table. (NotNull)
      */
     String asTableDbName();
+
+    // ===================================================================================
+    //                                                                             Specify
+    //                                                                             =======
+    C7aSpecification specify();
 
     // ===================================================================================
     //                                                                               Query

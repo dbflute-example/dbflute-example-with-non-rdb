@@ -119,6 +119,7 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         if (iterator.hasNext()) {
             createBehaviorExceptionThrower().throwSelectEntityDuplicatedException("1 < resultCount", statement, null);
         }
+        markAsSelect(cb, entity);
         return OptionalEntity.of(entity);
     }
 
@@ -136,6 +137,7 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
             ResultSet resultSet = mapper.getManager().getSession().execute(statement);
             return Lists.newArrayList(mapper.map(resultSet));
         });
+        entityList.forEach(entity -> markAsSelect(cb, entity));
         return entityList;
     }
 
@@ -158,6 +160,7 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
             List<ENTITY> list = Lists.newArrayList();
             while (iterator.hasNext() && remaining != 0) {
                 ENTITY entity = iterator.next();
+                markAsSelect(cb, entity);
                 list.add(entity);
                 remaining--;
             }
@@ -630,6 +633,14 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
     // ===================================================================================
     //                                                                               Other
     //                                                                               =====
+    protected void markAsSelect(CB cb, ENTITY entity) {
+        entity.markAsSelect();
+        if (cb.specify().hasSpecifiedColumn()) {
+            entity.modifiedToSpecified();
+            cb.specify().getSpecifyColumns().stream().forEach(specifyColumn -> entity.myspecifyProperty(specifyColumn));
+        }
+    }
+
     protected BehaviorExceptionThrower createBehaviorExceptionThrower() {
         return new BehaviorExceptionThrower();
     }

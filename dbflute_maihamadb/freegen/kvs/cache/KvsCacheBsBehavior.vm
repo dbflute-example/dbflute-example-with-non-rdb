@@ -39,6 +39,8 @@
 #set($added = $importList.add('java.util.stream.Collectors'))
 #set($added = $importList.add('java.util.stream.Stream'))
 #set($added = $importList.add('org.dbflute.dbmeta.info.ColumnInfo'))
+#set($added = $importList.add('org.dbflute.kvs.cache.bhv.writable.DeleteOption'))
+#set($added = $importList.add('org.dbflute.kvs.cache.bhv.writable.InsertOrUpdateOption'))
 #set($added = $importList.add("${data.extendsClass}"))
 #set($added = $importList.add('org.dbflute.optional.OptionalEntity'))
 #set($added = $importList.add('org.dbflute.util.DfCollectionUtil'))
@@ -101,8 +103,7 @@ public abstract class ${data.className} extends ${data.extendsClassName} {
         ${data.exConditionBean.className} kvsCB = createCB(cbLambda);
         ${data.dbflute.exConditionBean.className} cb = adjustKvsConditionBeanOf${column.capCamelName}(kvsCB);
 
-        OptionalEntity<${data.dbflute.exEntity.className}> optEntity =
-                ${data.kvs.schema}KvsCacheFacade.findEntity(createKvsKeyListOf${column.capCamelName}(kvsCB), cb,
+        OptionalEntity<${data.dbflute.exEntity.className}> optEntity = ${data.kvs.schema}KvsCacheFacade.findEntity(createKvsKeyListOf${column.capCamelName}(kvsCB), cb,
                 expireDateTimeLambdaOf${column.capCamelName}(), kvsCB.isKvsCacheAsyncReflectionEnabled());
 
         return Stream.of(optEntity)
@@ -376,10 +377,7 @@ public abstract class ${data.className} extends ${data.extendsClassName} {
         ${data.dbflute.exEntity.className} ${manager.initUncap($data.tableName)} = entityLambda.get();
         InsertOrUpdateOption option = new InsertOrUpdateOption();
         op.accept(option);
-        ${data.kvs.schema}KvsCacheFacade.insertOrUpdate(
-                createKvsKeyListOf${column.capCamelName}(${manager.initUncap($data.tableName)}),
-                ${manager.initUncap($data.tableName)},
-                option.isKvsCacheAsyncReflectionEnabled());
+        ${data.kvs.schema}KvsCacheFacade.insertOrUpdate(createKvsKeyListOf${column.capCamelName}(${manager.initUncap($data.tableName)}), ${manager.initUncap($data.tableName)}, option);
 
         return ${manager.initUncap($data.tableName)};
     }
@@ -417,10 +415,7 @@ public abstract class ${data.className} extends ${data.extendsClassName} {
         ${data.dbflute.exEntity.className} ${manager.initUncap($data.tableName)} = entityLambda.get();
         DeleteOption option = new DeleteOption();
         op.accept(option);
-        ${data.kvs.schema}KvsCacheFacade.delete(
-                createKvsKeyListOf${column.capCamelName}(${manager.initUncap($data.tableName)}),
-                ${manager.initUncap($data.tableName)},
-                option.isKvsCacheAsyncReflectionEnabled());
+        ${data.kvs.schema}KvsCacheFacade.delete(createKvsKeyListOf${column.capCamelName}(${manager.initUncap($data.tableName)}), ${manager.initUncap($data.tableName)}, option);
     }
 
     protected List<Object> createKvsKeyListOf${column.capCamelName}(${data.exConditionBean.className} kvsCB) {

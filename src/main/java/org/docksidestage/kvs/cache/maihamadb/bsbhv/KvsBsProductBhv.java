@@ -30,6 +30,8 @@ import javax.annotation.Resource;
 
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.kvs.cache.bhv.AbstractKvsCacheBehaviorWritable;
+import org.dbflute.kvs.cache.bhv.writable.DeleteOption;
+import org.dbflute.kvs.cache.bhv.writable.InsertOrUpdateOption;
 import org.dbflute.optional.OptionalEntity;
 import org.dbflute.util.DfCollectionUtil;
 import org.docksidestage.dbflute.bsentity.dbmeta.ProductDbm;
@@ -86,8 +88,7 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
         KvsProductCB kvsCB = createCB(cbLambda);
         ProductCB cb = adjustKvsConditionBeanOfProductId(kvsCB);
 
-        OptionalEntity<Product> optEntity =
-                maihamadbKvsCacheFacade.findEntity(createKvsKeyListOfProductId(kvsCB), cb,
+        OptionalEntity<Product> optEntity = maihamadbKvsCacheFacade.findEntity(createKvsKeyListOfProductId(kvsCB), cb,
                 expireDateTimeLambdaOfProductId(), kvsCB.isKvsCacheAsyncReflectionEnabled());
 
         return Stream.of(optEntity)
@@ -201,10 +202,7 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
         Product product = entityLambda.get();
         InsertOrUpdateOption option = new InsertOrUpdateOption();
         op.accept(option);
-        maihamadbKvsCacheFacade.insertOrUpdate(
-                createKvsKeyListOfProductId(product),
-                product,
-                option.isKvsCacheAsyncReflectionEnabled());
+        maihamadbKvsCacheFacade.insertOrUpdate(createKvsKeyListOfProductId(product), product, option);
 
         return product;
     }
@@ -242,10 +240,7 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
         Product product = entityLambda.get();
         DeleteOption option = new DeleteOption();
         op.accept(option);
-        maihamadbKvsCacheFacade.delete(
-                createKvsKeyListOfProductId(product),
-                product,
-                option.isKvsCacheAsyncReflectionEnabled());
+        maihamadbKvsCacheFacade.delete(createKvsKeyListOfProductId(product), product, option);
     }
 
     protected List<Object> createKvsKeyListOfProductId(KvsProductCB kvsCB) {
@@ -431,10 +426,7 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
         Product product = entityLambda.get();
         InsertOrUpdateOption option = new InsertOrUpdateOption();
         op.accept(option);
-        maihamadbKvsCacheFacade.insertOrUpdate(
-                createKvsKeyListOfCategoryCode(product),
-                product,
-                option.isKvsCacheAsyncReflectionEnabled());
+        maihamadbKvsCacheFacade.insertOrUpdate(createKvsKeyListOfCategoryCode(product), product, option);
 
         return product;
     }
@@ -472,10 +464,7 @@ public abstract class KvsBsProductBhv extends AbstractKvsCacheBehaviorWritable<P
         Product product = entityLambda.get();
         DeleteOption option = new DeleteOption();
         op.accept(option);
-        maihamadbKvsCacheFacade.delete(
-                createKvsKeyListOfCategoryCode(product),
-                product,
-                option.isKvsCacheAsyncReflectionEnabled());
+        maihamadbKvsCacheFacade.delete(createKvsKeyListOfCategoryCode(product), product, option);
     }
 
     protected List<Object> createKvsKeyListOfCategoryCode(KvsProductCB kvsCB) {

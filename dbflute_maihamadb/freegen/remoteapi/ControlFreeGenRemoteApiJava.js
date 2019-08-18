@@ -217,7 +217,8 @@ function processHull(request) {
     processBean(rule, remoteApiBeanList);
     processBhv(rule, request, exBehaviorMap);
     processDoc(rule, request, exBehaviorMap);
-    clean(rule, request, api.package.replace(/\./g, '/'), srcPathList);
+    var package = api.package + '.' + scriptEngine.invokeMethod(rule, 'schemaPackage', api.schema);
+    clean(rule, request, package.replace(/\./g, '/'), srcPathList);
 }
 
 /**

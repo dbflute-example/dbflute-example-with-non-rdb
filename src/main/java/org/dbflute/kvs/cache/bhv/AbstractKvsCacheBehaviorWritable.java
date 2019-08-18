@@ -106,39 +106,4 @@ public abstract class AbstractKvsCacheBehaviorWritable<ENTITY extends Entity, CB
             throw new IllegalArgumentException(msg);
         }
     }
-
-    // ===================================================================================
-    //                                                                              Option
-    //                                                                           =========
-    public class InsertOrUpdateOption {
-        protected boolean _kvsCacheAsyncReflectionEnabled = true;
-
-        public void enableKvsCacheAsyncReflection() {
-            _kvsCacheAsyncReflectionEnabled = true;
-        }
-
-        public void disableKvsCacheAsyncReflection() {
-            _kvsCacheAsyncReflectionEnabled = false;
-        }
-
-        public boolean isKvsCacheAsyncReflectionEnabled() {
-            return _kvsCacheAsyncReflectionEnabled;
-        }
-    }
-
-    public class DeleteOption {
-        protected boolean _kvsCacheAsyncReflectionEnabled = true;
-
-        public void enableKvsCacheAsyncReflection() {
-            _kvsCacheAsyncReflectionEnabled = true;
-        }
-
-        public void disableKvsCacheAsyncReflection() {
-            _kvsCacheAsyncReflectionEnabled = false;
-        }
-
-        public boolean isKvsCacheAsyncReflectionEnabled() {
-            return _kvsCacheAsyncReflectionEnabled;
-        }
-    }
 }

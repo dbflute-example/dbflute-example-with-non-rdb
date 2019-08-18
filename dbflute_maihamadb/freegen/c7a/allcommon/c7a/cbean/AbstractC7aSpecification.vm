@@ -1,0 +1,56 @@
+##
+## Copyright 2014-2018 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+${manager.allClassCopyright}package org.dbflute.c7a.cbean;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * @author FreeGen
+ */
+public abstract class AbstractC7aSpecification implements C7aSpecification {
+
+    private final List<String> specifyColumnList = new ArrayList<String>();
+
+    protected void addSpecifyColumn(String spcifyColumn) {
+        this.specifyColumnList.add(spcifyColumn);
+    }
+
+    protected void clearSpecify() {
+        this.specifyColumnList.clear();
+    }
+
+    @Override
+    public boolean hasSpecifiedColumn() {
+        return !specifyColumnList.isEmpty();
+    }
+
+    @Override
+    public List<String> getSpecifyColumns() {
+        return specifyColumnList;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(" { ");
+        sb.append(specifyColumnList.stream().map(solrDBMeta -> solrDBMeta.toString()).collect(Collectors.joining(",")));
+        sb.append(" } ");
+
+        return sb.toString();
+    }
+}

@@ -33,12 +33,16 @@ import org.dbflute.Entity;
 import org.dbflute.bhv.BehaviorReadable;
 import org.dbflute.bhv.BehaviorSelector;
 import org.dbflute.bhv.BehaviorWritable;
+import org.dbflute.bhv.writable.InsertOption;
+import org.dbflute.bhv.writable.UpdateOption;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.accessory.ColumnNullObjectable;
 import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.exception.EntityAlreadyDeletedException;
 import org.dbflute.exception.EntityDuplicatedException;
+import org.dbflute.kvs.cache.bhv.writable.DeleteOption;
+import org.dbflute.kvs.cache.bhv.writable.InsertOrUpdateOption;
 import org.dbflute.optional.OptionalEntity;
 import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
@@ -185,12 +189,12 @@ public class KvsCacheBusinessAssist {
      * @param searchKeyList Key info. specified in KVS (equal to the search condition spedified by CB) (NotNull)
      * @param entity Entity to be inserted or updated (NotNull)
      * @param <ENTITY> Entity of DBFlute
-     * @param kvsCacheAsyncReflectionEnabled config of async or sync (NotNull)
+     * @param op Option (NotNull)
      */
     public <ENTITY extends Entity> void insertOrUpdate(BehaviorSelector selector, String dbName, List<Object> searchKeyList, ENTITY entity,
-            boolean kvsCacheAsyncReflectionEnabled) {
-        insertOrUpdate(selector, entity); // Insert/Update to RDB
-        removeCache(dbName, entity.asTableDbName(), searchKeyList, kvsCacheAsyncReflectionEnabled);
+            InsertOrUpdateOption op) {
+        insertOrUpdate(selector, entity, op); // Insert/Update to RDB
+        removeCache(dbName, entity.asTableDbName(), searchKeyList, op.isKvsCacheAsyncReflectionEnabled());
     }
 
     // ===================================================================================
@@ -203,13 +207,13 @@ public class KvsCacheBusinessAssist {
      * @param searchKeyList Key info. specified in KVS (equal to the search condition spedified by CB) (NotNull)
      * @param entity Entity to be deleted (NotNull)
      * @param <ENTITY> Entity of DBFlute
-     * @param kvsCacheAsyncReflectionEnabled config of async or sync (NotNull)
+     * @param op Option (NotNull)
      * @return The number of deleted rows
      */
     public <ENTITY extends Entity> int delete(BehaviorSelector selector, String dbName, List<Object> searchKeyList, ENTITY entity,
-            boolean kvsCacheAsyncReflectionEnabled) {
+            DeleteOption op) {
         final int deleteCount = queryDelete(selector, entity);
-        removeCache(dbName, entity.asTableDbName(), searchKeyList, kvsCacheAsyncReflectionEnabled);
+        removeCache(dbName, entity.asTableDbName(), searchKeyList, op.isKvsCacheAsyncReflectionEnabled());
         return deleteCount;
     }
 
@@ -502,10 +506,17 @@ public class KvsCacheBusinessAssist {
      * @param selector Selector corresponding to the DB to connect to (NotNull）
      * @param entity An entity to be inserted or updated (NotNull)
      * @param <ENTITY> Entity of DBFlute
+     * @param op Option (NotNull)
      */
-    protected <ENTITY extends Entity> void insertOrUpdate(BehaviorSelector selector, ENTITY entity) {
+    protected <ENTITY extends Entity> void insertOrUpdate(BehaviorSelector selector, ENTITY entity, InsertOrUpdateOption op) {
         final BehaviorWritable writable = (BehaviorWritable) selector.byName(entity.asTableDbName()); // Fetch abstract Behavior
-        writable.createOrModify(entity, null, null);
+        InsertOption<? extends ConditionBean> insertOption = new InsertOption<ConditionBean>();
+        UpdateOption<? extends ConditionBean> updateOption = new UpdateOption<ConditionBean>();
+        if (op.isCommonColumnAutoSetupDisabled()) {
+            insertOption.disableCommonColumnAutoSetup();
+            updateOption.disableCommonColumnAutoSetup();
+        }
+        writable.createOrModify(entity, insertOption, updateOption);
     }
 
     // ===================================================================================

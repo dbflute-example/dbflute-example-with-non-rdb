@@ -36,6 +36,8 @@ import org.dbflute.dbmeta.info.ColumnInfo;
 import org.dbflute.dbmeta.info.PrimaryInfo;
 import org.dbflute.kvs.cache.KvsCacheBusinessAssist;
 import org.dbflute.kvs.cache.KvsCacheManager;
+import org.dbflute.kvs.cache.bhv.writable.DeleteOption;
+import org.dbflute.kvs.cache.bhv.writable.InsertOrUpdateOption;
 import org.dbflute.kvs.core.exception.KvsException;
 import org.dbflute.optional.OptionalEntity;
 #if ($manager.isTargetContainerSeasar())
@@ -94,18 +96,16 @@ public abstract class AbstractKvsCacheFacade implements KvsCacheFacade {
     //                                                    Insert OR Update (For KVS Cache)
     //                                                    ================================
     @Override
-    public <ENTITY extends Entity> void insertOrUpdate(List<Object> searchKeyList, ENTITY entity, boolean kvsCacheAsyncReflectionEnabled) {
-        kvsCacheBusinessAssist.insertOrUpdate(mySelector(), entity.asDBMeta().getProjectName(), searchKeyList, entity,
-                kvsCacheAsyncReflectionEnabled);
+    public <ENTITY extends Entity> void insertOrUpdate(List<Object> searchKeyList, ENTITY entity, InsertOrUpdateOption op) {
+        kvsCacheBusinessAssist.insertOrUpdate(mySelector(), entity.asDBMeta().getProjectName(), searchKeyList, entity, op);
     }
 
     // ===================================================================================
     //                                                              Delete (For KVS Cache)
     //                                                              ======================
     @Override
-    public <ENTITY extends Entity> int delete(List<Object> searchKeyList, ENTITY entity, boolean kvsCacheAsyncReflectionEnabled) {
-        return kvsCacheBusinessAssist.delete(mySelector(), entity.asDBMeta().getProjectName(), searchKeyList, entity,
-                kvsCacheAsyncReflectionEnabled);
+    public <ENTITY extends Entity> int delete(List<Object> searchKeyList, ENTITY entity, DeleteOption op) {
+        return kvsCacheBusinessAssist.delete(mySelector(), entity.asDBMeta().getProjectName(), searchKeyList, entity, op);
     }
 
     @Override

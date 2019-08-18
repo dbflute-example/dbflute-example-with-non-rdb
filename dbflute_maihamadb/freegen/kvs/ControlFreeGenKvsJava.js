@@ -77,6 +77,9 @@ function processCore(request) {
         coreVmList.push('cache/KvsCacheManager.vm');
         coreVmList.push('cache/KvsCacheManagerImpl.vm');
         coreVmList.push('cache/bhv/AbstractKvsCacheBehaviorWritable.vm');
+        coreVmList.push('cache/bhv/writable/DeleteOption.vm');
+        coreVmList.push('cache/bhv/writable/InsertOrUpdateOption.vm');
+        coreVmList.push('cache/bhv/writable/WritableOption.vm');
         coreVmList.push('cache/cbean/KvsCacheConditionBean.vm');
     }
 

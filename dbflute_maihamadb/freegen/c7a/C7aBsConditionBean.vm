@@ -17,6 +17,7 @@
 ${manager.allClassCopyright}package ${data.package};
 #set ($importList = [])
 #set($added = $importList.add('org.dbflute.c7a.entity.dbmeta.C7aDBMeta'))
+#set($added = $importList.add('org.dbflute.c7a.cbean.AbstractC7aSpecification'))
 #set($added = $importList.add('com.datastax.driver.core.querybuilder.QueryBuilder'))
 #set($added = $importList.add('com.datastax.driver.core.querybuilder.Delete'))
 #set($added = $importList.add('com.datastax.driver.core.querybuilder.Select'))
@@ -136,7 +137,6 @@ public abstract class ${data.className}#if ($data.extendsClass && $data.extendsC
     protected void buildWhere(Select select) {
         Select.Where where = select.where();
 #foreach($property in $data.exConditionQuery.bs.properties)
-#set($property.fieldName = $fieldName)
         if (query().get${manager.initCap($property.fieldName)}_Equal() != null) {
             where.and(QueryBuilder.eq("${property.name}", query().get${manager.initCap($property.fieldName)}_Equal()));
         }
@@ -152,7 +152,6 @@ public abstract class ${data.className}#if ($data.extendsClass && $data.extendsC
     protected void buildWhere(Update update) {
         Update.Where where = update.where();
 #foreach($property in $data.exConditionQuery.bs.properties)
-#set($property.fieldName = $fieldName)
         if (query().get${manager.initCap($property.fieldName)}_Equal() != null) {
             where.and(QueryBuilder.eq("${property.name}", query().get${manager.initCap($property.fieldName)}_Equal()));
         }
@@ -167,7 +166,6 @@ public abstract class ${data.className}#if ($data.extendsClass && $data.extendsC
     protected void buildWhere(Delete delete) {
         Delete.Where where = delete.where();
 #foreach($property in $data.exConditionQuery.bs.properties)
-#set($property.fieldName = $fieldName)
         if (query().get${manager.initCap($property.fieldName)}_Equal() != null) {
             where.and(QueryBuilder.eq("${property.name}", query().get${manager.initCap($property.fieldName)}_Equal()));
         }
@@ -176,6 +174,27 @@ public abstract class ${data.className}#if ($data.extendsClass && $data.extendsC
             where.and(QueryBuilder.in("${property.name}", query().get${manager.initCap($property.fieldName)}_InScope()));
         }
 #end
+#end
+    }
+
+    // ===================================================================================
+    //                                                                             Specify
+    //                                                                             =======
+    protected HpSpecification _specification;
+
+    public HpSpecification specify() {
+        if (_specification == null) {
+            _specification = new HpSpecification();
+        }
+        return _specification;
+    }
+
+    public static class HpSpecification extends AbstractC7aSpecification {
+#foreach($property in $data.exConditionQuery.bs.properties)
+
+        public void column${manager.initCap($property.fieldName)}() {
+            addSpecifyColumn("${property.name}");
+        }
 #end
     }
 }

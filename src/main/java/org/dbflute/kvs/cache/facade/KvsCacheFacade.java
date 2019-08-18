@@ -25,6 +25,8 @@ import org.dbflute.bhv.BehaviorSelector;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.info.ColumnInfo;
+import org.dbflute.kvs.cache.bhv.writable.DeleteOption;
+import org.dbflute.kvs.cache.bhv.writable.InsertOrUpdateOption;
 import org.dbflute.optional.OptionalEntity;
 
 /**
@@ -94,9 +96,9 @@ public interface KvsCacheFacade {
      * @param searchKeyList A list of keys for search (NotNull)
      * @param entity The entity to be inserted or updated (NotNull)
      * @param <ENTITY> Entity of DBFlute
-     * @param kvsCacheAsyncReflectionEnabled config of async or sync (NotNull)
+     * @param op Option (NotNull)
      */
-    <ENTITY extends Entity> void insertOrUpdate(List<Object> searchKeyList, ENTITY entity, boolean kvsCacheAsyncReflectionEnabled);
+    <ENTITY extends Entity> void insertOrUpdate(List<Object> searchKeyList, ENTITY entity, InsertOrUpdateOption op);
 
     // ===================================================================================
     //                                                              Delete (For KVS Cache)
@@ -107,10 +109,10 @@ public interface KvsCacheFacade {
      * @param searchKeyList A list of keys for search (NotNull)
      * @param entity The entity to be deleted (NotNull)
      * @param <ENTITY> Entity of DBFlute
-     * @param kvsCacheAsyncReflectionEnabled config of async or sync (NotNull)
+     * @param op Option (NotNull)
      * @return The number of entity that has been deleted
      */
-    <ENTITY extends Entity> int delete(List<Object> searchKeyList, ENTITY entity, boolean kvsCacheAsyncReflectionEnabled);
+    <ENTITY extends Entity> int delete(List<Object> searchKeyList, ENTITY entity, DeleteOption op);
 
     /**
      * Delete row(s) in RDB corresponding to the query condition specified by CB,

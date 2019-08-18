@@ -55,6 +55,8 @@ function processCore(request) {
         coreVmList.push('entity/C7aPagingResultBean.vm');
         coreVmList.push('entity/dbmeta/C7aDBMeta.vm');
         coreVmList.push('entity/dbmeta/AbstractC7aDBMeta.vm');
+        coreVmList.push('cbean/C7aSpecification.vm');
+        coreVmList.push('cbean/AbstractC7aSpecification.vm');
         coreVmList.push('cbean/C7aConditionQuery.vm');
         coreVmList.push('cbean/AbstractC7aConditionQuery.vm');
         coreVmList.push('cbean/C7aConditionBean.vm');
