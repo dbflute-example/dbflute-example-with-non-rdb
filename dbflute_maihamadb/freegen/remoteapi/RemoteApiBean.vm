@@ -65,8 +65,12 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
 #set ($nestType = '')
 #if ($property.items && $property.items['$ref'])
 #set ($nestType = $generator.getClass().forName('java.net.URLDecoder').decode($property.items['$ref'].replace('#/definitions/', ''), 'UTF-8'))
+#elseif ($property.items && $property.items.allOf[0]['$ref'])
+#set ($nestType = $generator.getClass().forName('java.net.URLDecoder').decode($property.items.allOf[0]['$ref'].replace('#/definitions/', ''), 'UTF-8'))
 #elseif ($property['$ref'])
 #set ($nestType = $generator.getClass().forName('java.net.URLDecoder').decode($property['$ref'].replace('#/definitions/', ''), 'UTF-8'))
+#elseif ($property.allOf[0]['$ref'])
+#set ($nestType = $generator.getClass().forName('java.net.URLDecoder').decode($property.allOf[0]['$ref'].replace('#/definitions/', ''), 'UTF-8'))
 #end
 #if ($nestType && $nestType != '')
 #foreach($nestPropertyEntry in $definitionMap[$nestType].properties.entrySet())
@@ -100,6 +104,7 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
 #set ($property = $propertyEntry.value)
 ## TODO p1us2er0 temporary for beanPropertyManualMappingDescription. (2017/10/10)
 #set ($property.name = $fieldName)
+#set ($fieldClass = '')
 #set ($enumValueComment = '')
 #set ($nestType = '')
 #if ($property.enum)
@@ -132,8 +137,12 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
 #set ($fieldClass = "${typeMap[$property.type]}<${typeMap[$property.items.format]}>")
 #elseif (${typeMap[$property.items.type]})
 #set ($fieldClass = "${typeMap[$property.type]}<${typeMap[$property.items.type]}>")
-#else
+#elseif ($property.items['$ref'] || ($property.items && $property.items.allOf[0]['$ref']))
+#if ($property.items['$ref'])
 #set ($nestType = $generator.getClass().forName('java.net.URLDecoder').decode($property.items['$ref'].replace('#/definitions/', ''), 'UTF-8'))
+#elseif ($property.items && $property.items.allOf[0]['$ref'])
+#set ($nestType = $generator.getClass().forName('java.net.URLDecoder').decode($property.items.allOf[0]['$ref'].replace('#/definitions/', ''), 'UTF-8'))
+#end
 #adjustType($nestType)
 #set ($fieldClass = "${typeMap[$property.type]}<$adjustType>")
 #generateIndent($nestList.size())@javax.validation.Valid
@@ -144,11 +153,18 @@ public class ${data.className}#if ($data.extendsClass && $data.extendsClass != '
 #set ($fieldClass = ${typeMap[$property.format]})
 #elseif (${typeMap[$property.type]})
 #set ($fieldClass = ${typeMap[$property.type]})
-#else
+#elseif ($property['$ref'] || $property.allOf[0]['$ref'])
+#if ($property['$ref'])
 #set ($nestType = $generator.getClass().forName('java.net.URLDecoder').decode($property['$ref'].replace('#/definitions/', ''), 'UTF-8'))
+#elseif ($property.allOf[0]['$ref'])
+#set ($nestType = $generator.getClass().forName('java.net.URLDecoder').decode($property.allOf[0]['$ref'].replace('#/definitions/', ''), 'UTF-8'))
+#end
 #adjustType($nestType)
 #set ($fieldClass = $adjustType)
 #generateIndent($nestList.size())@javax.validation.Valid
+#end
+#if ($fieldClass == '')
+#set ($fieldClass = ${typeMap['']})
 #end
 #generateIndent($nestList.size())public $fieldClass $fieldName;
 #generateNestType($nestType)

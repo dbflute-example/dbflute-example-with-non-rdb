@@ -380,7 +380,7 @@ var baseRule = {
      */
     typeMap: function() {
         return {
-            'object': 'Object',
+            'object': 'java.util.Map<String, Object>',
             'int32': 'Integer',
             'int64': 'Long',
             'float': 'Float',
@@ -392,7 +392,8 @@ var baseRule = {
             'boolean': 'Boolean',
             'date': 'java.time.LocalDate',
             'date-time': 'java.time.LocalDateTime',
-            'array': 'java.util.List'
+            'array': 'java.util.List',
+            '': 'String'
         };
     },
 

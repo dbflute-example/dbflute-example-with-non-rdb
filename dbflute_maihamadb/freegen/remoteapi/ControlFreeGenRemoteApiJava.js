@@ -150,17 +150,19 @@ function processHull(request) {
             }
         }
 
-        if (!queryProperties.isEmpty()) {
-            var remoteApiBean = createBean(rule, 'param', api, queryProperties, definitionMap);
-            remoteApiBean.in = 'query';
-            paramBean = remoteApiBean;
-            remoteApiBeanList.push(paramBean);
-        }
-        if (!formDataProperties.isEmpty()) {
-            var remoteApiBean = createBean(rule, 'param', api, formDataProperties, definitionMap);
-            remoteApiBean.in = 'formData';
-            paramBean = remoteApiBean;
-            remoteApiBeanList.push(paramBean);
+        if (bodyProperties.isEmpty()) {
+            if (!queryProperties.isEmpty()) {
+                var remoteApiBean = createBean(rule, 'param', api, queryProperties, definitionMap);
+                remoteApiBean.in = 'query';
+                paramBean = remoteApiBean;
+                remoteApiBeanList.push(paramBean);
+            }
+            if (!formDataProperties.isEmpty()) {
+                var remoteApiBean = createBean(rule, 'param', api, formDataProperties, definitionMap);
+                remoteApiBean.in = 'formData';
+                paramBean = remoteApiBean;
+                remoteApiBeanList.push(paramBean);
+            }
         }
 
         // +-------------------------+
