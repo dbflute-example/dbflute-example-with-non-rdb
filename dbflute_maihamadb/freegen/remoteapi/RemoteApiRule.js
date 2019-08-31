@@ -83,6 +83,8 @@ var baseRule = {
      * @return {boolean} true if target. (NotNull)
      */
     target: function(api) {
+    	// p1us2er0 fixedly all target (2019/08/31)
+		// previously, it was TARGET when the request body or response body was json or xml content.
         return true;
     },
 
