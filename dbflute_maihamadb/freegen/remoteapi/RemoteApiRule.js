@@ -83,22 +83,7 @@ var baseRule = {
      * @return {boolean} true if target. (NotNull)
      */
     target: function(api) {
-        if (this.targetHttpMethodList().indexOf(api.httpMethod) === -1) {
-            return false;
-        }
-        var contentTypes = [];
-        Array.prototype.push.apply(contentTypes, api.consumes ? api.consumes: []);
-        Array.prototype.push.apply(contentTypes, api.produces ? api.produces: []);
-        return (contentTypes.indexOf('application/json') !== -1 || (contentTypes.indexOf('application/xml') !== -1))
-                && api.url.indexOf('/swagger/json') !== 0;
-    },
-
-    /**
-     * Return target http method list.
-     * @return string[] target http method list. (NotNull)
-     */
-    targetHttpMethodList: function() {
-        return ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'];
+        return true;
     },
 
     /**
