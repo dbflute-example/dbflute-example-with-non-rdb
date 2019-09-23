@@ -5,6 +5,13 @@
 // =======================================================================================
 //                                                                                   Base
 //                                                                                  ======
+// 自動生成対象を調整する(RequestもResponseのないAPIの自動生成) @until 2019/08/31
+// @since 2019/09/01 RemoteApiRule.jsですべてtrueになっています。
+remoteApiRule.target = function(api) {
+    // 自動生成対象から除外したいURLがあれば、他のremoteApiRule.targetのoverrideの指定方法を参考にしてください。
+    return true;
+};
+
 // 自動生成対象から除外する(URLで指定)
 remoteApiRule.target = function(api) {
     if (!baseRule.target(api)) {
@@ -39,6 +46,11 @@ remoteApiRule.behaviorSubPackage = function(api) {
 // =======================================================================================
 //                                                                            Param/Return
 //                                                                            ============
+// 自動生成するParamクラスにimplementsするインターフェースを指定する。
+remoteApiRule.paramImplementsClasses = function(api, properties) {
+    return 'xxx.yyy.zzz.AbcParam';
+};
+
 // 自動生成するReturnクラスにimplementsするインターフェースを指定する。
 remoteApiRule.returnImplementsClasses = function(api, properties) {
     return 'xxx.yyy.zzz.AbcReturn';
