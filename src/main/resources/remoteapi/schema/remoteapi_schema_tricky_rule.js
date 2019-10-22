@@ -56,6 +56,15 @@ remoteApiRule.returnImplementsClasses = function(api, properties) {
     return 'xxx.yyy.zzz.AbcReturn';
 };
 
+// 自動生成するParam/Returnクラスのネストクラスの名前を調整する。
+remoteApiRule.nestClassName = function(api, className) {
+    return className.replace(/Xxx$/, '') + 'Yyy';
+    // 以下はデフォルト設定。
+    // lastafluteの推奨suffixのPart、Spring MVCの推奨suffixのModel、Javaの一般的なsuffixのBeanを除去して、Partをsuffixにつける。
+    // ※Resultの除去は互換性のために残しています。
+    // return className.replace(/(Part|Result|Model|Bean)$/, '') + 'Part';
+};
+
 // =======================================================================================
 //                                                                                  Option
 //                                                                                  ======
