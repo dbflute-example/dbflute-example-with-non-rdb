@@ -116,6 +116,7 @@ function processHull(request) {
         var formDataProperties = new java.util.LinkedHashMap();
         var bodyProperties = new java.util.LinkedHashMap();
         var paramBean = new java.util.LinkedHashMap();
+        var paramBeanArray = false;
 
         // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
         // loop parameters's elements, e.g. in, name, description, required, schema, ...
@@ -142,9 +143,9 @@ function processHull(request) {
                         bodyProperties[bodyPropertyKey].required = required.contains(bodyPropertyKey);
                     }
                 }
-                var remoteApiBean = createBean(rule, 'param', api, bodyProperties, definitionMap);
+                var remoteApiBean = createBean(rule, 'param', api, bodyProperties, definitionMap, definitionKey);
                 remoteApiBean.in = api.consumes && api.consumes.indexOf('application/xml') !== -1 ? 'xml' : 'json';
-                remoteApiBean.array = parameter.schema.type === 'array';
+                paramBeanArray = parameter.schema.type === 'array';
                 paramBean = remoteApiBean;
                 remoteApiBeanList.push(paramBean);
             }
@@ -172,6 +173,7 @@ function processHull(request) {
         // +-------------------------+
         var returnProperties = new java.util.LinkedHashMap();
         var returnBean = new java.util.LinkedHashMap();
+        var returnBeanArray = false;
 
         // _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
         // loop responses's elements, e.g. in, name, description, required, schema, ...
@@ -193,7 +195,8 @@ function processHull(request) {
                     returnBean.array = array;
                 } else {
                     var definitionKey = java.net.URLDecoder.decode(responseSchema['$ref'].replace('#/definitions/', ''), "UTF-8");
-                    var definition = definitionMap[scriptEngine.invokeMethod(rule, 'definitionKey', definitionKey)];
+                    definitionKey = scriptEngine.invokeMethod(rule, 'definitionKey', definitionKey);
+                    var definition = definitionMap[definitionKey];
                     if (definition) {
                         var returnProperties = definition.properties;
                         if (!returnProperties.isEmpty()) {
@@ -204,8 +207,8 @@ function processHull(request) {
                                     returnPropertyValue.required = required.contains(returnPropertyKey);
                                 }
                             }
-                            var remoteApiBean = createBean(rule, 'return', api, returnProperties, definitionMap);
-                            remoteApiBean.array = array;
+                            var remoteApiBean = createBean(rule, 'return', api, returnProperties, definitionMap, definitionKey);
+                            returnBeanArray = array;
                             returnBean = remoteApiBean;
                             remoteApiBeanList.push(returnBean);
                         }
@@ -214,8 +217,49 @@ function processHull(request) {
                 returnBean.in = api.produces.indexOf('application/xml') !== -1 ? 'xml' : 'json';
             }
         }
-        keepBehavior(rule, api, pathVariables, paramBean, returnBean, exBehaviorMap);
+        keepBehavior(rule, api, pathVariables, paramBean, paramBeanArray, returnBean, returnBeanArray, exBehaviorMap);
     }
+
+    if (rule['beanDefinetionGeneration']) {
+        for each (var remoteApiBean in remoteApiBeanList) {
+            if (!remoteApiBean.definitionKey) {
+                continue;
+            }
+            for each (var comparisonRemoteApiBean in remoteApiBeanList) {
+                if (remoteApiBean !== comparisonRemoteApiBean
+                        && remoteApiBean.definitionKey === comparisonRemoteApiBean.definitionKey
+                        && remoteApiBean.in === comparisonRemoteApiBean.in) {
+    
+                    var definetionRemoteApiBean = new java.util.LinkedHashMap();
+                    definetionRemoteApiBean.api = null;
+                    var schemaPackage = scriptEngine.invokeMethod(rule, 'schemaPackage', api.schema);
+                    var subPackage = scriptEngine.invokeMethod(rule, 'beanDefinetionSubPackage', request, remoteApiBean.definitionKey);
+                    var package = api.package + '.' + schemaPackage;
+                    if (subPackage) {
+                        package = package + '.' + subPackage;
+                    }
+                    definetionRemoteApiBean.package = package;
+                    definetionRemoteApiBean.className = scriptEngine.invokeMethod(rule, 'beanDefinetionClassName', request, remoteApiBean.definitionKey);
+                    definetionRemoteApiBean.extendsClass = remoteApiBean.extendsClass;
+                    definetionRemoteApiBean.implementsClasses = remoteApiBean.implementsClasses;
+                    definetionRemoteApiBean.properties = remoteApiBean.properties;
+                    definetionRemoteApiBean.beanPurposeType = remoteApiBean.definitionKey;
+                    definetionRemoteApiBean.remoteApiExp = 'definition';
+                    definetionRemoteApiBean.definitionMap = definitionMap;
+                    definetionRemoteApiBean.in = remoteApiBean.in;
+    
+                    remoteApiBeanList.push(definetionRemoteApiBean);
+    
+                    remoteApiBean.extendsClass = definetionRemoteApiBean.package + '.' + definetionRemoteApiBean.className;
+                    remoteApiBean.implementsClasses = null;
+                    remoteApiBean.in = null;
+                    remoteApiBean.properties = [];
+                    break;
+                 }
+            }
+        }
+    }
+
     processBean(rule, remoteApiBeanList);
     processBhv(rule, request, exBehaviorMap);
     processDoc(rule, request, exBehaviorMap);
@@ -230,8 +274,9 @@ function processHull(request) {
  * @param {Api} api - The information of api. (NotNull)
  * @param {Properties} properties - The information of property for the bean. (NotNull)
  * @param {DefinitionMap} definitionMap - The information of definition map. (NotNull)
+ * @param {string} definitionKey - definition key (NotNull)
  */
-function createBean(rule, beanPurposeType, api, properties, definitionMap) {
+function createBean(rule, beanPurposeType, api, properties, definitionMap, definitionKey) {
     var schemaPackage = scriptEngine.invokeMethod(rule, 'schemaPackage', api.schema);
     var subPackage = scriptEngine.invokeMethod(rule, 'beanSubPackage', api);
     var package = api.package + '.' + schemaPackage;
@@ -243,6 +288,7 @@ function createBean(rule, beanPurposeType, api, properties, definitionMap) {
     remoteApiBean.api = api;
     remoteApiBean.package = package;
     remoteApiBean.className = scriptEngine.invokeMethod(rule, beanPurposeType + 'ClassName', api, false);
+    remoteApiBean.definitionKey = definitionKey;
     remoteApiBean.extendsClass = scriptEngine.invokeMethod(rule, beanPurposeType + 'ExtendsClass', api, properties);
     remoteApiBean.implementsClasses = scriptEngine.invokeMethod(rule, beanPurposeType + 'ImplementsClasses', api, properties);
     remoteApiBean.properties = properties;
@@ -258,10 +304,12 @@ function createBean(rule, beanPurposeType, api, properties, definitionMap) {
  * @param {Api} api - The information of api. (NotNull)
  * @param {PathVariables} pathVariables - The array of path variables. (NotNull)
  * @param {ParamBean} paramBean - The information of param bean. (NotNull)
+ * @param {boolean} paramBeanArray - true if param bean is array. (NotNull)
  * @param {ReturnBean} returnBean - The information of return bean. (NotNull)
+ * @param {boolean} returnBeanArray - true if return bean is array. (NotNull)
  * @param {ExBehaviorMap} exBehaviorMap - The map of behavior information. (NotNull)
  */
-function keepBehavior(rule, api, pathVariables, paramBean, returnBean, exBehaviorMap) {
+function keepBehavior(rule, api, pathVariables, paramBean, paramBeanArray, returnBean, returnBeanArray, exBehaviorMap) {
     var schemaPackage = scriptEngine.invokeMethod(rule, 'schemaPackage', api.schema);
     var subPackage = scriptEngine.invokeMethod(rule, 'behaviorSubPackage', api);
     var package = api.package + '.' + schemaPackage;
@@ -283,7 +331,7 @@ function keepBehavior(rule, api, pathVariables, paramBean, returnBean, exBehavio
         bsBehavior.methodList = [];
         exBehavior.bsBehavior = bsBehavior;
     }
-    exBehaviorMap[package + '.' + className].bsBehavior.methodList.push({ 'api': api, 'pathVariables': pathVariables, 'paramBean': paramBean, 'returnBean': returnBean });
+    exBehaviorMap[package + '.' + className].bsBehavior.methodList.push({ 'api': api, 'pathVariables': pathVariables, 'paramBean': paramBean, 'paramBeanArray': paramBeanArray, 'returnBean': returnBean, 'returnBeanArray': returnBeanArray });
 }
 
 /**
@@ -296,7 +344,7 @@ function processBean(rule, remoteApiBeanList) {
     for (remoteApiBeanListIndex in remoteApiBeanList) {
         var remoteApiBean = remoteApiBeanList[remoteApiBeanListIndex];
         var path = remoteApiBean.package.replace(/\./g, '/') +'/' + remoteApiBean.className + '.java';
-        sortRemoteApiBeanMap[path + '@@@@@' + remoteApiBean.api.url] = remoteApiBean;
+        sortRemoteApiBeanMap[path + '@@@@@' + (remoteApiBean.api ? remoteApiBean.api.url : '')] = remoteApiBean;
     }
 
     var uniqueRemoteApiBeanMap = {};

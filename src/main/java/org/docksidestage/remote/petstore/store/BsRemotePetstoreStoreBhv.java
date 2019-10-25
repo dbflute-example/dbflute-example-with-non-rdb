@@ -51,7 +51,7 @@ public abstract class BsRemotePetstoreStoreBhv extends AbstractRemotePetstoreBhv
      * </pre>
      * @return The bean object as return type, receiving response body. (NotNull)
      */
-    public Object requestInventory() {
+    public java.util.Map<String, Object> requestInventory() {
         return doRequestInventory(rule -> {});
     }
 
@@ -64,8 +64,9 @@ public abstract class BsRemotePetstoreStoreBhv extends AbstractRemotePetstoreBhv
      * @param ruleLambda The callback for setting rule as dynamic requirement. (NotNull)
      * @return The bean object as return type, receiving response body. (NotNull)
      */
-    protected Object doRequestInventory(Consumer<FlutyRemoteApiRule> ruleLambda) {
-        return doRequestGet(Object.class, "/store/inventory", noMoreUrl(), noQuery(), rule -> {
+    protected java.util.Map<String, Object> doRequestInventory(Consumer<FlutyRemoteApiRule> ruleLambda) {
+        return doRequestGet(new org.lastaflute.di.helper.misc.ParameterizedRef<java.util.Map<String, Object>>() {
+        }.getType(), "/store/inventory", noMoreUrl(), noQuery(), rule -> {
             ruleOfInventory(rule);
             ruleLambda.accept(rule);
         });

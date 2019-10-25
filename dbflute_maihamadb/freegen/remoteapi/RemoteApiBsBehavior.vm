@@ -112,7 +112,7 @@ public abstract class ${data.className} extends ${data.abstractBehavior.classNam
 #set ($paramBeanClassName = '')
 #if (${method.paramBean.className})
 #set ($paramBeanClassName = ${method.paramBean.className})
-#if ($method.paramBean.array)
+#if ($method.paramBeanArray)
 #set ($paramBeanClassName = "java.util.List<${paramBeanClassName}>")
 #end
 #set ($parameterDefinition = "${parameterDefinition}Consumer<${paramBeanClassName}> paramLambda")
@@ -124,7 +124,7 @@ public abstract class ${data.className} extends ${data.abstractBehavior.classNam
 #set ($moreUrl = 'noMoreUrl()')
 #end
 #set ($returnBeanClassName = ${method.returnBean.className})
-#if ($method.returnBean.array)
+#if ($method.returnBeanArray)
 #set ($returnBeanClassName = "${typeMap['array']}<${returnBeanClassName}>")
 #end
 #set ($returnBeanClassName = $scriptEngine.invokeMethod($rule, 'unDefinitionKey', ${returnBeanClassName}))
@@ -192,7 +192,7 @@ public abstract class ${data.className} extends ${data.abstractBehavior.classNam
 #set ($param = 'noRequestBody()')
 #end
 #if (${paramBeanClassName} && ${paramBeanClassName} != '')
-#if ($method.paramBean.array)
+#if ($method.paramBeanArray)
         ${paramBeanClassName} param = new java.util.ArrayList<${method.paramBean.className}>();
 #else
         ${paramBeanClassName} param = new ${paramBeanClassName}();

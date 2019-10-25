@@ -83,8 +83,8 @@ var baseRule = {
      * @return {boolean} true if target. (NotNull)
      */
     target: function(api) {
-    	// p1us2er0 fixedly all target (2019/08/31)
-		// previously, it was TARGET when the request body or response body was json or xml content.
+        // p1us2er0 fixedly all target (2019/08/31)
+        // previously, it was TARGET when the request body or response body was json or xml content.
         return true;
     },
 
@@ -233,6 +233,28 @@ var baseRule = {
      * @return {string} definition key before filtering from the filtered definition key. (NotNull)
      */
     unDefinitionKey: function(definitionKey) { return definitionKey; },
+
+	beanDefinetionGeneration: false,
+
+    /**
+     * Return filtered bean definetion subPackage.
+     * @param {Request} request - Request. (NotNull)
+     * @param {string} definitionKey - definition key. (NotNull)
+     * @return {string} filtered bean subPackage. (NotNull)
+     */
+    beanDefinetionSubPackage: function(request, definitionKey) {
+        return 'definition';
+    },
+
+    /**
+     * Return bean definetion class name.
+     * @param {Request} request - Request. (NotNull)
+     * @param {string} definitionKey - definition key. (NotNull)
+     * @return {string} bean definetion class name. (NotNull)
+     */
+    beanDefinetionClassName: function(request, definitionKey) {
+        return definitionKey.replace(/.*\./g, '') + 'Definition';
+    },
 
     /**
      * Return bean class name.
@@ -440,6 +462,9 @@ var baseRule = {
                 return true;
             }
         }
+        if (file.getName().match(new RegExp(this.beanDefinetionClassName(request, '@@@').replace('@@@', '.+')))) {
+            return true;
+        }        
         return false;
     }
 };
