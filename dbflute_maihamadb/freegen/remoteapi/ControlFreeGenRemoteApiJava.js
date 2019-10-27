@@ -220,7 +220,7 @@ function processHull(request) {
         keepBehavior(rule, api, pathVariables, paramBean, paramBeanArray, returnBean, returnBeanArray, exBehaviorMap);
     }
 
-    if (rule['beanDefinetionGeneration']) {
+    if (rule['beanExtendsDefinitionGeneration']) {
         for each (var remoteApiBean in remoteApiBeanList) {
             if (!remoteApiBean.definitionKey) {
                 continue;
@@ -230,27 +230,27 @@ function processHull(request) {
                         && remoteApiBean.definitionKey === comparisonRemoteApiBean.definitionKey
                         && remoteApiBean.in === comparisonRemoteApiBean.in) {
     
-                    var definetionRemoteApiBean = new java.util.LinkedHashMap();
-                    definetionRemoteApiBean.api = null;
+                    var definitionRemoteApiBean = new java.util.LinkedHashMap();
+                    definitionRemoteApiBean.api = null;
                     var schemaPackage = scriptEngine.invokeMethod(rule, 'schemaPackage', api.schema);
-                    var subPackage = scriptEngine.invokeMethod(rule, 'beanDefinetionSubPackage', request, remoteApiBean.definitionKey);
+                    var subPackage = scriptEngine.invokeMethod(rule, 'beanExtendsDefinitionSubPackage', request, remoteApiBean.definitionKey);
                     var package = api.package + '.' + schemaPackage;
                     if (subPackage) {
                         package = package + '.' + subPackage;
                     }
-                    definetionRemoteApiBean.package = package;
-                    definetionRemoteApiBean.className = scriptEngine.invokeMethod(rule, 'beanDefinetionClassName', request, remoteApiBean.definitionKey);
-                    definetionRemoteApiBean.extendsClass = remoteApiBean.extendsClass;
-                    definetionRemoteApiBean.implementsClasses = remoteApiBean.implementsClasses;
-                    definetionRemoteApiBean.properties = remoteApiBean.properties;
-                    definetionRemoteApiBean.beanPurposeType = remoteApiBean.definitionKey;
-                    definetionRemoteApiBean.remoteApiExp = 'definition';
-                    definetionRemoteApiBean.definitionMap = definitionMap;
-                    definetionRemoteApiBean.in = remoteApiBean.in;
+                    definitionRemoteApiBean.package = package;
+                    definitionRemoteApiBean.className = scriptEngine.invokeMethod(rule, 'beanExtendsDefinitionClassName', request, remoteApiBean.definitionKey);
+                    definitionRemoteApiBean.extendsClass = remoteApiBean.extendsClass;
+                    definitionRemoteApiBean.implementsClasses = remoteApiBean.implementsClasses;
+                    definitionRemoteApiBean.properties = remoteApiBean.properties;
+                    definitionRemoteApiBean.beanPurposeType = remoteApiBean.definitionKey;
+                    definitionRemoteApiBean.remoteApiExp = 'definition';
+                    definitionRemoteApiBean.definitionMap = definitionMap;
+                    definitionRemoteApiBean.in = remoteApiBean.in;
     
-                    remoteApiBeanList.push(definetionRemoteApiBean);
+                    remoteApiBeanList.push(definitionRemoteApiBean);
     
-                    remoteApiBean.extendsClass = definetionRemoteApiBean.package + '.' + definetionRemoteApiBean.className;
+                    remoteApiBean.extendsClass = definitionRemoteApiBean.package + '.' + definitionRemoteApiBean.className;
                     remoteApiBean.implementsClasses = null;
                     remoteApiBean.in = null;
                     remoteApiBean.properties = [];

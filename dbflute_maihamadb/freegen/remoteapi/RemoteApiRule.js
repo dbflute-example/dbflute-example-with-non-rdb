@@ -234,25 +234,25 @@ var baseRule = {
      */
     unDefinitionKey: function(definitionKey) { return definitionKey; },
 
-	beanDefinetionGeneration: false,
+	beanExtendsDefinitionGeneration: false,
 
     /**
-     * Return filtered bean definetion subPackage.
+     * Return filtered bean definition subPackage.
      * @param {Request} request - Request. (NotNull)
      * @param {string} definitionKey - definition key. (NotNull)
      * @return {string} filtered bean subPackage. (NotNull)
      */
-    beanDefinetionSubPackage: function(request, definitionKey) {
+    beanExtendsDefinitionSubPackage: function(request, definitionKey) {
         return 'definition';
     },
 
     /**
-     * Return bean definetion class name.
+     * Return bean definition class name.
      * @param {Request} request - Request. (NotNull)
      * @param {string} definitionKey - definition key. (NotNull)
-     * @return {string} bean definetion class name. (NotNull)
+     * @return {string} bean definition class name. (NotNull)
      */
-    beanDefinetionClassName: function(request, definitionKey) {
+    beanExtendsDefinitionClassName: function(request, definitionKey) {
         return definitionKey.replace(/.*\./g, '') + 'Definition';
     },
 
@@ -462,7 +462,7 @@ var baseRule = {
                 return true;
             }
         }
-        if (file.getName().match(new RegExp(this.beanDefinetionClassName(request, '@@@').replace('@@@', '.+')))) {
+        if (file.getName().match(new RegExp(this.beanExtendsDefinitionClassName(request, '@@@').replace('@@@', '.+')))) {
             return true;
         }        
         return false;

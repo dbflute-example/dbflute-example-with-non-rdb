@@ -46,6 +46,9 @@ remoteApiRule.behaviorSubPackage = function(api) {
 // =======================================================================================
 //                                                                            Param/Return
 //                                                                            ============
+// 自動生成するParam/Returnクラスの親Definitionクラスを生成します。
+remoteApiRule.beanExtendsDefinitionGeneration = true;
+
 // 自動生成するParamクラスにimplementsするインターフェースを指定する。
 remoteApiRule.paramImplementsClasses = function(api, properties) {
     return 'xxx.yyy.zzz.AbcParam';
