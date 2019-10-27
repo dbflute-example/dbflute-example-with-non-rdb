@@ -14,7 +14,7 @@
 ## governing permissions and limitations under the License.
 ##
 #set ($rule = $scriptEngine.get('remoteApiRule'))
-#if ($data.properties.size() > 0)
+#if (!$data.properties.isEmpty() || !$data.definitionRemoteApiBean.properties.isEmpty())
 <table>
     <thead>
     <tr>
@@ -24,6 +24,13 @@
     </tr>
     </thead>
 #foreach($propertyEntry in $data.properties.entrySet())
+    <tr>
+        <td class="rowcellnum" rowspan="$rowspan">${foreach.count}</td>
+        <td>${scriptEngine.invokeMethod($rule, 'fieldName', $data.api, $data, $propertyEntry.key)}</td>
+        <td>TODO</td>
+    </tr>
+#end
+#foreach($propertyEntry in $data.definitionRemoteApiBean.properties.entrySet())
     <tr>
         <td class="rowcellnum" rowspan="$rowspan">${foreach.count}</td>
         <td>${scriptEngine.invokeMethod($rule, 'fieldName', $data.api, $data, $propertyEntry.key)}</td>
