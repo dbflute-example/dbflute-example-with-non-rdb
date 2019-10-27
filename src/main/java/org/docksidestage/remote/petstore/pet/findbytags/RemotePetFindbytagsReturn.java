@@ -15,75 +15,13 @@
  */
 package org.docksidestage.remote.petstore.pet.findbytags;
 
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlElement;
-
 import org.lastaflute.core.util.Lato;
-import org.lastaflute.web.validation.Required;
 
 /**
  * The bean class as return for remote API of GET /pet/findByTags.
  * @author FreeGen
  */
-public class RemotePetFindbytagsReturn {
-
-    /** The property of id. (NullAllowed) */
-    @XmlElement(name = "id")
-    public Long id;
-
-    /** The property of category. (NullAllowed) */
-    @XmlElement(name = "category")
-    @javax.validation.Valid
-    public CategoryPart category;
-
-    /**
-     * The part class of CategoryPart.
-     * @author FreeGen
-     */
-    public static class CategoryPart {
-
-        /** The property of id. (NullAllowed) */
-        @XmlElement(name = "id")
-        public Long id;
-
-        /** The property of name. (NullAllowed) */
-        @XmlElement(name = "name")
-        public String name;
-    }
-
-    /** The property of name. */
-    @XmlElement(name = "name")
-    @Required
-    public String name;
-
-    /** The property of photoUrls. */
-    @XmlElement(name = "photoUrls")
-    @NotNull
-    public java.util.List<String> photoUrls;
-
-    /** The property of tags. (NullAllowed) */
-    @XmlElement(name = "tags")
-    @javax.validation.Valid
-    public java.util.List<TagPart> tags;
-
-    /**
-     * The part class of TagPart.
-     * @author FreeGen
-     */
-    public static class TagPart {
-
-        /** The property of id. (NullAllowed) */
-        @XmlElement(name = "id")
-        public Long id;
-
-        /** The property of name. (NullAllowed) */
-        @XmlElement(name = "name")
-        public String name;
-    }
-
-    /** The property of status. (enumValue=[available, pending, sold]) (pet status in the store) (NullAllowed) */
-    @XmlElement(name = "status")
-    public String status;
+public class RemotePetFindbytagsReturn extends org.docksidestage.remote.petstore.definition.PetDefinition {
 
     @Override
     public String toString() {

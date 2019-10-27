@@ -13,15 +13,39 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.docksidestage.remote.petstore.user.createwitharray;
+package org.docksidestage.remote.petstore.definition;
 
 import org.lastaflute.core.util.Lato;
 
 /**
- * The bean class as param for remote API of POST /user/createWithArray.
+ * The bean class as User for remote API of definition.
  * @author FreeGen
  */
-public class RemoteUserCreatewitharrayParam extends org.docksidestage.remote.petstore.definition.UserDefinition {
+public class UserDefinition {
+
+    /** The property of id. (NullAllowed) */
+    public Long id;
+
+    /** The property of username. (NullAllowed) */
+    public String username;
+
+    /** The property of firstName. (NullAllowed) */
+    public String firstName;
+
+    /** The property of lastName. (NullAllowed) */
+    public String lastName;
+
+    /** The property of email. (NullAllowed) */
+    public String email;
+
+    /** The property of password. (NullAllowed) */
+    public String password;
+
+    /** The property of phone. (NullAllowed) */
+    public String phone;
+
+    /** The property of userStatus. (User Status) (NullAllowed) */
+    public Integer userStatus;
 
     @Override
     public String toString() {

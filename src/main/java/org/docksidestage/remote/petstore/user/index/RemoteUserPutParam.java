@@ -21,31 +21,7 @@ import org.lastaflute.core.util.Lato;
  * The bean class as param for remote API of PUT /user/{username}.
  * @author FreeGen
  */
-public class RemoteUserPutParam {
-
-    /** The property of id. (NullAllowed) */
-    public Long id;
-
-    /** The property of username. (NullAllowed) */
-    public String username;
-
-    /** The property of firstName. (NullAllowed) */
-    public String firstName;
-
-    /** The property of lastName. (NullAllowed) */
-    public String lastName;
-
-    /** The property of email. (NullAllowed) */
-    public String email;
-
-    /** The property of password. (NullAllowed) */
-    public String password;
-
-    /** The property of phone. (NullAllowed) */
-    public String phone;
-
-    /** The property of userStatus. (User Status) (NullAllowed) */
-    public Integer userStatus;
+public class RemoteUserPutParam extends org.docksidestage.remote.petstore.definition.UserDefinition {
 
     @Override
     public String toString() {

@@ -15,39 +15,13 @@
  */
 package org.docksidestage.remote.petstore.store.order;
 
-import javax.xml.bind.annotation.XmlElement;
-
 import org.lastaflute.core.util.Lato;
 
 /**
  * The bean class as return for remote API of POST /store/order.
  * @author FreeGen
  */
-public class RemoteStoreOrderReturn {
-
-    /** The property of id. (NullAllowed) */
-    @XmlElement(name = "id")
-    public Long id;
-
-    /** The property of petId. (NullAllowed) */
-    @XmlElement(name = "petId")
-    public Long petId;
-
-    /** The property of quantity. (NullAllowed) */
-    @XmlElement(name = "quantity")
-    public Integer quantity;
-
-    /** The property of shipDate. (NullAllowed) */
-    @XmlElement(name = "shipDate")
-    public java.time.LocalDateTime shipDate;
-
-    /** The property of status. (enumValue=[placed, approved, delivered]) (Order Status) (NullAllowed) */
-    @XmlElement(name = "status")
-    public String status;
-
-    /** The property of complete. (NullAllowed) */
-    @XmlElement(name = "complete")
-    public Boolean complete;
+public class RemoteStoreOrderReturn extends org.docksidestage.remote.petstore.definition.OrderDefinition {
 
     @Override
     public String toString() {
