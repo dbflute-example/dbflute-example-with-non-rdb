@@ -21,7 +21,7 @@
 ${manager.allClassCopyright}package ${data.package};
 #set ($importList = [])
 #set($added = $importList.add('org.lastaflute.core.util.Lato'))
-#if ($data.in == 'xml')
+#if (!$data.properties.isEmpty() && $data.in == 'xml')
 #set($added = $importList.add('javax.xml.bind.annotation.XmlElement'))
 #end
 #foreach($propertyEntry in $data.properties.entrySet())

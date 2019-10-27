@@ -252,7 +252,6 @@ function processHull(request) {
     
                     remoteApiBean.extendsClass = definitionRemoteApiBean.package + '.' + definitionRemoteApiBean.className;
                     remoteApiBean.implementsClasses = null;
-                    remoteApiBean.in = null;
                     remoteApiBean.properties = [];
                     break;
                  }
