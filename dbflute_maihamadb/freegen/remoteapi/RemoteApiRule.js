@@ -253,7 +253,7 @@ var baseRule = {
      * @return {string} bean definition class name. (NotNull)
      */
     beanExtendsDefinitionClassName: function(request, definitionKey) {
-        return definitionKey.replace(/.*\./g, '') + 'Definition';
+        return definitionKey.replace(/.*\./g, '').replace(/(<|>)/g, '') + 'Definition';
     },
 
     /**
