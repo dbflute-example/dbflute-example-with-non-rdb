@@ -34,7 +34,7 @@ function process(requestList) {
             throw e;
         }
     }
-    clean(null, null, '../resources/' + genType + '/di', srcPathList);
+    //clean(null, null, '../resources/' + genType + '/di', srcPathList);
 }
 
 /**
