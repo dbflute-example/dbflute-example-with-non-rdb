@@ -234,7 +234,7 @@ var baseRule = {
      */
     unDefinitionKey: function(definitionKey) { return definitionKey; },
 
-	beanExtendsDefinitionGeneration: false,
+    beanExtendsDefinitionGeneration: false,
 
     /**
      * Return filtered bean definition subPackage.
@@ -455,17 +455,12 @@ var baseRule = {
      * @return {boolean} delete target. (NotNull)
      */
     deleteTarget: function(request, file) {
-        var nameFunctionList = ['bsBehaviorClassName', 'exBehaviorClassName', 'paramClassName', 'returnClassName'];
-        var dummyApi = {'schema': this.schema(request), 'url': '@@@'};
-        for (var nameFunctionIndex in nameFunctionList) {
-            if (file.getName().match(new RegExp(this[nameFunctionList[nameFunctionIndex]](dummyApi).replace('@@@', '.+')))) {
-                return true;
-            }
+        try {
+            var text = java.nio.file.Files.readAllLines(file.toPath(), Java.type('java.nio.charset.StandardCharsets').UTF_8);
+            return Java.type('java.lang.String').join('\n', text).contains(' @author FreeGen');
+        } catch (e) {
+            return false;
         }
-        if (file.getName().match(new RegExp(this.beanExtendsDefinitionClassName(request, '@@@').replace('@@@', '.+')))) {
-            return true;
-        }        
-        return false;
     }
 };
 
