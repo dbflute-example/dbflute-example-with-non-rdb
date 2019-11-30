@@ -15,7 +15,6 @@
  */
 package org.dbflute.solr.cbean;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrQuery;
@@ -54,6 +53,8 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
     protected boolean useFilterQuery;
 
     protected String route;
+
+    protected SolrNativeQueryCall nativeQueryLambda;
 
     public enum QueryOperator {
         AND, OR
@@ -156,26 +157,30 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
         return this.getQueryBean().isUseSort();
     }
 
-    public List<SortClause> getSolrSortClauseList() {
+    protected List<SortClause> getSolrSortClauseList() {
         return this.getQueryBean().getSolrSortClauseList();
     }
 
-    public String getMinimumQuery() {
+    protected String getMinimumQuery() {
         return getQueryBean().getMinimumQueryString();
     }
 
-    public String[] getQueryArray() {
+    protected String[] getQueryArray() {
         List<String> list = getQueryBean().getQueryList();
         return list.size() <= 1 ? new String[] {} : list.subList(1, list.size()).toArray(new String[] {});
     }
 
-    public String getQueryString() {
+    protected String getQueryString() {
         return getQueryBean().getQueryString();
     }
 
-    public String[] getFilterQueryArray() {
+    protected String[] getFilterQueryArray() {
         List<String> list = getFilterQueryBean().getQueryList();
         return list.toArray(new String[] {});
+    }
+
+    public void nativeQuery(SolrNativeQueryCall nativeQueryLambda) {
+        this.nativeQueryLambda = nativeQueryLambda;
     }
 
     // ===================================================================================
@@ -196,13 +201,17 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
     @Override
     public SolrQuery buildSolrQuery() {
         SolrQuery query = new SolrQuery();
+
         if (queryOperator != null) {
             query.add(SOLR_QUERY_OPERATOR_KEY, queryOperator.name());
         }
+
         if (this.specify().isSpecify()) {
             query.setFields(this.getSpecifyFields());
         }
+
         query.setIncludeScore(this.specify().isScoreEnable());
+
         if (this.isUseFilterQuery()) {
             query.setQuery(this.getMinimumQuery());
             query.setFilterQueries(this.getQueryArray());
@@ -213,6 +222,7 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
                 query.setFilterQueries(this.getFilterQueryArray());
             }
         }
+
         if (this.isUseSort()) {
             for (SortClause sortClause : this.getSolrSortClauseList()) {
                 query.addSort(sortClause);
@@ -244,6 +254,10 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
             if (this.getFacetFetchSize() != null) {
                 query.setFacetLimit(this.getFacetFetchSize());
             }
+        }
+
+        if (nativeQueryLambda != null) {
+            nativeQueryLambda.callback(query);
         }
 
         return query;
@@ -280,11 +294,6 @@ public abstract class AbstractSolrConditionBean implements SolrConditionBean {
      * @return String of query condition
      */
     public String toDisplayCondition() {
-        StringBuilder sb = new StringBuilder();
-        buildSolrQuery().getMap().forEach((key, value) -> {
-            sb.append("").append(key).append(" = ").append(Arrays.asList(value)).append(" \n");
-        });
-
-        return sb.toString();
+        return buildSolrQuery().toString();
     }
 }

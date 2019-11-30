@@ -48,7 +48,9 @@ function processCore(request) {
     var coreVmList = [];
     if (!genCore) {
         genCore = true;
+        coreVmList.push('C7aCommonColumnAutoSetupper.vm');
         coreVmList.push('C7aPool.vm');
+        coreVmList.push('bhv/AbstractC7aBehaviorReadable.vm');
         coreVmList.push('bhv/AbstractC7aBehaviorWritable.vm');
         coreVmList.push('entity/C7aEntity.vm');
         coreVmList.push('entity/AbstractC7aEntity.vm');
@@ -116,13 +118,40 @@ function processHull(request) {
             exUserTypeMap.put(exUserType.userTypeName, exUserType);
         }
 
+        var tableMetaList = [];
         for (var tableMetaKey in keyspaceMeta.tableMetaList) {
             var tableMeta = keyspaceMeta.tableMetaList[tableMetaKey];
+            tableMeta.sameMaterializedViewMetaList = [];
+            tableMetaList.push(tableMeta);
+            for (var materializedViewMetaKey in tableMeta.materializedViewMetaList) {
+                var materializedViewMeta = tableMeta.materializedViewMetaList[materializedViewMetaKey];
+                if (tableMeta.partitionKeyList.equals(materializedViewMeta.partitionKeyList)) {
+                    tableMeta.sameMaterializedViewMetaList.push(materializedViewMeta);
+                } else {
+                    var sameMaterializedView = false;
+                    for (var key in tableMetaList) {
+                        if (tableMetaList[key].partitionKeyList.equals(materializedViewMeta.partitionKeyList)) {
+                            sameMaterializedView = true;
+                            tableMetaList[key].sameMaterializedViewMetaList.push(materializedViewMeta);
+                        }
+                    }
+                    if (!sameMaterializedView) {
+                        materializedViewMeta.sameMaterializedViewMetaList = [];
+                        materializedViewMeta.materializedView = true;
+                        tableMetaList.push(materializedViewMeta);
+                    }
+                }
+            }
+        }
+
+        for (var tableMetaKey in tableMetaList) {
+            var tableMeta = tableMetaList[tableMetaKey];
 
             var base = new java.util.LinkedHashMap();
             base.c7a = c7a;
             base.tableName = tableMeta.name;
             base.bs = new java.util.LinkedHashMap();
+            base.bs.materializedView = tableMeta.materializedView;
             base.bs.c7a = c7a;
             base.bs.exUserTypeMap = exUserTypeMap;
             base.bs.keyspaceName = keyspaceMeta.name;
@@ -134,7 +163,7 @@ function processHull(request) {
             base.bs.clusteringColumnList = tableMeta.clusteringColumnList;
             base.bs.clusteringOrderList = tableMeta.clusteringOrderList;
             base.bs.primaryKeyList = tableMeta.primaryKeyList;
-            base.bs.materializedViewMetaList = tableMeta.materializedViewMetaList;
+            base.bs.materializedViewMetaList = tableMeta.sameMaterializedViewMetaList;
             base.bs.filterTableName = scriptEngine.invokeMethod(rule, 'filterTableName', c7a, tableMeta);
             analyzeProperties(rule, base.bs);
 
@@ -196,8 +225,13 @@ function processHull(request) {
             subPackage = scriptEngine.invokeMethod(rule, 'bsBehaviorSubPackage', c7a, tableMeta);
             exBehavior.bs.package = subPackage ? c7a.package + '.' + subPackage : c7a.package;
             exBehavior.bs.className = scriptEngine.invokeMethod(rule, 'bsBehaviorClassName', c7a, tableMeta);
-            exBehavior.bs.extendsClassName = scriptEngine.invokeMethod(rule, 'bsBehaviorExtendsClassName', c7a);
-            exBehavior.bs.extendsClass = scriptEngine.invokeMethod(rule, 'bsBehaviorExtendsClass', c7a);
+            if (tableMeta.materializedView) {
+                exBehavior.bs.extendsClassName = 'AbstractC7aBehaviorReadable';
+                exBehavior.bs.extendsClass = 'org.dbflute.c7a.bhv.' + exBehavior.bs.extendsClassName;
+            } else {
+                exBehavior.bs.extendsClassName = scriptEngine.invokeMethod(rule, 'bsBehaviorExtendsClassName', c7a);
+                exBehavior.bs.extendsClass = scriptEngine.invokeMethod(rule, 'bsBehaviorExtendsClass', c7a);
+            }
             exBehavior.bs.implementsClasses = scriptEngine.invokeMethod(rule, 'bsBehaviorImplementsClasses', c7a, tableMeta);
             exBehavior.bs.exEntity = exEntity;
             exBehavior.bs.exConditionBean = exConditionBean;
@@ -223,6 +257,14 @@ function processHull(request) {
 
     var path = commonColumn.package.replace(/\./g, '/') + '/' + commonColumn.className.replace(/\./g, '/') + '.java';
     generate('./c7a/C7aEntityDefinedCommonColumn.vm', path, commonColumn, true);
+    
+    var commonColumnAutoSetupper = new java.util.LinkedHashMap();
+    commonColumnAutoSetupper.c7a = c7a;
+    commonColumnAutoSetupper.package = c7a.package;
+    commonColumnAutoSetupper.className = 'C7aLaxImplementedCommonColumnAutoSetupper';
+    commonColumnAutoSetupper.commonColumn = commonColumn;
+    var path = commonColumnAutoSetupper.package.replace(/\./g, '/') + '/' + commonColumnAutoSetupper.className.replace(/\./g, '/') + '.java';
+    generate('./c7a/C7aImplementedCommonColumnAutoSetupper.vm', path, commonColumnAutoSetupper, true);
 
     var abstractBehavior = new java.util.LinkedHashMap();
     abstractBehavior.c7a = c7a;
@@ -236,6 +278,7 @@ function processHull(request) {
     var di = new java.util.LinkedHashMap();
     di.c7a = c7a;
     di.exBehaviorList = exBehaviorList;
+    di.commonColumnAutoSetupper = commonColumnAutoSetupper;
     if (manager.isTargetContainerLastaDi()) {
         path = scriptEngine.invokeMethod(rule, 'poolDiXmlPath', c7a, request.resourceFile);
         generate('./c7a/allcommon/container/lastadi/C7aPoolDiXml.vm', path, di, true);
@@ -293,7 +336,8 @@ function analyzeProperties(rule, base) {
 /**
  * Process doc.
  * @param {Rule} rule - rule. (NotNull)
- * @param {Request} request - request (NotNull)
+ * @param {C7a} c7a - c7a (NotNull)
+ * @param {ExEntityList} exEntityList - The List of exEntity information. (NotNull)
  */
 function processDoc(rule, c7a, exEntityList) {
     if (!rule['docGeneration']) {
@@ -302,12 +346,12 @@ function processDoc(rule, c7a, exEntityList) {
     var doc = new java.util.LinkedHashMap();
     doc.put('c7a', c7a);
     doc.put('exEntityList', exEntityList);
-    var c7aDocHtml = generate('./c7a/doc/C7aDocHtml.vm', null, doc, true);
+    var docHtml = generate('./' + genType + '/doc/' + manager.initCap(genType) + 'DocHtml.vm', null, doc, true);
     var lastaDocHtmlPathList = manager.getLastaDocHtmlPathList();
     var markNaviLink = manager.getLastaDocHtmlMarkFreeGenDocNaviLink();
     var markBody = manager.getLastaDocHtmlMarkFreeGenDocBody();
-    var naviLinkHtml = '    | <a href="#c7a">to c7a</a>';
-    var naviLinkDestinationHtml = '<span id="c7a"></span>';
+    var naviLinkHtml = '    | <a href="#' + genType + '">to ' + genType + '</a>';
+    var naviLinkDestinationHtml = '<span id="' + genType + '"></span>';
     for (var lastaDocHtmlPathIndex in lastaDocHtmlPathList) {
         var lastaDocHtmlPath = java.nio.file.Paths.get(lastaDocHtmlPathList[lastaDocHtmlPathIndex]);
         var lastaDocHtml = Java.type('java.lang.String').join('\n', java.nio.file.Files.readAllLines(lastaDocHtmlPath));
@@ -315,9 +359,9 @@ function processDoc(rule, c7a, exEntityList) {
             lastaDocHtml = lastaDocHtml.replace(markNaviLink, naviLinkHtml + '\n' + markNaviLink);
         }
         if (!lastaDocHtml.contains(naviLinkDestinationHtml)) {
-            c7aDocHtml = naviLinkDestinationHtml + c7aDocHtml;
+            docHtml = naviLinkDestinationHtml + docHtml;
         }
-        java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, c7aDocHtml + '\n' + markBody).getBytes('UTF-8'));
+        java.nio.file.Files.write(lastaDocHtmlPath, lastaDocHtml.replace(markBody, docHtml + '\n' + markBody).getBytes('UTF-8'));
     }
 }
 

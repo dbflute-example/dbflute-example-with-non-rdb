@@ -16,6 +16,12 @@
 #set ($rule = $scriptEngine.get('c7aRule'))
 ${manager.allClassCopyright}package ${data.package};
 #set ($importList = [])
+#set($added = $importList.add('javax.annotation.Resource'))
+#set($added = $importList.add('org.dbflute.c7a.C7aPool'))
+#if (!$data.materializedView)
+#set($added = $importList.add('org.dbflute.c7a.C7aCommonColumnAutoSetupper'))
+#set($added = $importList.add('org.dbflute.c7a.entity.C7aEntity'))
+#end
 #set($added = $importList.add("${data.extendsClass}"))
 #set($added = $importList.add("${data.exConditionBean.package}.${data.exConditionBean.className}"))
 #set($added = $importList.add("${data.exEntity.package}.${data.exEntity.className}"))
@@ -26,6 +32,19 @@ ${manager.allClassCopyright}package ${data.package};
  * @author FreeGen
  */
 public abstract class ${data.className}#if ($data.extendsClassName && $data.extendsClassName != '') extends ${data.extendsClassName}<${data.exEntity.className}, ${data.exConditionBean.className}>#end#if ($data.implementsClasses && $data.implementsClasses != '') implements $data.implementsClasses#end {
+
+    @Resource
+    private C7aPool c7a${data.c7a.schema}Pool;
+#if (!$data.materializedView)
+
+    @Resource
+    private C7aCommonColumnAutoSetupper commonColumnAutoSetupper;
+#end
+
+    @Override
+    protected C7aPool getC7aPool() {
+        return c7a${data.c7a.schema}Pool;
+    }
 
     @Override
     protected String getKeyspace() {
@@ -41,6 +60,7 @@ public abstract class ${data.className}#if ($data.extendsClassName && $data.exte
     protected Class<${data.exEntity.className}> typeOfSelectedEntity() {
         return ${data.exEntity.className}.class;
     }
+#if (!$data.materializedView)
 #foreach($property in $data.properties)
 #if($property.name.equalsIgnoreCase($data.c7a.optimisticLock.fieldName))
 
@@ -54,5 +74,16 @@ public abstract class ${data.className}#if ($data.extendsClassName && $data.exte
         entity.set${manager.initCap($property.fieldName)}($data.c7a.optimisticLock.operation);
     }
 #end
+#end
+
+    @Override
+    protected void handleCommonColumnOfInsertIfNeeds(C7aEntity targetEntity) {
+        commonColumnAutoSetupper.handleCommonColumnOfInsertIfNeeds(targetEntity);
+    }
+
+    @Override
+    protected void handleCommonColumnOfUpdateIfNeeds(C7aEntity targetEntity) {
+        commonColumnAutoSetupper.handleCommonColumnOfUpdateIfNeeds(targetEntity);
+    }
 #end
 }

@@ -16,10 +16,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE components PUBLIC "-//DBFLUTE//DTD LastaDi 1.0//EN"
     "http://dbflute.org/meta/lastadi10.dtd">
+<!-- @author FreeGen -->
 <components namespace="c7a_${data.c7a.schemaPackage.replaceAll('\.', '-')}">
     <include condition="#exists('#path')" path="my_included_c7a.xml"/>
     <include path="c7a/di/c7a_pool_${data.c7a.schemaPackage.replaceAll('\.', '-')}.xml"/>
 
+    <component name="${manager.initUncap($data.commonColumnAutoSetupper.className)}" class="${data.commonColumnAutoSetupper.package}.${data.commonColumnAutoSetupper.className}"/>
     <!-- The components of Behavior. -->
 #foreach ($behavior in $data.exBehaviorList)
     <component name="${manager.initUncap($behavior.className)}" class="${behavior.package}.${behavior.className}"/>

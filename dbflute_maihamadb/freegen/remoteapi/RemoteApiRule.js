@@ -456,8 +456,7 @@ var baseRule = {
      */
     deleteTarget: function(request, file) {
         try {
-            var text = java.nio.file.Files.readAllLines(file.toPath(), Java.type('java.nio.charset.StandardCharsets').UTF_8);
-            return Java.type('java.lang.String').join('\n', text).contains(' @author FreeGen');
+            return new java.lang.String(java.nio.file.Files.readAllBytes(file.toPath()), 'UTF-8').contains(' @author FreeGen');
         } catch (e) {
             return false;
         }

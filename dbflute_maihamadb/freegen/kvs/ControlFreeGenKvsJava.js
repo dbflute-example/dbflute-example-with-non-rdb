@@ -58,12 +58,12 @@ function processCore(request) {
         coreVmList.push('core/exception/KvsException.vm');
         coreVmList.push('core/delegator/KvsDelegator.vm');
         if (rule['cluster']) {
-	        coreVmList.push('core/delegator/cluster/AbstractKvsRedisDelegator.vm');
-	        coreVmList.push('core/delegator/cluster/KvsRedisPool.vm');
-	    } else {
-	        coreVmList.push('core/delegator/AbstractKvsRedisDelegator.vm');
-	        coreVmList.push('core/delegator/KvsRedisPool.vm');
-	    }
+            coreVmList.push('core/delegator/cluster/AbstractKvsRedisDelegator.vm');
+            coreVmList.push('core/delegator/cluster/KvsRedisPool.vm');
+        } else {
+            coreVmList.push('core/delegator/AbstractKvsRedisDelegator.vm');
+            coreVmList.push('core/delegator/KvsRedisPool.vm');
+        }
         coreVmList.push('core/delegator/KvsLocalMapDelegator.vm');
     }
 

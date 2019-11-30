@@ -79,7 +79,11 @@ var baseRule = {
      * @return {boolean} delete target. (NotNull)
      */
     deleteTarget: function(request, file) {
-        return true;
+        try {
+            return new java.lang.String(java.nio.file.Files.readAllBytes(file.toPath()), 'UTF-8').contains(' @author FreeGen');
+        } catch (e) {
+            return false;
+        }
     }
 };
 

@@ -13,13 +13,18 @@
 ## either express or implied. See the License for the specific language
 ## governing permissions and limitations under the License.
 ##
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE components PUBLIC "-//SEASAR//DTD S2Container 2.4//EN"
-    "http://www.seasar.org/dtd/components24.dtd">
-<!-- @author FreeGen -->
-<components namespace="solr-${manager.initUncap($data.solr.tableMap.schema)}">
-    <include path="saflute_assist.dicon"/>
-    <include path="saflute_core.dicon"/>
+${manager.allClassCopyright}package org.dbflute.solr.cbean;
 
-    <component name="solr${data.solr.tableMap.schema}Bhv" class="${data.solr.package}.exbhv.Solr${data.solr.tableMap.schema}Bhv" />
-</components>
+import org.apache.solr.client.solrj.SolrQuery;
+
+/**
+ * @author FreeGen
+ */
+@FunctionalInterface
+public interface SolrNativeQueryCall {
+
+    /**
+     * @param query The solr native query to be set up. (NotNull)
+     */
+    void callback(SolrQuery query);
+}

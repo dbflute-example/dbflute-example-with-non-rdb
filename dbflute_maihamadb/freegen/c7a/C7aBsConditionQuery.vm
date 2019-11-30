@@ -17,7 +17,18 @@
 ${manager.allClassCopyright}package ${data.package};
 #set ($importList = [])
 #set($added = $importList.add('java.util.Collection'))
-#if(!$data.materializedViewMetaList.isEmpty())
+#foreach($property in $data.properties)
+#set($orderBy = false)
+#foreach($clustering in $data.clusteringColumnList)
+#set($orderBy = true)
+#end
+#end
+#foreach($materializedViewMeta in $data.materializedViewMetaList)
+#foreach($clustering in $materializedViewMeta.clusteringColumnList)
+#set($orderBy = true)
+#end
+#end
+#if($orderBy)
 #set($added = $importList.add('org.dbflute.cbean.sqlclause.orderby.OrderByElement'))
 #end
 #set($added = $importList.add('org.dbflute.kvs.core.assertion.KvsAssertion'))

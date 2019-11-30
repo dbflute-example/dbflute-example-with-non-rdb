@@ -37,6 +37,18 @@ function process(requestList) {
         }
     }
     clean(null, null, 'org/dbflute/' + genType, srcPathList);
+    for each (var request in requestList) {
+        if (!request.isResourceTypeSolr()) {
+            continue;
+        }
+        scriptEngine.eval('load("./freegen/' + genType + '/' + manager.initCap(genType) + 'Rule.js");');
+        if (optionMap.ruleJsPath && optionMap.ruleJsPath != '') {
+            // load application rule settings if exists
+            scriptEngine.eval('load("' + optionMap.ruleJsPath + '");');
+        }
+        var rule = scriptEngine.get(genType + 'Rule');
+        clean(rule, request, request.package.replace(/\./g, '/'), srcPathList);
+    }
     clean(null, null, '../resources/' + genType + '/di', srcPathList);
 }
 
@@ -57,6 +69,7 @@ function processCore(request) {
         coreVmList.push('cbean/SolrConditionBean.vm');
         coreVmList.push('cbean/SolrFilterQueryBean.vm');
         coreVmList.push('cbean/SolrFQBCall.vm');
+        coreVmList.push('cbean/SolrNativeQueryCall.vm');
         coreVmList.push('cbean/SolrQBCall.vm');
         coreVmList.push('cbean/SolrQFCall.vm');
         coreVmList.push('cbean/SolrQueryBean.vm');
@@ -111,7 +124,7 @@ function processHull(request) {
     dbMeta.package = subPackage ? solr.package + '.' + subPackage : solr.package;
     dbMeta.className = 'Solr' + solr.schemaShort + 'Dbm';
     dbMetaList.push(dbMeta);
-    
+
     var exEntity = new java.util.LinkedHashMap(base);
     subPackage = 'exentity';
     exEntity.package = subPackage ? solr.package + '.' + subPackage : solr.package;
@@ -196,9 +209,8 @@ function processHull(request) {
             generate('./solr/allcommon/container/lastadi/SolrAllDiXml.vm', '../resources/solr/di/solr-all.xml', '', true);
         }
     }
-    
+
     processDoc(rule, request);
-    clean(rule, request, solr.package.replace(/\./g, '/'), srcPathList);
 }
 
 /**

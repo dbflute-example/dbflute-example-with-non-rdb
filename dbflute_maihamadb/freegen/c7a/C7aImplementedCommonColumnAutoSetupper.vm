@@ -1,0 +1,85 @@
+##
+## Copyright 2014-2018 the original author or authors.
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+##     http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+## either express or implied. See the License for the specific language
+## governing permissions and limitations under the License.
+##
+#set ($rule = $scriptEngine.get('c7aRule'))
+${manager.allClassCopyright}package ${data.package};
+#set ($importList = [])
+#set($added = $importList.add('org.dbflute.c7a.C7aCommonColumnAutoSetupper'))
+#set($added = $importList.add('org.dbflute.c7a.entity.C7aEntity'))
+#set($added = $importList.add("${data.commonColumn.package}.${data.commonColumn.className}"))
+#generateImports($importList, $data.package, $scriptEngine.invokeMethod($rule, 'importOrderList'))
+
+/**
+ * The basic implementation of the auto set-upper of common column.
+ * @author FreeGen
+ */
+public class ${data.className} implements C7aCommonColumnAutoSetupper {
+
+    @Override
+    public void handleCommonColumnOfInsertIfNeeds(C7aEntity targetEntity) {
+        final ${data.commonColumn.className} entity = askIfEntitySetup(targetEntity);
+        if (entity == null) {
+            return;
+        }
+        doHandleCommonColumnOfInsertIfNeeds(entity);
+    }
+
+    @Override
+    public void handleCommonColumnOfUpdateIfNeeds(C7aEntity targetEntity) {
+        final ${data.commonColumn.className} entity = askIfEntitySetup(targetEntity);
+        if (entity == null) {
+            return;
+        }
+        doHandleCommonColumnOfUpdateIfNeeds(entity);
+    }
+
+    protected void doHandleCommonColumnOfInsertIfNeeds(${data.commonColumn.className} entity) {
+#foreach($property in $data.commonColumn.properties)
+#foreach($beforeInsert in $data.commonColumn.beforeInsert)
+#if($property.name == $beforeInsert.name)
+        entity.set${manager.initCap($property.fieldName)}($beforeInsert.value.replace('$$AccessContext$$', 'org.dbflute.hook.AccessContext'));
+#end
+#end
+#end
+    }
+
+    protected void doHandleCommonColumnOfUpdateIfNeeds(${data.commonColumn.className} entity) {
+#foreach($property in $data.commonColumn.properties)
+#foreach($beforeInsert in $data.commonColumn.beforeUpdate)
+#if($property.name == $beforeInsert.name)
+        entity.set${manager.initCap($property.fieldName)}($beforeInsert.value.replace('$$AccessContext$$', 'org.dbflute.hook.AccessContext'));
+#end
+#end
+#end
+    }
+
+    // =====================================================================================
+    //                                                                         Assist Helper
+    //                                                                         =============
+    protected ${data.commonColumn.className} askIfEntitySetup(C7aEntity targetEntity) {
+        if (!hasCommonColumn(targetEntity)) {
+            return null;
+        }
+        return downcastEntity(targetEntity);
+    }
+
+    protected boolean hasCommonColumn(C7aEntity targetEntity) {
+        return targetEntity instanceof ${data.commonColumn.className};
+    }
+
+    protected ${data.commonColumn.className} downcastEntity(C7aEntity targetEntity) {
+        return (${data.commonColumn.className}) targetEntity;
+    }
+}

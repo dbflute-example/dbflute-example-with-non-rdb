@@ -38,15 +38,15 @@ function process(requestList) {
         if (!request.isResourceTypeSwagger()) {
             continue;
         }
-		var optionMap = request.optionMap;
+        var optionMap = request.optionMap;
         scriptEngine.eval('load("./freegen/' + genType + '/' + 'RemoteApiRule.js");');
         if (optionMap.ruleJsPath && optionMap.ruleJsPath != '') {
             // load application rule settings if exists
             scriptEngine.eval('load("' + optionMap.ruleJsPath + '");');
         }
-		var rule = scriptEngine.get('remoteApiRule');
-    	clean(rule, request, '../resources/' + genType + '/di', srcPathList);
-	}
+        var rule = scriptEngine.get('remoteApiRule');
+        clean(rule, request, '../resources/' + genType + '/di', srcPathList);
+    }
 }
 
 /**
