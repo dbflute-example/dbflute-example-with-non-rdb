@@ -71,10 +71,28 @@ remoteApiRule.nestClassName = function(api, className) {
 // =======================================================================================
 //                                                                                  Option
 //                                                                                  ======
+// 自動生成ファイルのimprot宣言の順番を調整する。
+remoteApiRule.importOrderList = function() {
+    return ['java', 'javax', 'junit', 'org', 'com', 'net', 'ognl', 'mockit', 'jp'];
+},
+
+// リクエストやレスポンスの各フィールド名を調整する。
+// デフォルトは、小文字スネークケースからキャメルケースに変換して自動生成します。
+// 変換しないようにする場合は、this.FIELD_NAMING.CAMEL_TO_LOWER_SNAKEをnullにしてください。
+remoteApiRule.fieldNamingMapping = function() {
+    return {
+        'path': this.FIELD_NAMING.CAMEL_TO_LOWER_SNAKE,
+        'query': this.FIELD_NAMING.CAMEL_TO_LOWER_SNAKE,
+        'formData': this.FIELD_NAMING.CAMEL_TO_LOWER_SNAKE,
+        'json': this.FIELD_NAMING.CAMEL_TO_LOWER_SNAKE,
+        'xml': this.FIELD_NAMING.CAMEL_TO_LOWER_SNAKE
+    };
+},
+
 // -----------------------------------------------------
 //                                          Type Mapping
 //                                          ------------
-swagger.jsonの型とJavaの型を調整する。
+// swagger.jsonの型とJavaの型を調整する。
 remoteApiRule.typeMap = function() {
     var typeMap = baseRule.typeMap();
     // 配列(リスト)のマッピングを、java.util.ListからEclipse CollectionsのImmutableListに変更。
@@ -82,4 +100,14 @@ remoteApiRule.typeMap = function() {
     // 日時のマッピングを、java.time.LocalDateTimeからjava.time.ZonedDateTimeに変更。    
     typeMap['date-time'] = 'java.time.ZonedDateTime';
     return typeMap;
-}
+};
+
+// -----------------------------------------------------
+//                                              clean up
+//                                              --------
+// 自動生成後のファイルのクリーンアップ(削除)対象を調整する。
+// @since 2019/11/31 ファイルの中身に「 @author FreeGen」が含まれるファイルがクリーンアップ(削除)対象になります。
+remoteApiRule.deleteTarget = function(request, file) {
+    // 標準の動きで問題がある場合は、条件を足してください。
+	return baseRule.deleteTarget(request, file) && xxx;
+};
