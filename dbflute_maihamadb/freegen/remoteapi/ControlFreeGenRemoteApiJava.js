@@ -45,6 +45,10 @@ function process(requestList) {
             scriptEngine.eval('load("' + optionMap.ruleJsPath + '");');
         }
         var rule = scriptEngine.get('remoteApiRule');
+        var schema = scriptEngine.invokeMethod(rule, 'schema', request);
+        var schemaPackage = scriptEngine.invokeMethod(rule, 'schemaPackage', schema);
+        var package = request.package + '.' + schemaPackage;
+        clean(rule, request, package.replace(/\./g, '/'), srcPathList);
         clean(rule, request, '../resources/' + genType + '/di', srcPathList);
     }
 }
@@ -275,8 +279,6 @@ function processHull(request) {
     processBean(rule, remoteApiBeanList);
     processBhv(rule, request, exBehaviorMap);
     processDoc(rule, request, exBehaviorMap);
-    var package = api.package + '.' + scriptEngine.invokeMethod(rule, 'schemaPackage', api.schema);
-    clean(rule, request, package.replace(/\./g, '/'), srcPathList);
 }
 
 /**
