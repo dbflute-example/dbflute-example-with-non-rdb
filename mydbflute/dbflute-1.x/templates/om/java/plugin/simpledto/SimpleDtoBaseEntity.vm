@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2019 the original author or authors.
+## Copyright 2014-2020 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -360,13 +360,13 @@ public abstract class $myClassName implements Serializable {
     @JSONHint(format="${col.simpleDtoJsonicDecorationTimePattern}")
 #end
 #if ($col.hasSimpleDtoJacksonDecorationDatePattern())
-    @JsonFormat(pattern="${col.simpleDtoJsonicDecorationDatePattern}")
+    @JsonFormat(pattern="${col.simpleDtoJacksonDecorationDatePattern}")
 #end
 #if ($col.hasSimpleDtoJacksonDecorationTimestampPattern())
-    @JsonFormat(pattern="${col.simpleDtoJsonicDecorationTimestampPattern}")
+    @JsonFormat(pattern="${col.simpleDtoJacksonDecorationTimestampPattern}")
 #end
 #if ($col.hasSimpleDtoJacksonDecorationTimePattern())
-    @JsonFormat(pattern="${col.simpleDtoJsonicDecorationTimePattern}")
+    @JsonFormat(pattern="${col.simpleDtoJacksonDecorationTimePattern}")
 #end
     public ${col.javaNative} get${col.javaName}() {
         return ${col.simpleDtoVariableName};

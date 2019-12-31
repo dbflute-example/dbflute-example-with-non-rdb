@@ -175,6 +175,10 @@ public abstract class EsAbstractEntity implements Entity, Serializable, Cloneabl
         return false;
     }
 
+    @Override
+    public void clearMarkAsSelect() {
+    }
+
     // ===================================================================================
     //                                                                      Classification
     //                                                                      ==============

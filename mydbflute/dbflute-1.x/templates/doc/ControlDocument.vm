@@ -1,5 +1,5 @@
 ##
-## Copyright 2014-2019 the original author or authors.
+## Copyright 2014-2020 the original author or authors.
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License");
 ## you may not use this file except in compliance with the License.
@@ -20,12 +20,6 @@ $database.enableDocumentOutputDirectory()
 ## Initialize properties.
 ## - - - - - - - - - - - -
 $database.initializeVersion(90)
-#if ($selector.needsInitializeProperties())
-$database.initializeAdditionalPrimaryKey()
-$database.initializeAdditionalUniqueKey()
-$database.initializeAdditionalForeignKey()
-$database.initializeClassificationDeployment()
-#end
 
 ## - - - - - - - - - - - - - - - - - - - -
 ## Loading HTML resource before generation 
@@ -33,7 +27,7 @@ $database.initializeClassificationDeployment()
 ##  o but only sister HTMLs
 ## - - - - - - - - - - - - - - - - - - - -
 #if ($selector.isHistoryHtml())
-$selector.loadSchemaHistoryAsCore()
+$selector.lazyLoadIfNeedsCoreSchemaDiffList()
 $selector.loadHacoMap()
 #end
 #if ($selector.isPropertiesHtml())
