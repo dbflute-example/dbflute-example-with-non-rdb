@@ -107,13 +107,13 @@ public class KvsCacheManagerImpl implements KvsCacheManager {
     //                                                  List
     //                                                  ----
     @Override
-    public void registerList(String key, List<String> value) {
-        kvsCacheDelegator.registerList(key, value);
+    public void registerList(String key, List<String> list) {
+        kvsCacheDelegator.registerList(key, list);
     }
 
     @Override
-    public void registerList(String key, List<String> value, LocalDateTime expireDateTime) {
-        kvsCacheDelegator.registerList(key, value, expireDateTime);
+    public void registerList(String key, List<String> list, LocalDateTime expireDateTime) {
+        kvsCacheDelegator.registerList(key, list, expireDateTime);
     }
 
     @Override
@@ -131,13 +131,13 @@ public class KvsCacheManagerImpl implements KvsCacheManager {
     //                                                  Hash
     //                                                  ----
     @Override
-    public void registerHash(String key, Map<String, String> fieldValueMap) {
-        kvsCacheDelegator.registerHash(key, fieldValueMap);
+    public void registerHash(String key, Map<String, String> hash) {
+        kvsCacheDelegator.registerHash(key, hash);
     }
 
     @Override
-    public void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime expireDateTime) {
-        kvsCacheDelegator.registerHash(key, fieldValueMap, expireDateTime);
+    public void registerHash(String key, Map<String, String> hash, LocalDateTime expireDateTime) {
+        kvsCacheDelegator.registerHash(key, hash, expireDateTime);
     }
 
     @Override

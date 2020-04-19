@@ -112,13 +112,13 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     //                                                  List
     //                                                  ----
     @Override
-    public void registerList(String key, List<String> value) {
-        kvsStoreDelegator.registerList(key, value);
+    public void registerList(String key, List<String> list) {
+        kvsStoreDelegator.registerList(key, list);
     }
 
     @Override
-    public void registerList(String key, List<String> value, LocalDateTime expireDateTime) {
-        kvsStoreDelegator.registerList(key, value, expireDateTime);
+    public void registerList(String key, List<String> list, LocalDateTime expireDateTime) {
+        kvsStoreDelegator.registerList(key, list, expireDateTime);
     }
 
     @Override
@@ -135,13 +135,13 @@ public class KvsStoreManagerImpl implements KvsStoreManager {
     //                                                  Hash
     //                                                  ----
     @Override
-    public void registerHash(String key, Map<String, String> fieldValueMap) {
-        kvsStoreDelegator.registerHash(key, fieldValueMap);
+    public void registerHash(String key, Map<String, String> hash) {
+        kvsStoreDelegator.registerHash(key, hash);
     }
 
     @Override
-    public void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime expireDateTime) {
-        kvsStoreDelegator.registerHash(key, fieldValueMap, expireDateTime);
+    public void registerHash(String key, Map<String, String> hash, LocalDateTime expireDateTime) {
+        kvsStoreDelegator.registerHash(key, hash, expireDateTime);
     }
 
     @Override

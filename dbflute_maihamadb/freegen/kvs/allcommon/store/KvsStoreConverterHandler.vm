@@ -66,11 +66,11 @@ public class KvsStoreConverterHandler {
      * @param <ENTITY> Entity class of DBFlute
      * @return An Entity object of DBFlute (NotNull)
      */
-    @SuppressWarnings("unchecked")
     public <ENTITY extends KvsStoreEntity> ENTITY toEntity(String mapString, KvsStoreDBMeta dbmeta) {
-        KvsStoreEntity entity = dbmeta.newKvsStoreEntity();
+        @SuppressWarnings("unchecked")
+        ENTITY entity = (ENTITY) dbmeta.newKvsStoreEntity();
         dbmeta.acceptAllColumnMap(entity, fromMapString(mapString));
-        return (ENTITY) entity;
+        return entity;
     }
 
     /**
@@ -80,39 +80,38 @@ public class KvsStoreConverterHandler {
      * @param <ENTITY> Entity class of DBFlute
      * @return A list of Entity objects of DBFlute (NotNull)
      */
-    @SuppressWarnings("unchecked")
     public <ENTITY extends KvsStoreEntity> List<ENTITY> toEntityList(List<String> mapStringList, KvsStoreDBMeta dbmeta) {
-        List<KvsStoreEntity> entityList = mapStringList.stream().map(mapString -> {
-            KvsStoreEntity entity = dbmeta.newKvsStoreEntity();
+        List<ENTITY> entityList = mapStringList.stream().map(mapString -> {
+            @SuppressWarnings("unchecked")
+            ENTITY entity = (ENTITY) dbmeta.newKvsStoreEntity();
             dbmeta.acceptAllColumnMap(entity, fromMapString(mapString));
             return entity;
         }).collect(Collectors.toList());
-        return (List<ENTITY>) entityList;
+        return entityList;
     }
 
     /**
      * Convert a list of String value to an Entity object.
      * @param value A list of String values (NotNull)
      * @param dbmeta DBMeta (NotNull)
-     * @param specifiedColumnDbNames specifiedColumnDbNames (NotNull)
      * @param <ENTITY> Entity class of DBFlute
      * @return An Entity object of DBFlute (NotNull)
      */
-    @SuppressWarnings("unchecked")
     public <ENTITY extends KvsStoreEntity> ENTITY toEntity(List<String> value, KvsStoreDBMeta dbmeta) {
-        KvsStoreEntity entity = dbmeta.newKvsStoreEntity();
+        @SuppressWarnings("unchecked")
+        ENTITY entity = (ENTITY) dbmeta.newKvsStoreEntity();
         List<String> list = DfCollectionUtil.newArrayList(dbmeta.extractAllColumnMap(entity).keySet());
-        Map<String, Object> columnValueMap = DfCollectionUtil.newHashMap();
-        IntStream.range(0, list.size()).forEach(index -> {
-            if (value.get(index) != null) {
-                columnValueMap.put(list.get(index), value.get(index));
-            }
-        });
-        if (!columnValueMap.isEmpty()) {
-            dbmeta.acceptAllColumnMap(entity, columnValueMap);
-            return (ENTITY) entity;
+        Map<String, Object> columnValueMap = IntStream.range(0, Math.min(list.size(), value.size()))
+                .filter(index -> value.get(index) != null)
+                .boxed()
+                .collect(Collectors.toMap(index -> list.get(index), index -> value.get(index)));
+
+        if (columnValueMap.isEmpty()) {
+            return null;
         }
-        return null;
+
+        dbmeta.acceptAllColumnMap(entity, columnValueMap);
+        return entity;
     }
 
     // ===================================================================================

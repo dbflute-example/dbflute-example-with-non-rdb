@@ -283,72 +283,78 @@ public class KvsCacheBusinessAssist {
             boolean kvsCacheAsyncReflectionEnabled) {
         logger.debug("tableName={}, specifiedColumnInfoSet={}", cb.asTableDbName(), specifiedColumnInfoSet);
         final String kvsKey = generateKeyForColumnNullObject(dbName, cb.asTableDbName(), searchKeyList);
+        final DBMeta dbmeta = cb.asDBMeta(); // Get metadata of the target table
         Set<String> specifiedPropertyNameSet =
                 specifiedColumnInfoSet.stream().map(columnInfo -> columnInfo.getPropertyName()).collect(Collectors.toSet());
+
+        // threadCached
         ENTITY cachedEntity = findEntityFromThreadCache(kvsKey);
         if (cachedEntity != null) {
-            logger.debug("hit threadCached. entity={}", cachedEntity);
+            logger.debug("hit entity in threadCached. entity={}", cachedEntity);
             Set<String> properties = myspecifiedAndModifiedProperties(cachedEntity);
             if (properties.containsAll(specifiedPropertyNameSet)) {
+                logger.debug("return entity in threadCached.");
                 return OptionalEntity.of(cachedEntity);
             }
+            logger.debug("don't enough entity in threadCached.");
+            specifiedPropertyNameSet.removeAll(properties);
+        } else {
+            logger.debug("don't hit entity in threadCached.");
         }
 
-        final DBMeta dbmeta = cb.asDBMeta(); // Get metadata of the target table
-        Set<String> specifiedColumnDbNames =
-                specifiedColumnInfoSet.stream().map(columnInfo -> columnInfo.getColumnDbName()).collect(Collectors.toSet());
-        if (cachedEntity != null) {
-            Set<String> properties = myspecifiedAndModifiedProperties(cachedEntity);
-            specifiedColumnDbNames.removeAll(
-                    properties.stream().map(property -> dbmeta.findColumnInfo(property).getColumnDbName()).collect(Collectors.toSet()));
-        }
-        final List<String> foundValue = kvsCacheManager.findHash(kvsKey, specifiedColumnDbNames);
-
-        if (foundValue != null) {
-            final ENTITY kvsEntity = kvsCacheConverterHandler.toEntity(foundValue, dbmeta, specifiedColumnDbNames);
+        // KVS
+        final List<String> value = kvsCacheManager.findHash(kvsKey,
+                specifiedPropertyNameSet.stream().map(name -> dbmeta.findColumnInfo(name).getColumnDbName()).collect(Collectors.toSet()));
+        if (value != null) {
+            logger.debug("hit value in KVS. value={}", value);
+            final ENTITY kvsEntity = kvsCacheConverterHandler.toEntity(value, dbmeta,
+                    specifiedPropertyNameSet.stream()
+                            .map(name -> dbmeta.findColumnInfo(name).getColumnDbName())
+                            .collect(Collectors.toSet()));
+            logger.debug("convert to entity. entity={}", kvsEntity);
             if (kvsEntity != null) {
-                logger.debug("hit kvs. entity={}", kvsEntity);
                 reflectEntity(kvsEntity, cachedEntity);
                 Set<String> properties = myspecifiedAndModifiedProperties(kvsEntity);
                 if (properties.containsAll(specifiedPropertyNameSet)) {
                     registerThreadCache(kvsKey, kvsEntity);
+                    logger.debug("return entity in KVS.");
                     return OptionalEntity.of(kvsEntity);
                 }
-                specifiedColumnDbNames.removeAll(kvsEntity.mymodifiedProperties()
-                        .stream()
-                        .map(specifiedProperty -> dbmeta.findColumnInfo(specifiedProperty).getColumnDbName())
-                        .collect(Collectors.toSet()));
+                logger.debug("don't enough entity in KVS.");
+                specifiedPropertyNameSet.removeAll(properties);
                 cachedEntity = kvsEntity;
+            } else {
+                logger.debug("don't enough entity in KVS.");
             }
+        } else {
+            logger.debug("don't hit entity in KVS.");
         }
 
-        final List<ColumnInfo> columnInfoList = DfCollectionUtil.newArrayList(specifiedColumnInfoSet);
-        if (cachedEntity != null) {
-            Set<String> properties = myspecifiedAndModifiedProperties(cachedEntity);
-            columnInfoList.removeAll(properties.stream().map(property -> dbmeta.findColumnInfo(property)).collect(Collectors.toSet()));
-        }
-
-        columnInfoList.forEach(columnInfo -> {
+        // DB
+        specifiedPropertyNameSet.forEach(name -> {
+            ColumnInfo columnInfo = dbmeta.findColumnInfo(name);
             if (columnInfo.canBeNullObject()) {
                 cb.invokeSpecifyColumn(columnInfo.getPropertyName());
             }
         });
         cb.disableColumnNullObject();
-
         final OptionalEntity<ENTITY> optEntity = selectEntity(selector, cb);
 
         ENTITY halfwayCachedEntity = cachedEntity;
         optEntity.ifPresent(entity -> {
+            logger.debug("hit entity in DB. entity={}", entity);
             reflectEntity(entity, halfwayCachedEntity);
             registerThreadCache(kvsKey, entity);
             Map<String, String> fieldValueMap = dbmeta.extractAllColumnMap(entity)
                     .entrySet()
                     .stream()
-                    .filter(entry -> columnInfoList.contains(dbmeta.findColumnInfo(entry.getKey())))
+                    .filter(entry -> specifiedPropertyNameSet.contains(dbmeta.findColumnInfo(entry.getKey()).getPropertyName()))
                     .collect(HashMap::new, (map, column) -> map.put(column.getKey(), DfTypeUtil.toString(column.getValue())), Map::putAll);
             reflectKvsCache(() -> {
                 kvsCacheManager.registerHash(kvsKey, fieldValueMap, expireDateTimeLambda.apply(entity));
             }, kvsCacheAsyncReflectionEnabled);
+        }).orElse(() -> {
+            logger.debug("don't hit entity in DB.");
         });
 
         return optEntity;
@@ -372,39 +378,53 @@ public class KvsCacheBusinessAssist {
             DBMeta dbmeta, BiConsumer<ConditionBean, List<List<Object>>> cbLamda, Long ttl, Set<ColumnInfo> specifiedColumnInfoSet) {
         Set<String> specifiedPropertyNameSet =
                 specifiedColumnInfoSet.stream().map(columnInfo -> columnInfo.getPropertyName()).collect(Collectors.toSet());
+
+        // threadCached
         List<List<Object>> noCachedSearchKeyListList = searchKeyListList.stream().filter(searchKeyList -> {
             String kvsKey = generateKeyForColumnNullObject(dbName, dbmeta.getTableDbName(), searchKeyList);
-            final ENTITY threadCachedEntity = findEntityFromThreadCache(kvsKey);
-            return threadCachedEntity == null || !threadCachedEntity.myspecifiedProperties().containsAll(specifiedPropertyNameSet);
-        }).map(searchKeyList -> searchKeyList).collect(Collectors.toList());
+            final ENTITY cachedEntity = findEntityFromThreadCache(kvsKey);
+            return cachedEntity == null || !myspecifiedAndModifiedProperties(cachedEntity).containsAll(specifiedPropertyNameSet);
+        }).collect(Collectors.toList());
         if (noCachedSearchKeyListList.isEmpty()) {
+            logger.debug("hit all entity in threadCached.");
             return;
         }
+        logger.debug("don't hit entity in threadCached or don't enough entity in threadCached.");
 
-        Set<String> specifiedColumnDbNames =
-                specifiedColumnInfoSet.stream().map(columnInfo -> columnInfo.getColumnDbName()).collect(Collectors.toSet());
-        List<List<String>> found = kvsCacheManager.findMultiHash(noCachedSearchKeyListList.stream().map(searchKeyList -> {
+        // KVS
+        List<List<String>> value = kvsCacheManager.findMultiHash(noCachedSearchKeyListList.stream().map(searchKeyList -> {
             return generateKeyForColumnNullObject(dbName, dbmeta.getTableDbName(), searchKeyList);
         }).collect(Collectors.toList()), specifiedPropertyNameSet);
-        if (found != null && !found.isEmpty()) {
-            found.forEach(f -> {
+        if (value != null && !value.isEmpty()) {
+            logger.debug("hit value in KVS. value={}", value);
+            value.forEach(f -> {
                 if (f != null && !f.isEmpty()) {
+                    logger.debug("don't enough entity in KVS.");
                     return;
                 }
-                final Entity foundEntity = kvsCacheConverterHandler.toEntity(f, dbmeta, specifiedColumnDbNames);
-                if (foundEntity == null) {
+                Set<String> specifiedColumnDbNames =
+                        specifiedColumnInfoSet.stream().map(columnInfo -> columnInfo.getColumnDbName()).collect(Collectors.toSet());
+                final Entity kvsEntity = kvsCacheConverterHandler.toEntity(f, dbmeta, specifiedColumnDbNames);
+                logger.debug("convert to entity. entity={}", kvsEntity);
+                if (kvsEntity == null) {
+                    logger.debug("don't enough entity in KVS.");
                     return;
                 }
-                final List<Object> cachedSearchKeyList = DfCollectionUtil.newArrayList(dbmeta.extractPrimaryKeyMap(foundEntity).values());
+                final List<Object> cachedSearchKeyList = DfCollectionUtil.newArrayList(dbmeta.extractPrimaryKeyMap(kvsEntity).values());
                 noCachedSearchKeyListList.remove(cachedSearchKeyList);
                 String kvsKey = generateKeyForColumnNullObject(dbName, dbmeta.getTableDbName(), cachedSearchKeyList);
-                registerThreadCache(kvsKey, foundEntity);
+                registerThreadCache(kvsKey, kvsEntity);
+                logger.debug("enough entity in KVS.");
             });
             if (noCachedSearchKeyListList.isEmpty()) {
+                logger.debug("hit all entity in KVS.");
                 return;
             }
+        } else {
+            logger.debug("don't hit entity in KVS.");
         }
 
+        // DB
         BehaviorReadable readable = selector.byName(dbmeta.getTableDbName());
         ConditionBean cb = readable.newConditionBean();
         cbLamda.accept(cb, noCachedSearchKeyListList);

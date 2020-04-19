@@ -136,7 +136,7 @@ public interface KvsStoreManager {
      * @param key key (NotNull)
      * @param list list (NotNull)
      */
-    void registerList(String key, List<String> value);
+    void registerList(String key, List<String> list);
 
     /**
      * Register list for the specified key. (Specify expire date time.)
@@ -144,7 +144,7 @@ public interface KvsStoreManager {
      * @param list list (NotNull)
      * @param expireDateTime expire date time (NullAllowed: If it is null, it depends on the KVS server setting)
      */
-    void registerList(String key, List<String> value, LocalDateTime expireDateTime);
+    void registerList(String key, List<String> list, LocalDateTime expireDateTime);
 
     /**
      * Register a combination of the specified key and list.
@@ -167,7 +167,7 @@ public interface KvsStoreManager {
      * @param key key (NotNull)
      * @param hash hash (NotNull)
      */
-    void registerHash(String key, Map<String, String> fieldValueMap);
+    void registerHash(String key, Map<String, String> hash);
 
     /**
      * Register hash for the specified key. (Specify expire date time.)
@@ -175,7 +175,7 @@ public interface KvsStoreManager {
      * @param hash hash (NotNull)
      * @param expireDateTime expire date time (NullAllowed: If it is null, it depends on the KVS server setting)
      */
-    void registerHash(String key, Map<String, String> fieldValueMap, LocalDateTime expireDateTime);
+    void registerHash(String key, Map<String, String> hash, LocalDateTime expireDateTime);
 
     /**
      * If the specified field does not exist in the hash of the specified key, register the hash of the specified key.

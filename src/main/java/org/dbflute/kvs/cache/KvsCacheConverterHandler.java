@@ -76,51 +76,21 @@ public class KvsCacheConverterHandler {
      * @param <ENTITY> Entity class of DBFlute
      * @return An Entity object of DBFlute (NotNull)
      */
-    @SuppressWarnings("unchecked")
     public <ENTITY extends Entity> ENTITY toEntity(String mapString, DBMeta dbmeta) {
         Map<String, Object> columnValueMap = fromMapString(mapString);
 
         // Only if all columns of the table to which the result Entity belongs exist
         if (existsAllColumn(dbmeta, columnValueMap)) {
-            final Entity foundEntity = dbmeta.newEntity();
+            @SuppressWarnings("unchecked")
+            final ENTITY foundEntity = (ENTITY) dbmeta.newEntity();
             try {
                 dbmeta.acceptAllColumnMap(foundEntity, columnValueMap);
-                return (ENTITY) foundEntity;
+                return foundEntity;
             } catch (Exception e) {
                 logger.info("DDL changes. deserialize error. reload RDB.mapString={}, exceptionMessage={}", mapString, e.getMessage());
             }
         } else {
             logger.info("DDL changes. column added. reload RDB.mapString={}", mapString);
-        }
-        return null;
-    }
-
-    /**
-     * Convert a list of String value to an Entity object.
-     * @param value A list of String values (NotNull)
-     * @param dbmeta DBMeta (NotNull)
-     * @param specifiedColumnDbNames specifiedColumnDbNames (NotNull)
-     * @param <ENTITY> Entity class of DBFlute
-     * @return An Entity object of DBFlute (NotNull)
-     */
-    @SuppressWarnings("unchecked")
-    public <ENTITY extends Entity> ENTITY toEntity(List<String> value, DBMeta dbmeta, Set<String> specifiedColumnDbNames) {
-        Map<String, Object> columnValueMap = DfCollectionUtil.newHashMap();
-        List<String> specifiedList = DfCollectionUtil.newArrayList(specifiedColumnDbNames);
-        IntStream.range(0, specifiedList.size()).forEach(index -> {
-            if (value.get(index) != null) {
-                columnValueMap.put(specifiedList.get(index), value.get(index));
-            }
-        });
-        if (!columnValueMap.isEmpty()) {
-            final Entity foundEntity = dbmeta.newEntity();
-            try {
-                dbmeta.acceptAllColumnMap(foundEntity, columnValueMap);
-                return (ENTITY) foundEntity;
-            } catch (Exception e) {
-                logger.info("DDL changes. deserialize error. reload RDB.columnValueMap={}, exceptionMessage={}", columnValueMap,
-                        e.getMessage());
-            }
         }
         return null;
     }
@@ -149,9 +119,43 @@ public class KvsCacheConverterHandler {
         return Collections.emptyList();
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * Convert a list of String value to an Entity object.
+     * @param value A list of String values (NotNull)
+     * @param dbmeta DBMeta (NotNull)
+     * @param specifiedColumnDbNames specifiedColumnDbNames (NotNull)
+     * @param <ENTITY> Entity class of DBFlute
+     * @return An Entity object of DBFlute (NotNull)
+     */
+    public <ENTITY extends Entity> ENTITY toEntity(List<String> value, DBMeta dbmeta, Set<String> specifiedColumnDbNames) {
+        List<String> specifiedList = DfCollectionUtil.newArrayList(specifiedColumnDbNames);
+        Map<String, Object> columnValueMap = IntStream.range(0, Math.min(specifiedList.size(), value.size()))
+                .filter(index -> value.get(index) != null)
+                .boxed()
+                .collect(Collectors.toMap(index -> specifiedList.get(index), index -> value.get(index)));
+
+        if (columnValueMap.isEmpty()) {
+            return null;
+        }
+
+        @SuppressWarnings("unchecked")
+        final ENTITY foundEntity = (ENTITY) dbmeta.newEntity();
+        try {
+            dbmeta.acceptAllColumnMap(foundEntity, columnValueMap);
+            return foundEntity;
+        } catch (Exception e) {
+            logger.info("DDL changes. deserialize error. reload RDB.columnValueMap={}, exceptionMessage={}", columnValueMap,
+                    e.getMessage());
+            return null;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                        Small Helper
+    //                                                                        ============
     protected <ENTITY extends Entity> boolean matchesAll(List<String> mapStringList, DBMeta dbmeta, List<ENTITY> foundList, String value) {
-        final Entity foundEntity = dbmeta.newEntity();
+        @SuppressWarnings("unchecked")
+        final ENTITY foundEntity = (ENTITY) dbmeta.newEntity();
         try {
             dbmeta.acceptAllColumnMap(foundEntity, fromMapString(value));
         } catch (RuntimeException e) {
@@ -159,7 +163,7 @@ public class KvsCacheConverterHandler {
             logger.info("DDL changes. deserialize error. reload RDB.mapStringList={}, exceptionMessage={}", mapStringList, e.getMessage());
             return false;
         }
-        foundList.add((ENTITY) foundEntity);
+        foundList.add(foundEntity);
         return true;
     }
 
