@@ -6,7 +6,25 @@ This plugin generates classes for accessing to KVS(Redis).
 
 [about KVSFlute](http://dbflute.seasar.org/ja/manual/function/helper/kvsflute/index.html)
 
-## Setup for use KVS
+## Supported KVS product
+
+- [Redis](https://redis.io/)
+
+## License
+
+Apache 2.0
+
+## INDEX
+
+[Setup for use KVS](#setup-for-use-kvs)
+
+[Setup for use KVS Store](#setup-for-use-kvs-store)
+
+[Setup for use KVS Cache](#setup-for-use-kvs-cache)
+
+[Setup for use CB-Embedded Cache](#setup-for-use-cb-embedded-cache)
+
+### Setup for use KVS
 
 - Add dependency on [jedis](https://github.com/xetorthio/jedis).
 
@@ -141,7 +159,9 @@ This plugin generates classes for accessing to KVS(Redis).
   sh manage.sh 12
   ```
 
-### Setup for KVS Store
+### Setup for use KVS Store
+
+- must 'Setup for use KVS'
 
 - Create `kvs-store-schema-{instanceName}.json` and define schema.
 
@@ -197,7 +217,37 @@ This plugin generates classes for accessing to KVS(Redis).
   sh manage.sh 12
   ```
 
-### Setup for KVS Cache
+- Usage example.
+
+  ```java
+  // Insert/Update
+  KvsEgStoreExample insertedEntity = kvsEgStoreExampleBhv.insertOrUpdate(() -> {
+      KvsEgStoreExample entity = new KvsEgStoreExample();
+      entity.setEgName(name);
+      entity.setEgDescription(description);
+      entity.setExpireDatetime(expireDatetime);
+      return entity;
+  });
+
+  String egkey = insertedEntity.getEgkey();
+
+  // Select (selectEntity)
+  OptionalEntity<KvsEgStoreExample> result = kvsEgStoreExampleBhv.selectEntity(cb -> {
+      cb.acceptPK(egkey);
+  });
+
+  // Delete
+  kvsEgStoreExampleBhv.delete(() -> {
+      KvsEgStoreExample entity = new KvsEgStoreExample();
+      entity.setEgkey(egkey);
+      return entity;
+  });
+  ```
+
+### Setup for use KVS Cache
+
+- must 'Setup for use KVS'
+
 - Create `kvs-cache-schema-{dbfluteClientName}.json` and define schema.
 
   Create schema.json per schema.
@@ -265,9 +315,61 @@ This plugin generates classes for accessing to KVS(Redis).
   sh manage.sh 12
   ```
 
-### Setup for CB-Embedded Cache
+- Usage example.
 
-- Add configuration to `dfprop/littladjustment.dfprop`.
+  ```java
+  // Insert/Update
+  kvsProductBhv.insertOrUpdateByCategoryCode(() -> {
+      Product product = new Product();
+
+      // The column(s) registerd to "kvsKeys" must be set some value.
+      product.setProductCategoryCode(categoryCode);
+
+      product.setProductName(productName);
+      product.setProductHandleCode(productHandleCode);
+      product.setProductStatusCode_OnSaleProduction();
+      product.setRegularPrice(price);
+
+      return product;
+  });
+
+  // Select (selectList)
+  List<Product> productList = kvsProductBhv.selectListByCategoryCode(cb -> {
+      // Query condition must be set to the column(s) registerd to "kvsKeys."
+      cb.query().setProductCategoryCode_Equal(categoryCode);
+
+      cb.query().setProductStatusCode_Equal(statusCode);
+      cb.query().addOrderBy_RegisterDatetime_Desc();
+  });
+
+  // Delete
+  kvsProductBhv.deleteByProductId(() -> {
+      Product product = new Product();
+      // The column(s) registerd to "kvsKeys" must be set some value.
+      product.setProductCategoryCode(categoryCode);
+      return product;
+  });
+  ```
+
+### Setup for use CB-Embedded Cache
+
+- must 'Setup for use KVS'
+
+- must 'Setup for use KVS Cache'
+
+  If you do not use KVS Cache, create a dummy file at 'Setup for use KVS Cache'.
+
+  e.g. kvs_cache_schema_maihamadb.json
+
+  ```
+  {
+      "dummy": {
+          "$comment": "dummy",
+      }
+  }
+  ```
+
+- Add configuration to `dfprop/littleAdjustmentMap.dfprop`.
 
   ```
   ; columnNullObjectMap = map:{
@@ -293,85 +395,30 @@ This plugin generates classes for accessing to KVS(Redis).
   sh manage.sh 1
   ```
 
-## Usage example
+- initialize KvsCacheColumnNullObject.
 
-### KVS Store
+  e.g. org.docksidestage.mylasta.direction.sponsor.NonrdbCurtainBeforeHook
 
-```java
-// Insert/Update
-KvsEgStoreExample insertedEntity = kvsEgStoreExampleBhv.insertOrUpdate(() -> {
-    KvsEgStoreExample entity = new KvsEgStoreExample();
+  ```
+  public void hook(FwAssistantDirector assistantDirector) {
+      processDBFluteSystem();
+      processDBFluteCacheObject();
+  }
+    
+  protected void processDBFluteCacheObject() {
+      initializeColumnCache();
+  }
 
-    entity.setEgName(name);
-    entity.setEgDescription(description);
-    entity.setExpireDatetime(expireDatetime);
+  // #KvsCacheColumnNullObject initialize
+  protected void initializeColumnCache() {
+      Map<String, KvsCacheFacade> kvsCacheFacadeMap = DfCollectionUtil.newHashMap();
+      kvsCacheFacadeMap.put(DBCurrent.getInstance().projectName(), ContainerUtil.getComponent(MaihamadbKvsCacheFacade.class));
+      KvsCacheColumnNullObject.getInstance().init(kvsCacheFacadeMap);
 
-    return entity;
-});
+      ContainerUtil.searchComponents(KvsCacheFacade.class);
+  }
+  ```
 
-String egkey = insertedEntity.getEgkey();
+- Usage example.
 
-// Select (selectEntity)
-OptionalEntity<KvsEgStoreExample> result = kvsEgStoreExampleBhv.selectEntity(cb -> {
-    cb.acceptPK(egkey);
-});
-
-// Delete
-kvsEgStoreExampleBhv.delete(() -> {
-    KvsEgStoreExample entity = new KvsEgStoreExample();
-
-    entity.setEgkey(egkey);
-
-    return entity;
-});
-```
-
-### KVS Cache
-
-```java
-// Insert/Update
-kvsProductBhv.insertOrUpdateByCategoryCode(() -> {
-    Product product = new Product();
-
-    // The column(s) registerd to "kvsKeys" must be set some value.
-    product.setProductCategoryCode(categoryCode);
-
-    product.setProductName(productName);
-    product.setProductHandleCode(productHandleCode);
-    product.setProductStatusCode_OnSaleProduction();
-    product.setRegularPrice(price);
-
-    return product;
-});
-
-// Select (selectList)
-List<Product> productList = kvsProductBhv.selectListByCategoryCode(cb -> {
-    // Query condition must be set to the column(s) registerd to "kvsKeys."
-    cb.query().setProductCategoryCode_Equal(categoryCode);
-
-    cb.query().setProductStatusCode_Equal(statusCode);
-    cb.query().addOrderBy_RegisterDatetime_Desc();
-});
-
-// Delete
-kvsProductBhv.deleteByProductId(() -> {
-    Product product = new Product();
-
-    // The column(s) registerd to "kvsKeys" must be set some value.
-    product.setProductCategoryCode(categoryCode);
-
-    return product;
-});
-```
-
-### CB-Embedded Cache
-
-Applied column is cached when it is specified by `specify()` in DBFlute ConditionBean.
-
-## Supported KVS product
-
-- [Redis](https://redis.io/)
-
-## License
-
-Apache 2.0
+  Applied column is cached when it is specified by `specify()` in DBFlute ConditionBean.

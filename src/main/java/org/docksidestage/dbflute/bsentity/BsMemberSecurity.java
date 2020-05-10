@@ -21,11 +21,13 @@ import java.util.ArrayList;
 import org.dbflute.Entity;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.AbstractEntity;
+import org.dbflute.dbmeta.accessory.ColumnNullObjectable;
 import org.dbflute.dbmeta.accessory.DomainEntity;
 import org.dbflute.optional.OptionalEntity;
 import org.docksidestage.dbflute.allcommon.EntityDefinedCommonColumn;
 import org.docksidestage.dbflute.allcommon.DBMetaInstanceHandler;
 import org.docksidestage.dbflute.exentity.*;
+import org.dbflute.kvs.cache.*;
 
 /**
  * The entity of (会員セキュリティ情報)MEMBER_SECURITY as TABLE. <br>
@@ -84,7 +86,7 @@ import org.docksidestage.dbflute.exentity.*;
  * </pre>
  * @author DBFlute(AutoGenerator)
  */
-public abstract class BsMemberSecurity extends AbstractEntity implements DomainEntity, EntityDefinedCommonColumn {
+public abstract class BsMemberSecurity extends AbstractEntity implements DomainEntity, EntityDefinedCommonColumn, ColumnNullObjectable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -124,6 +126,9 @@ public abstract class BsMemberSecurity extends AbstractEntity implements DomainE
 
     /** VERSION_NO: {NotNull, BIGINT(19)} */
     protected Long _versionNo;
+
+    /** Is the handling of column null object enabled? */
+    protected boolean _columnNullObjectEnabled;
 
     // ===================================================================================
     //                                                                             DB Meta
@@ -176,6 +181,19 @@ public abstract class BsMemberSecurity extends AbstractEntity implements DomainE
     //                                                                   =================
     protected <ELEMENT> List<ELEMENT> newReferrerList() { // overriding to import
         return new ArrayList<ELEMENT>();
+    }
+
+    // ===================================================================================
+    //                                                                   Column NullObject
+    //                                                                   =================
+    /** {@inheritDoc} */
+    public void enableColumnNullObject() {
+        _columnNullObjectEnabled = true;
+    }
+
+    /** {@inheritDoc} */
+    public void disableColumnNullObject() {
+        _columnNullObjectEnabled = false;
     }
 
     // ===================================================================================
@@ -299,6 +317,8 @@ public abstract class BsMemberSecurity extends AbstractEntity implements DomainE
      */
     public String getReminderQuestion() {
         checkSpecifiedProperty("reminderQuestion");
+        if (_columnNullObjectEnabled && convertEmptyToNull(_reminderQuestion) == null)
+        { _reminderQuestion = KvsCacheColumnNullObject.getInstance().findColumn(this, "REMINDER_QUESTION", getMemberId()); }
         return convertEmptyToNull(_reminderQuestion);
     }
 
@@ -319,6 +339,8 @@ public abstract class BsMemberSecurity extends AbstractEntity implements DomainE
      */
     public String getReminderAnswer() {
         checkSpecifiedProperty("reminderAnswer");
+        if (_columnNullObjectEnabled && convertEmptyToNull(_reminderAnswer) == null)
+        { _reminderAnswer = KvsCacheColumnNullObject.getInstance().findColumn(this, "REMINDER_ANSWER", getMemberId()); }
         return convertEmptyToNull(_reminderAnswer);
     }
 
@@ -396,6 +418,8 @@ public abstract class BsMemberSecurity extends AbstractEntity implements DomainE
      */
     public java.time.LocalDateTime getUpdateDatetime() {
         checkSpecifiedProperty("updateDatetime");
+        if (_columnNullObjectEnabled && _updateDatetime == null)
+        { _updateDatetime = KvsCacheColumnNullObject.getInstance().findColumn(this, "UPDATE_DATETIME", getMemberId()); }
         return _updateDatetime;
     }
 

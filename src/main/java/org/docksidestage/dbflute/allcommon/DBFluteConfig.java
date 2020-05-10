@@ -80,8 +80,8 @@ public class DBFluteConfig {
     protected boolean _specifyColumnRequired = false;
     protected SpecifyColumnRequiredExceptDeterminer _specifyColumnRequiredExceptDeterminer;
     protected boolean _specifyColumnRequiredWarningOnly = false;
-    protected boolean _columnNullObjectAllowed = false;
-    protected boolean _columnNullObjectGearedToSpecify = false;
+    protected boolean _columnNullObjectAllowed = true;
+    protected boolean _columnNullObjectGearedToSpecify = true;
     protected boolean _datetimePrecisionTruncationOfCondition = false;
     protected boolean _disableSelectIndex;
     protected boolean _queryUpdateCountPreCheck = false;

@@ -80,7 +80,7 @@ public interface NonrdbEnv {
     /** The key of the configuration. e.g. http://localhost:8983/solr/example */
     String SOLR_EXAMPLE_URL = "solr.example.url";
 
-    /** The key of the configuration. e.g. true */
+    /** The key of the configuration. e.g. false */
     String KVS_MOCK = "kvs.mock";
 
     /** The key of the configuration. e.g. localhost */
@@ -316,7 +316,7 @@ public interface NonrdbEnv {
 
     /**
      * Get the value for the key 'kvs.mock'. <br>
-     * The value is, e.g. true <br>
+     * The value is, e.g. false <br>
      * comment: Whether to use mock for KVS
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      */
@@ -324,7 +324,7 @@ public interface NonrdbEnv {
 
     /**
      * Is the property for the key 'kvs.mock' true? <br>
-     * The value is, e.g. true <br>
+     * The value is, e.g. false <br>
      * comment: Whether to use mock for KVS
      * @return The determination, true or false. (if not found, exception but basically no way)
      */

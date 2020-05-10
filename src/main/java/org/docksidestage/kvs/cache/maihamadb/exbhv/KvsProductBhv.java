@@ -18,7 +18,7 @@ package org.docksidestage.kvs.cache.maihamadb.exbhv;
 import org.docksidestage.kvs.cache.maihamadb.bsbhv.KvsBsProductBhv;
 
 /**
- * The behavior of (Products)Product.
+ * The behavior of (Product)Product.
  * @author FreeGen
  */
 public class KvsProductBhv extends KvsBsProductBhv {

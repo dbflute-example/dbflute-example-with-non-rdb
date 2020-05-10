@@ -20,10 +20,12 @@ import java.util.ArrayList;
 
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.dbmeta.AbstractEntity;
+import org.dbflute.dbmeta.accessory.ColumnNullObjectable;
 import org.dbflute.dbmeta.accessory.DomainEntity;
 import org.docksidestage.dbflute.allcommon.DBMetaInstanceHandler;
 import org.docksidestage.dbflute.allcommon.CDef;
 import org.docksidestage.dbflute.exentity.*;
+import org.dbflute.kvs.cache.*;
 
 /**
  * The entity of (会員ステータス)MEMBER_STATUS as TABLE. <br>
@@ -73,7 +75,7 @@ import org.docksidestage.dbflute.exentity.*;
  * </pre>
  * @author DBFlute(AutoGenerator)
  */
-public abstract class BsMemberStatus extends AbstractEntity implements DomainEntity {
+public abstract class BsMemberStatus extends AbstractEntity implements DomainEntity, ColumnNullObjectable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -95,6 +97,9 @@ public abstract class BsMemberStatus extends AbstractEntity implements DomainEnt
 
     /** (表示順)DISPLAY_ORDER: {UQ, NotNull, INTEGER(10)} */
     protected Integer _displayOrder;
+
+    /** Is the handling of column null object enabled? */
+    protected boolean _columnNullObjectEnabled;
 
     // ===================================================================================
     //                                                                             DB Meta
@@ -287,6 +292,19 @@ public abstract class BsMemberStatus extends AbstractEntity implements DomainEnt
     }
 
     // ===================================================================================
+    //                                                                   Column NullObject
+    //                                                                   =================
+    /** {@inheritDoc} */
+    public void enableColumnNullObject() {
+        _columnNullObjectEnabled = true;
+    }
+
+    /** {@inheritDoc} */
+    public void disableColumnNullObject() {
+        _columnNullObjectEnabled = false;
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
@@ -406,6 +424,8 @@ public abstract class BsMemberStatus extends AbstractEntity implements DomainEnt
      */
     public String getDescription() {
         checkSpecifiedProperty("description");
+        if (_columnNullObjectEnabled && convertEmptyToNull(_description) == null)
+        { _description = KvsCacheColumnNullObject.getInstance().findColumn(this,  "DESCRIPTION", getMemberStatusCode()); }
         return convertEmptyToNull(_description);
     }
 

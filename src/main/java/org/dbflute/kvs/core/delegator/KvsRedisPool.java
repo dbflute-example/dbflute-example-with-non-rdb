@@ -56,10 +56,6 @@ public class KvsRedisPool implements Closeable {
         return jedis;
     }
 
-    public int getNumActive() {
-        return jedisPool.getNumActive();
-    }
-
     @Override
     public void close() {
         jedisPool.close();
@@ -87,5 +83,36 @@ public class KvsRedisPool implements Closeable {
 
     public void setTimeout(Integer timeout) {
         this.timeout = timeout;
+    }
+
+    // ===================================================================================
+    //                                                                      Pool Reference
+    //                                                                      ==============
+    public String getHost() {
+        return host;
+    };
+
+    public Integer getPort() {
+        return port;
+    };
+
+    public int getMaxTotal() {
+        return jedisPoolConfig.getMaxTotal();
+    }
+
+    public int getMinIdle() {
+        return jedisPoolConfig.getMinIdle();
+    }
+
+    public int getNumActive() {
+        return jedisPool.getNumActive();
+    }
+
+    public int getNumIdle() {
+        return jedisPool.getNumIdle();
+    }
+
+    public int getNumWaiters() {
+        return jedisPool.getNumWaiters();
     }
 }

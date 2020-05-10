@@ -42,6 +42,9 @@ public class SolrBsExampleCFQ extends AbstractSolrFilterQueryBean {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** Query Attribute for product_id (long) */
+    protected Map<String, String> productIdQueryMap = new LinkedHashMap<String, String>();
+
     /** Query Attribute for latest_purchase_date (tdate) */
     protected Map<String, String> latestPurchaseDateQueryMap = new LinkedHashMap<String, String>();
 
@@ -63,14 +66,14 @@ public class SolrBsExampleCFQ extends AbstractSolrFilterQueryBean {
     /** Query Attribute for product_status_code (string) */
     protected Map<String, String> productStatusCodeQueryMap = new LinkedHashMap<String, String>();
 
+    /** Query Attribute for regular_price (long) */
+    protected Map<String, String> regularPriceQueryMap = new LinkedHashMap<String, String>();
+
     /** Query Attribute for register_datetime (tdate) */
     protected Map<String, String> registerDatetimeQueryMap = new LinkedHashMap<String, String>();
 
     /** Query Attribute for register_user (string) */
     protected Map<String, String> registerUserQueryMap = new LinkedHashMap<String, String>();
-
-    /** Query Attribute for regular_price (long) */
-    protected Map<String, String> regularPriceQueryMap = new LinkedHashMap<String, String>();
 
     /** Query Attribute for update_datetime (tdate) */
     protected Map<String, String> updateDatetimeQueryMap = new LinkedHashMap<String, String>();
@@ -78,9 +81,98 @@ public class SolrBsExampleCFQ extends AbstractSolrFilterQueryBean {
     /** Query Attribute for update_user (string) */
     protected Map<String, String> updateUserQueryMap = new LinkedHashMap<String, String>();
 
+    /** Query Attribute for _version_ (long) */
+    protected Map<String, String> versionQueryMap = new LinkedHashMap<String, String>();
+
     // ===================================================================================
     //                                                                          Conditions
     //                                                                          ==========
+    // ===========================================================
+    // Query Setter for product_id (long)
+    //                                                  ==========
+    /**
+     * ExistsQuery( q=product_id:* )
+     */
+    public void setProductId_Exists() {
+        SolrQueryBuilder.assertNullQuery("product_id_Exists", this.productIdQueryMap.get("product_id_Exists"));
+        this.productIdQueryMap.put("product_id_Exists", SolrQueryBuilder.queryBuilderForExists("product_id"));
+    }
+
+    /**
+     * ExistsQuery( q=NOT product_id:* )
+     */
+    public void setProductId_NotExists() {
+        SolrQueryBuilder.assertNullQuery("product_id_NotExists", this.productIdQueryMap.get("product_id_NotExists"));
+        this.productIdQueryMap.put("product_id_NotExists", SolrQueryBuilder.wrapNotGroupQuery(SolrQueryBuilder.queryBuilderForExists("product_id"), false));
+    }
+
+    /**
+     * ExistsQuery( q=(query OR (NOT product_id:*)) )
+     */
+    public void addProductId_NotExists() {
+        String value = null;
+        if (!this.productIdQueryMap.isEmpty()) {
+            List<String> list = DfCollectionUtil.newArrayList(this.productIdQueryMap.values());
+            value = list.get(list.size() - 1);
+        }
+        SolrQueryBuilder.assertNotNullQuery("product_id", value);
+        this.productIdQueryMap.put("product_id", SolrQueryBuilder.wrapGroupQuery(SolrQueryBuilder.concatEachCondition(Arrays.asList(value, SolrQueryBuilder.wrapNotGroupQuery(SolrQueryBuilder.queryBuilderForExists("product_id"), true)), SolrQueryLogicalOperator.OR)));
+    }
+
+    public void setProductId_Equal(Long query) {
+        SolrQueryBuilder.assertNullQuery("product_id_Equal", this.productIdQueryMap.get("product_id_Equal"));
+        if (query != null) {
+            this.productIdQueryMap.put("product_id_Equal", SolrQueryBuilder.queryBuilderForEqual("product_id", query.toString()));
+        }
+    }
+
+    public void setProductId_NotEqual(Long query) {
+        SolrQueryBuilder.assertNullQuery("product_id_NotEqual", this.productIdQueryMap.get("product_id_NotEqual"));
+        if (query != null) {
+            this.productIdQueryMap.put("product_id_NotEqual", SolrQueryBuilder.wrapNotGroupQuery(SolrQueryBuilder.queryBuilderForEqual("product_id", query.toString()), false));
+        }
+    }
+
+    public void setProductId_InScope(Collection<Long> queryList) {
+        this.setProductId_InScope(queryList, SolrQueryLogicalOperator.OR);
+    }
+
+    public void setProductId_InScope(Collection<Long> queryList, SolrQueryLogicalOperator operator) {
+        SolrQueryBuilder.assertNullQuery("product_id_InScope", this.productIdQueryMap.get("product_id_InScope"));
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchList("product_id", queryList, operator);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.productIdQueryMap.put("product_id_InScope", convertedQuery);
+        }
+    }
+
+    public void setProductId_NotInScope(Collection<Long> queryList) {
+        SolrQueryBuilder.assertNullQuery("product_id_NotInScope", this.productIdQueryMap.get("product_id_NotInScope"));
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchList("product_id", queryList, SolrQueryLogicalOperator.NOT);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.productIdQueryMap.put("product_id_NotInScope", convertedQuery);
+        }
+    }
+
+    public void setProductId_RangeSearchFrom(Long from) {
+        if (from != null) {
+            setProductId_RangeSearch(from, null);
+        }
+    }
+
+    public void setProductId_RangeSearchTo(Long to) {
+        if (to != null) {
+            setProductId_RangeSearch(null, to);
+        }
+    }
+
+    public void setProductId_RangeSearch(Long from, Long to) {
+        SolrQueryBuilder.assertNullQuery("product_id_RangeSearch", this.productIdQueryMap.get("product_id_RangeSearch"));
+        String convertedQuery = SolrQueryBuilder.queryBuilderForRangeSearch("product_id", from, to);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.productIdQueryMap.put("product_id_RangeSearch", convertedQuery);
+        }
+    }
+
     // ===========================================================
     // Query Setter for latest_purchase_date (tdate)
     //                                                  ==========
@@ -801,6 +893,92 @@ public class SolrBsExampleCFQ extends AbstractSolrFilterQueryBean {
         }
     }
     // ===========================================================
+    // Query Setter for regular_price (long)
+    //                                                  ==========
+    /**
+     * ExistsQuery( q=regular_price:* )
+     */
+    public void setRegularPrice_Exists() {
+        SolrQueryBuilder.assertNullQuery("regular_price_Exists", this.regularPriceQueryMap.get("regular_price_Exists"));
+        this.regularPriceQueryMap.put("regular_price_Exists", SolrQueryBuilder.queryBuilderForExists("regular_price"));
+    }
+
+    /**
+     * ExistsQuery( q=NOT regular_price:* )
+     */
+    public void setRegularPrice_NotExists() {
+        SolrQueryBuilder.assertNullQuery("regular_price_NotExists", this.regularPriceQueryMap.get("regular_price_NotExists"));
+        this.regularPriceQueryMap.put("regular_price_NotExists", SolrQueryBuilder.wrapNotGroupQuery(SolrQueryBuilder.queryBuilderForExists("regular_price"), false));
+    }
+
+    /**
+     * ExistsQuery( q=(query OR (NOT regular_price:*)) )
+     */
+    public void addRegularPrice_NotExists() {
+        String value = null;
+        if (!this.regularPriceQueryMap.isEmpty()) {
+            List<String> list = DfCollectionUtil.newArrayList(this.regularPriceQueryMap.values());
+            value = list.get(list.size() - 1);
+        }
+        SolrQueryBuilder.assertNotNullQuery("regular_price", value);
+        this.regularPriceQueryMap.put("regular_price", SolrQueryBuilder.wrapGroupQuery(SolrQueryBuilder.concatEachCondition(Arrays.asList(value, SolrQueryBuilder.wrapNotGroupQuery(SolrQueryBuilder.queryBuilderForExists("regular_price"), true)), SolrQueryLogicalOperator.OR)));
+    }
+
+    public void setRegularPrice_Equal(Long query) {
+        SolrQueryBuilder.assertNullQuery("regular_price_Equal", this.regularPriceQueryMap.get("regular_price_Equal"));
+        if (query != null) {
+            this.regularPriceQueryMap.put("regular_price_Equal", SolrQueryBuilder.queryBuilderForEqual("regular_price", query.toString()));
+        }
+    }
+
+    public void setRegularPrice_NotEqual(Long query) {
+        SolrQueryBuilder.assertNullQuery("regular_price_NotEqual", this.regularPriceQueryMap.get("regular_price_NotEqual"));
+        if (query != null) {
+            this.regularPriceQueryMap.put("regular_price_NotEqual", SolrQueryBuilder.wrapNotGroupQuery(SolrQueryBuilder.queryBuilderForEqual("regular_price", query.toString()), false));
+        }
+    }
+
+    public void setRegularPrice_InScope(Collection<Long> queryList) {
+        this.setRegularPrice_InScope(queryList, SolrQueryLogicalOperator.OR);
+    }
+
+    public void setRegularPrice_InScope(Collection<Long> queryList, SolrQueryLogicalOperator operator) {
+        SolrQueryBuilder.assertNullQuery("regular_price_InScope", this.regularPriceQueryMap.get("regular_price_InScope"));
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchList("regular_price", queryList, operator);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.regularPriceQueryMap.put("regular_price_InScope", convertedQuery);
+        }
+    }
+
+    public void setRegularPrice_NotInScope(Collection<Long> queryList) {
+        SolrQueryBuilder.assertNullQuery("regular_price_NotInScope", this.regularPriceQueryMap.get("regular_price_NotInScope"));
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchList("regular_price", queryList, SolrQueryLogicalOperator.NOT);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.regularPriceQueryMap.put("regular_price_NotInScope", convertedQuery);
+        }
+    }
+
+    public void setRegularPrice_RangeSearchFrom(Long from) {
+        if (from != null) {
+            setRegularPrice_RangeSearch(from, null);
+        }
+    }
+
+    public void setRegularPrice_RangeSearchTo(Long to) {
+        if (to != null) {
+            setRegularPrice_RangeSearch(null, to);
+        }
+    }
+
+    public void setRegularPrice_RangeSearch(Long from, Long to) {
+        SolrQueryBuilder.assertNullQuery("regular_price_RangeSearch", this.regularPriceQueryMap.get("regular_price_RangeSearch"));
+        String convertedQuery = SolrQueryBuilder.queryBuilderForRangeSearch("regular_price", from, to);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.regularPriceQueryMap.put("regular_price_RangeSearch", convertedQuery);
+        }
+    }
+
+    // ===========================================================
     // Query Setter for register_datetime (tdate)
     //                                                  ==========
     /**
@@ -975,92 +1153,6 @@ public class SolrBsExampleCFQ extends AbstractSolrFilterQueryBean {
         }
     }
     // ===========================================================
-    // Query Setter for regular_price (long)
-    //                                                  ==========
-    /**
-     * ExistsQuery( q=regular_price:* )
-     */
-    public void setRegularPrice_Exists() {
-        SolrQueryBuilder.assertNullQuery("regular_price_Exists", this.regularPriceQueryMap.get("regular_price_Exists"));
-        this.regularPriceQueryMap.put("regular_price_Exists", SolrQueryBuilder.queryBuilderForExists("regular_price"));
-    }
-
-    /**
-     * ExistsQuery( q=NOT regular_price:* )
-     */
-    public void setRegularPrice_NotExists() {
-        SolrQueryBuilder.assertNullQuery("regular_price_NotExists", this.regularPriceQueryMap.get("regular_price_NotExists"));
-        this.regularPriceQueryMap.put("regular_price_NotExists", SolrQueryBuilder.wrapNotGroupQuery(SolrQueryBuilder.queryBuilderForExists("regular_price"), false));
-    }
-
-    /**
-     * ExistsQuery( q=(query OR (NOT regular_price:*)) )
-     */
-    public void addRegularPrice_NotExists() {
-        String value = null;
-        if (!this.regularPriceQueryMap.isEmpty()) {
-            List<String> list = DfCollectionUtil.newArrayList(this.regularPriceQueryMap.values());
-            value = list.get(list.size() - 1);
-        }
-        SolrQueryBuilder.assertNotNullQuery("regular_price", value);
-        this.regularPriceQueryMap.put("regular_price", SolrQueryBuilder.wrapGroupQuery(SolrQueryBuilder.concatEachCondition(Arrays.asList(value, SolrQueryBuilder.wrapNotGroupQuery(SolrQueryBuilder.queryBuilderForExists("regular_price"), true)), SolrQueryLogicalOperator.OR)));
-    }
-
-    public void setRegularPrice_Equal(Long query) {
-        SolrQueryBuilder.assertNullQuery("regular_price_Equal", this.regularPriceQueryMap.get("regular_price_Equal"));
-        if (query != null) {
-            this.regularPriceQueryMap.put("regular_price_Equal", SolrQueryBuilder.queryBuilderForEqual("regular_price", query.toString()));
-        }
-    }
-
-    public void setRegularPrice_NotEqual(Long query) {
-        SolrQueryBuilder.assertNullQuery("regular_price_NotEqual", this.regularPriceQueryMap.get("regular_price_NotEqual"));
-        if (query != null) {
-            this.regularPriceQueryMap.put("regular_price_NotEqual", SolrQueryBuilder.wrapNotGroupQuery(SolrQueryBuilder.queryBuilderForEqual("regular_price", query.toString()), false));
-        }
-    }
-
-    public void setRegularPrice_InScope(Collection<Long> queryList) {
-        this.setRegularPrice_InScope(queryList, SolrQueryLogicalOperator.OR);
-    }
-
-    public void setRegularPrice_InScope(Collection<Long> queryList, SolrQueryLogicalOperator operator) {
-        SolrQueryBuilder.assertNullQuery("regular_price_InScope", this.regularPriceQueryMap.get("regular_price_InScope"));
-        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchList("regular_price", queryList, operator);
-        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
-            this.regularPriceQueryMap.put("regular_price_InScope", convertedQuery);
-        }
-    }
-
-    public void setRegularPrice_NotInScope(Collection<Long> queryList) {
-        SolrQueryBuilder.assertNullQuery("regular_price_NotInScope", this.regularPriceQueryMap.get("regular_price_NotInScope"));
-        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchList("regular_price", queryList, SolrQueryLogicalOperator.NOT);
-        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
-            this.regularPriceQueryMap.put("regular_price_NotInScope", convertedQuery);
-        }
-    }
-
-    public void setRegularPrice_RangeSearchFrom(Long from) {
-        if (from != null) {
-            setRegularPrice_RangeSearch(from, null);
-        }
-    }
-
-    public void setRegularPrice_RangeSearchTo(Long to) {
-        if (to != null) {
-            setRegularPrice_RangeSearch(null, to);
-        }
-    }
-
-    public void setRegularPrice_RangeSearch(Long from, Long to) {
-        SolrQueryBuilder.assertNullQuery("regular_price_RangeSearch", this.regularPriceQueryMap.get("regular_price_RangeSearch"));
-        String convertedQuery = SolrQueryBuilder.queryBuilderForRangeSearch("regular_price", from, to);
-        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
-            this.regularPriceQueryMap.put("regular_price_RangeSearch", convertedQuery);
-        }
-    }
-
-    // ===========================================================
     // Query Setter for update_datetime (tdate)
     //                                                  ==========
     /**
@@ -1234,6 +1326,92 @@ public class SolrBsExampleCFQ extends AbstractSolrFilterQueryBean {
             this.updateUserQueryMap.put("update_user_SetRangeSearchInScope", convertedQuery);
         }
     }
+    // ===========================================================
+    // Query Setter for _version_ (long)
+    //                                                  ==========
+    /**
+     * ExistsQuery( q=_version_:* )
+     */
+    public void setVersion_Exists() {
+        SolrQueryBuilder.assertNullQuery("_version__Exists", this.versionQueryMap.get("_version__Exists"));
+        this.versionQueryMap.put("_version__Exists", SolrQueryBuilder.queryBuilderForExists("_version_"));
+    }
+
+    /**
+     * ExistsQuery( q=NOT _version_:* )
+     */
+    public void setVersion_NotExists() {
+        SolrQueryBuilder.assertNullQuery("_version__NotExists", this.versionQueryMap.get("_version__NotExists"));
+        this.versionQueryMap.put("_version__NotExists", SolrQueryBuilder.wrapNotGroupQuery(SolrQueryBuilder.queryBuilderForExists("_version_"), false));
+    }
+
+    /**
+     * ExistsQuery( q=(query OR (NOT _version_:*)) )
+     */
+    public void addVersion_NotExists() {
+        String value = null;
+        if (!this.versionQueryMap.isEmpty()) {
+            List<String> list = DfCollectionUtil.newArrayList(this.versionQueryMap.values());
+            value = list.get(list.size() - 1);
+        }
+        SolrQueryBuilder.assertNotNullQuery("_version_", value);
+        this.versionQueryMap.put("_version_", SolrQueryBuilder.wrapGroupQuery(SolrQueryBuilder.concatEachCondition(Arrays.asList(value, SolrQueryBuilder.wrapNotGroupQuery(SolrQueryBuilder.queryBuilderForExists("_version_"), true)), SolrQueryLogicalOperator.OR)));
+    }
+
+    public void setVersion_Equal(Long query) {
+        SolrQueryBuilder.assertNullQuery("_version__Equal", this.versionQueryMap.get("_version__Equal"));
+        if (query != null) {
+            this.versionQueryMap.put("_version__Equal", SolrQueryBuilder.queryBuilderForEqual("_version_", query.toString()));
+        }
+    }
+
+    public void setVersion_NotEqual(Long query) {
+        SolrQueryBuilder.assertNullQuery("_version__NotEqual", this.versionQueryMap.get("_version__NotEqual"));
+        if (query != null) {
+            this.versionQueryMap.put("_version__NotEqual", SolrQueryBuilder.wrapNotGroupQuery(SolrQueryBuilder.queryBuilderForEqual("_version_", query.toString()), false));
+        }
+    }
+
+    public void setVersion_InScope(Collection<Long> queryList) {
+        this.setVersion_InScope(queryList, SolrQueryLogicalOperator.OR);
+    }
+
+    public void setVersion_InScope(Collection<Long> queryList, SolrQueryLogicalOperator operator) {
+        SolrQueryBuilder.assertNullQuery("_version__InScope", this.versionQueryMap.get("_version__InScope"));
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchList("_version_", queryList, operator);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.versionQueryMap.put("_version__InScope", convertedQuery);
+        }
+    }
+
+    public void setVersion_NotInScope(Collection<Long> queryList) {
+        SolrQueryBuilder.assertNullQuery("_version__NotInScope", this.versionQueryMap.get("_version__NotInScope"));
+        String convertedQuery = SolrQueryBuilder.queryBuilderForSearchList("_version_", queryList, SolrQueryLogicalOperator.NOT);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.versionQueryMap.put("_version__NotInScope", convertedQuery);
+        }
+    }
+
+    public void setVersion_RangeSearchFrom(Long from) {
+        if (from != null) {
+            setVersion_RangeSearch(from, null);
+        }
+    }
+
+    public void setVersion_RangeSearchTo(Long to) {
+        if (to != null) {
+            setVersion_RangeSearch(null, to);
+        }
+    }
+
+    public void setVersion_RangeSearch(Long from, Long to) {
+        SolrQueryBuilder.assertNullQuery("_version__RangeSearch", this.versionQueryMap.get("_version__RangeSearch"));
+        String convertedQuery = SolrQueryBuilder.queryBuilderForRangeSearch("_version_", from, to);
+        if (DfStringUtil.is_NotNull_and_NotEmpty(convertedQuery)) {
+            this.versionQueryMap.put("_version__RangeSearch", convertedQuery);
+        }
+    }
+
    /**
      * OR condition
      * @param orQueryLambda ConditionBean function for Solr for generating OR-combined condition (NotNull)
@@ -1263,6 +1441,7 @@ public class SolrBsExampleCFQ extends AbstractSolrFilterQueryBean {
         if (DfStringUtil.is_NotNull_and_NotEmpty(dismaxQuery)) {
             queryList.add(dismaxQuery);
         }
+        queryList.addAll(productIdQueryMap.values());
         queryList.addAll(latestPurchaseDateQueryMap.values());
         queryList.addAll(productCategoryQueryMap.values());
         queryList.addAll(productCategoryCodeQueryMap.values());
@@ -1270,11 +1449,12 @@ public class SolrBsExampleCFQ extends AbstractSolrFilterQueryBean {
         queryList.addAll(productNameQueryMap.values());
         queryList.addAll(productStatusQueryMap.values());
         queryList.addAll(productStatusCodeQueryMap.values());
+        queryList.addAll(regularPriceQueryMap.values());
         queryList.addAll(registerDatetimeQueryMap.values());
         queryList.addAll(registerUserQueryMap.values());
-        queryList.addAll(regularPriceQueryMap.values());
         queryList.addAll(updateDatetimeQueryMap.values());
         queryList.addAll(updateUserQueryMap.values());
+        queryList.addAll(versionQueryMap.values());
         List<String> nestQueryList = getNestQueryList();
         if (!nestQueryList.isEmpty()) {
             queryList.addAll(nestQueryList);

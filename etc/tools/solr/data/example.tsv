@@ -1,0 +1,3 @@
+product_id	latest_purchase_date	product_category	product_category_code	product_description	product_handle_code	product_name	product_status	product_status_code	regular_price	register_datetime	register_user	update_datetime	update_user
+1	2005-10-03T13:03:30.000Z	product_category	product_category_code	product_description	product_handle_code	product_name	product_status	product_status_code	1	2005-10-03T13:03:30.000Z	register_user	2005-10-03T13:03:30.000Z	update_user
+2	2005-10-03T13:03:30.000Z	product_category	product_category_code	product_description	product_handle_code	product_name	product_status	product_status_code	1	2005-10-03T13:03:30.000Z	register_user	2005-10-03T13:03:30.000Z	update_user

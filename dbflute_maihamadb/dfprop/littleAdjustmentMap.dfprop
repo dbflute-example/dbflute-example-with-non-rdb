@@ -164,6 +164,20 @@ map:{
     #        }
     #    }
     #}
+    ; columnNullObjectMap = map:{
+        ; providerPackage = org.dbflute.kvs.cache
+        ; isGearedToSpecify = true
+        ; columnMap = map:{
+            ; MEMBER_STATUS = map:{
+                ; DESCRIPTION = KvsCacheColumnNullObject.getInstance().findColumn(this,  "$$columnName$$", $$primaryKey$$)
+            }
+            ; MEMBER_SECURITY = map:{
+                ; REMINDER_ANSWER = KvsCacheColumnNullObject.getInstance().findColumn(this, "$$columnName$$", $$primaryKey$$)
+                ; REMINDER_QUESTION = KvsCacheColumnNullObject.getInstance().findColumn(this, "$$columnName$$", $$primaryKey$$)
+                ; UPDATE_DATETIME = KvsCacheColumnNullObject.getInstance().findColumn(this, "$$columnName$$", $$primaryKey$$)
+            }
+        }
+    }
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

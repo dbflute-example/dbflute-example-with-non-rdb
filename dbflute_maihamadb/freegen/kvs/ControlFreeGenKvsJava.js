@@ -152,6 +152,8 @@ function processCache(rule, request) {
     var kvsCacheFacadeImpl = new java.util.LinkedHashMap();
     kvsCacheFacadeImpl.package = request.package + '.' + tableMap.schema + '.facade';
     kvsCacheFacadeImpl.className = manager.initCap(tableMap.schema) + 'KvsCacheFacade';
+    kvsCacheFacadeImpl.dbflute = new java.util.LinkedHashMap();
+    kvsCacheFacadeImpl.dbflute.instance = tableMap.databaseMap[tableMap.schema].instance;
     generate('./kvs/cache/KvsCacheFacadeImpl.vm', request.generateDirPath + tableMap.schema + '/facade/' + kvsCacheFacadeImpl.className + '.java', kvsCacheFacadeImpl, true);
 
     var kvs = new java.util.LinkedHashMap();

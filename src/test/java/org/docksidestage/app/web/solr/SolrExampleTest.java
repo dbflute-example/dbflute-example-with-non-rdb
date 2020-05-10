@@ -53,7 +53,7 @@ public class SolrExampleTest extends UnitNonrdbTestCase {
     public void test_selectFacetQuery() {
         // ## Arrange ##
         // ## Act ##
-        SolrFacetResultBean result = solrExampleBhv.selectFacetQuery(cb -> {
+        SolrFacetResultBean<SolrExample> result = solrExampleBhv.selectFacetQuery(cb -> {
             cb.query().setProductName_Equal("foo");
             cb.addFacetQuery(qb -> qb.setLatestPurchaseDate_RangeSearchTo(toLocalDateTime("2015/12/31")));
             cb.addFacetQuery(qb -> qb.setLatestPurchaseDate_RangeSearch(toLocalDateTime("2016/1/1"), toLocalDateTime("2016/3/31")));

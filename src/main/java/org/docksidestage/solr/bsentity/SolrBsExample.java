@@ -31,6 +31,9 @@ public class SolrBsExample extends AbstractSolrEntity implements Serializable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** product_id (long) */
+    protected Long productId;
+
     /** latest_purchase_date (tdate) */
     protected java.time.LocalDateTime latestPurchaseDate;
 
@@ -55,20 +58,23 @@ public class SolrBsExample extends AbstractSolrEntity implements Serializable {
     /** product_status_code (string) */
     protected String productStatusCode;
 
+    /** regular_price (long) */
+    protected Long regularPrice;
+
     /** register_datetime (tdate) */
     protected java.time.LocalDateTime registerDatetime;
 
     /** register_user (string) */
     protected String registerUser;
 
-    /** regular_price (long) */
-    protected Long regularPrice;
-
     /** update_datetime (tdate) */
     protected java.time.LocalDateTime updateDatetime;
 
     /** update_user (string) */
     protected String updateUser;
+
+    /** _version_ (long) */
+    protected Long version;
 
     // ===================================================================================
     //                                                                        Solr DB Meta
@@ -81,6 +87,17 @@ public class SolrBsExample extends AbstractSolrEntity implements Serializable {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public Long getProductId() {
+        checkSpecifiedProperty("productId");
+        return productId;
+    }
+
+    @Field("product_id")
+    public void setProductId(Long value) {
+        registerModifiedProperty("productId");
+        productId = value;
+    }
+
     public java.time.LocalDateTime getLatestPurchaseDate() {
         checkSpecifiedProperty("latestPurchaseDate");
         return latestPurchaseDate;
@@ -174,6 +191,17 @@ public class SolrBsExample extends AbstractSolrEntity implements Serializable {
         productStatusCode = value;
     }
 
+    public Long getRegularPrice() {
+        checkSpecifiedProperty("regularPrice");
+        return regularPrice;
+    }
+
+    @Field("regular_price")
+    public void setRegularPrice(Long value) {
+        registerModifiedProperty("regularPrice");
+        regularPrice = value;
+    }
+
     public java.time.LocalDateTime getRegisterDatetime() {
         checkSpecifiedProperty("registerDatetime");
         return registerDatetime;
@@ -199,17 +227,6 @@ public class SolrBsExample extends AbstractSolrEntity implements Serializable {
     public void setRegisterUser(String value) {
         registerModifiedProperty("registerUser");
         registerUser = value;
-    }
-
-    public Long getRegularPrice() {
-        checkSpecifiedProperty("regularPrice");
-        return regularPrice;
-    }
-
-    @Field("regular_price")
-    public void setRegularPrice(Long value) {
-        registerModifiedProperty("regularPrice");
-        regularPrice = value;
     }
 
     public java.time.LocalDateTime getUpdateDatetime() {
@@ -239,6 +256,17 @@ public class SolrBsExample extends AbstractSolrEntity implements Serializable {
         updateUser = value;
     }
 
+    public Long getVersion() {
+        checkSpecifiedProperty("version");
+        return version;
+    }
+
+    @Field("_version_")
+    public void setVersion(Long value) {
+        registerModifiedProperty("version");
+        version = value;
+    }
+
     // ===================================================================================
     //                                                                            toString
     //                                                                            ========
@@ -246,6 +274,7 @@ public class SolrBsExample extends AbstractSolrEntity implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
+        sb.append("productId").append("=").append(productId).append(",");
         sb.append("latestPurchaseDate").append("=").append(latestPurchaseDate).append(",");
         sb.append("productCategory").append("=").append(productCategory).append(",");
         sb.append("productCategoryCode").append("=").append(productCategoryCode).append(",");
@@ -254,11 +283,12 @@ public class SolrBsExample extends AbstractSolrEntity implements Serializable {
         sb.append("productName").append("=").append(productName).append(",");
         sb.append("productStatus").append("=").append(productStatus).append(",");
         sb.append("productStatusCode").append("=").append(productStatusCode).append(",");
+        sb.append("regularPrice").append("=").append(regularPrice).append(",");
         sb.append("registerDatetime").append("=").append(registerDatetime).append(",");
         sb.append("registerUser").append("=").append(registerUser).append(",");
-        sb.append("regularPrice").append("=").append(regularPrice).append(",");
         sb.append("updateDatetime").append("=").append(updateDatetime).append(",");
         sb.append("updateUser").append("=").append(updateUser).append(",");
+        sb.append("version").append("=").append(version).append(",");
         sb.append("score").append("=").append(score);
         sb.append("]");
         return sb.toString();

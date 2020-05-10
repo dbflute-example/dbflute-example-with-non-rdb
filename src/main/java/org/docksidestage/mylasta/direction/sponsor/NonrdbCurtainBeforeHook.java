@@ -15,13 +15,20 @@
  */
 package org.docksidestage.mylasta.direction.sponsor;
 
+import java.util.Map;
 import java.util.TimeZone;
 
+import org.dbflute.kvs.cache.KvsCacheColumnNullObject;
+import org.dbflute.kvs.cache.facade.KvsCacheFacade;
 import org.dbflute.system.DBFluteSystem;
 import org.dbflute.system.provider.DfFinalTimeZoneProvider;
+import org.dbflute.util.DfCollectionUtil;
 import org.dbflute.util.DfTypeUtil;
+import org.docksidestage.dbflute.allcommon.DBCurrent;
+import org.docksidestage.kvs.cache.maihamadb.facade.MaihamadbKvsCacheFacade;
 import org.lastaflute.core.direction.CurtainBeforeHook;
 import org.lastaflute.core.direction.FwAssistantDirector;
+import org.lastaflute.core.util.ContainerUtil;
 
 /**
  * @author jflute
@@ -30,6 +37,7 @@ public class NonrdbCurtainBeforeHook implements CurtainBeforeHook {
 
     public void hook(FwAssistantDirector assistantDirector) {
         processDBFluteSystem();
+        processDBFluteCacheObject();
     }
 
     protected void processDBFluteSystem() {
@@ -51,5 +59,18 @@ public class NonrdbCurtainBeforeHook implements CurtainBeforeHook {
                 return DfTypeUtil.toClassTitle(this) + ":{" + provided.getID() + "}";
             }
         };
+    }
+
+    protected void processDBFluteCacheObject() {
+        initializeColumnCache();
+    }
+
+    // #KvsCacheColumnNullObject initialize
+    protected void initializeColumnCache() {
+        Map<String, KvsCacheFacade> kvsCacheFacadeMap = DfCollectionUtil.newHashMap();
+        kvsCacheFacadeMap.put(DBCurrent.getInstance().projectName(), ContainerUtil.getComponent(MaihamadbKvsCacheFacade.class));
+        KvsCacheColumnNullObject.getInstance().init(kvsCacheFacadeMap);
+
+        ContainerUtil.searchComponents(KvsCacheFacade.class);
     }
 }

@@ -32,6 +32,10 @@ public class SolrBsExampleIndex extends AbstractSolrIndexEntity implements Seria
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** product_id (long) */
+    @Field("product_id")
+    protected Long productId;
+
     /** latest_purchase_date (tdate) */
     @Field("latest_purchase_date")
     protected java.time.LocalDateTime latestPurchaseDate;
@@ -64,6 +68,10 @@ public class SolrBsExampleIndex extends AbstractSolrIndexEntity implements Seria
     @Field("product_status_code")
     protected String productStatusCode;
 
+    /** regular_price (long) */
+    @Field("regular_price")
+    protected Long regularPrice;
+
     /** register_datetime (tdate) */
     @Field("register_datetime")
     protected java.time.LocalDateTime registerDatetime;
@@ -71,10 +79,6 @@ public class SolrBsExampleIndex extends AbstractSolrIndexEntity implements Seria
     /** register_user (string) */
     @Field("register_user")
     protected String registerUser;
-
-    /** regular_price (long) */
-    @Field("regular_price")
-    protected Long regularPrice;
 
     /** update_datetime (tdate) */
     @Field("update_datetime")
@@ -84,10 +88,22 @@ public class SolrBsExampleIndex extends AbstractSolrIndexEntity implements Seria
     @Field("update_user")
     protected String updateUser;
 
+    /** _version_ (long) */
+    @Field("_version_")
+    protected Long version;
+
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public Long getProductId() {
+        return this.productId;
+    }
+
+    public void setProductId(Long value) {
+        this.productId = value;
+    }
+
     public java.time.LocalDateTime getLatestPurchaseDate() {
         return this.latestPurchaseDate;
     }
@@ -152,6 +168,14 @@ public class SolrBsExampleIndex extends AbstractSolrIndexEntity implements Seria
         this.productStatusCode = value;
     }
 
+    public Long getRegularPrice() {
+        return this.regularPrice;
+    }
+
+    public void setRegularPrice(Long value) {
+        this.regularPrice = value;
+    }
+
     public java.time.LocalDateTime getRegisterDatetime() {
         return this.registerDatetime;
     }
@@ -168,14 +192,6 @@ public class SolrBsExampleIndex extends AbstractSolrIndexEntity implements Seria
         this.registerUser = value;
     }
 
-    public Long getRegularPrice() {
-        return this.regularPrice;
-    }
-
-    public void setRegularPrice(Long value) {
-        this.regularPrice = value;
-    }
-
     public java.time.LocalDateTime getUpdateDatetime() {
         return this.updateDatetime;
     }
@@ -190,6 +206,14 @@ public class SolrBsExampleIndex extends AbstractSolrIndexEntity implements Seria
 
     public void setUpdateUser(String value) {
         this.updateUser = value;
+    }
+
+    public Long getVersion() {
+        return this.version;
+    }
+
+    public void setVersion(Long value) {
+        this.version = value;
     }
 
 }

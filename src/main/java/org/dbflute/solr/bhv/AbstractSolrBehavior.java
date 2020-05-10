@@ -16,14 +16,12 @@
 package org.dbflute.solr.bhv;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.http.client.HttpClient;
-import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -42,6 +40,7 @@ import org.dbflute.solr.entity.SolrEntity;
 import org.dbflute.solr.exception.SolrException;
 import org.dbflute.solr.result.SolrFacetResultBean;
 import org.dbflute.solr.result.SolrPagingResultBean;
+import org.dbflute.util.DfCollectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +51,6 @@ import org.slf4j.LoggerFactory;
  * @param <CB> The type of condition-bean handled by this behavior.
  * @author FreeGen
  */
-@SuppressWarnings("deprecation")
 public abstract class AbstractSolrBehavior<ENTITY extends SolrEntity, INDEX extends AbstractSolrIndexEntity, CB extends SolrConditionBean> {
 
     // ===================================================================================
@@ -314,13 +312,11 @@ public abstract class AbstractSolrBehavior<ENTITY extends SolrEntity, INDEX exte
      * @return HttpSolrClient (NotNull)
      */
     protected HttpSolrClient createHttpSolrClient(String url) {
-        HttpSolrClient client = new HttpSolrClient(url);
-        client.setConnectionTimeout(getConnectionTimeout());
-        client.setSoTimeout(getSocketTimeout());
-        client.setDefaultMaxConnectionsPerHost(getDefaultMaxConnectionsPerHost());
-        client.setMaxTotalConnections(getMaxTotalConnections());
-        client.setFollowRedirects(false);
-        return client;
+        HttpSolrClient.Builder builder = new HttpSolrClient.Builder(url);
+        builder.withHttpClient(createHttpClient());
+        builder.withConnectionTimeout(getConnectionTimeout());
+        builder.withSocketTimeout(getSocketTimeout());
+        return builder.build();
     }
 
     /**
@@ -329,7 +325,11 @@ public abstract class AbstractSolrBehavior<ENTITY extends SolrEntity, INDEX exte
      * @return CloudSolrClient (NotNull)
      */
     protected CloudSolrClient createCloudSolrClient(String host) {
-        CloudSolrClient client = new CloudSolrClient(host);
+        CloudSolrClient.Builder builder = new CloudSolrClient.Builder(DfCollectionUtil.newArrayList(host), Optional.empty());
+        builder.withHttpClient(createHttpClient());
+        builder.withConnectionTimeout(getConnectionTimeout());
+        builder.withSocketTimeout(getSocketTimeout());
+        CloudSolrClient client = builder.build();
         client.setZkConnectTimeout(getConnectionTimeout());
         return client;
     }
@@ -340,16 +340,13 @@ public abstract class AbstractSolrBehavior<ENTITY extends SolrEntity, INDEX exte
      * @return LBHttpSolrClient (NotNull)
      */
     protected LBHttpSolrClient createLBHttpSolrClient(List<String> urlList) {
-        LBHttpSolrClient client;
-        try {
-            client = new LBHttpSolrClient(urlList.toArray(new String[] {}));
-        } catch (MalformedURLException e) {
-            throw new SolrException("Failed to create Select Solr Client", e);
-        }
-        client.setConnectionTimeout(getConnectionTimeout());
-        client.setSoTimeout(getSocketTimeout());
+        LBHttpSolrClient.Builder builder = new LBHttpSolrClient.Builder();
+        builder.withBaseSolrUrls(urlList.toArray(new String[] {}));
+        builder.withHttpClient(createHttpClient());
+        builder.withConnectionTimeout(getConnectionTimeout());
+        builder.withSocketTimeout(getSocketTimeout());
+        LBHttpSolrClient client = builder.build();
         client.setAliveCheckInterval(getAliveCheckInterval());
-        adjustHttpClient(client.getHttpClient());
         return client;
     }
 
@@ -365,19 +362,6 @@ public abstract class AbstractSolrBehavior<ENTITY extends SolrEntity, INDEX exte
         builder.setConnectionManager(connectionManager);
         CloseableHttpClient httpClient = builder.build();
         return httpClient;
-    }
-
-    /**
-     * Adjust max total connections and default max connections per host of HTTP client
-     * @param httpClient HTTP client
-     */
-    protected void adjustHttpClient(HttpClient httpClient) {
-        ClientConnectionManager connectionManager = httpClient.getConnectionManager();
-        if (connectionManager instanceof PoolingClientConnectionManager) {
-            PoolingClientConnectionManager poolingClientConnectionManager = (PoolingClientConnectionManager) connectionManager;
-            poolingClientConnectionManager.setMaxTotal(getMaxTotalConnections());
-            poolingClientConnectionManager.setDefaultMaxPerRoute(getDefaultMaxConnectionsPerHost());
-        }
     }
 
     protected <RESULT> OptionalEntity<RESULT> createOptionalEntity(RESULT entity, Object... searchKey) {

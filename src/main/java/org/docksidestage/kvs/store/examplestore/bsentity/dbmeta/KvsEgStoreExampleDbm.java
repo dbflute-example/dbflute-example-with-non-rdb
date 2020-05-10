@@ -24,6 +24,7 @@ import org.dbflute.kvs.store.cbean.KvsStoreConditionBean;
 import org.dbflute.kvs.store.entity.KvsStoreEntity;
 import org.dbflute.kvs.store.entity.dbmeta.AbstractKvsStoreDBMeta;
 import org.dbflute.util.DfAssertUtil;
+import org.docksidestage.kvs.store.examplestore.bsentity.KvsEgBsStoreExample;
 import org.docksidestage.kvs.store.examplestore.cbean.KvsEgStoreExampleCB;
 import org.docksidestage.kvs.store.examplestore.exentity.KvsEgStoreExample;
 
@@ -77,7 +78,7 @@ public class KvsEgStoreExampleDbm extends AbstractKvsStoreDBMeta {
             return;
         }
 
-        KvsEgStoreExample storeExample = (KvsEgStoreExample) entity;
+        KvsEgBsStoreExample storeExample = (KvsEgBsStoreExample) entity;
         storeExample.setEgkey(toAnalyzedTypeValue(String.class, map.get("egkey")));
         storeExample.setEgId(toAnalyzedTypeValue(Integer.class, map.get("egId")));
         storeExample.setEgName(toAnalyzedTypeValue(String.class, map.get("egName")));

@@ -18,7 +18,7 @@ package org.docksidestage.kvs.cache.maihamadb.cbean.cq;
 import org.docksidestage.kvs.cache.maihamadb.cbean.cq.bs.KvsBsProductCQ;
 
 /**
- * The base condition-query of (Products)Product.
+ * The base condition-query of (Product)Product.
  * @author FreeGen
  */
 public class KvsProductCQ extends KvsBsProductCQ {

@@ -118,6 +118,10 @@ public class SolrBsExampleCB extends AbstractSolrConditionBean {
         // ===================================================================================
         //                                                                        SpricyColumn
         //                                                                        ============
+        public void fieldProductId() {
+            this.addSpecifyField(SolrExampleDbm.ProductId);
+        }
+
         public void fieldLatestPurchaseDate() {
             this.addSpecifyField(SolrExampleDbm.LatestPurchaseDate);
         }
@@ -150,6 +154,10 @@ public class SolrBsExampleCB extends AbstractSolrConditionBean {
             this.addSpecifyField(SolrExampleDbm.ProductStatusCode);
         }
 
+        public void fieldRegularPrice() {
+            this.addSpecifyField(SolrExampleDbm.RegularPrice);
+        }
+
         public void fieldRegisterDatetime() {
             this.addSpecifyField(SolrExampleDbm.RegisterDatetime);
         }
@@ -158,16 +166,16 @@ public class SolrBsExampleCB extends AbstractSolrConditionBean {
             this.addSpecifyField(SolrExampleDbm.RegisterUser);
         }
 
-        public void fieldRegularPrice() {
-            this.addSpecifyField(SolrExampleDbm.RegularPrice);
-        }
-
         public void fieldUpdateDatetime() {
             this.addSpecifyField(SolrExampleDbm.UpdateDatetime);
         }
 
         public void fieldUpdateUser() {
             this.addSpecifyField(SolrExampleDbm.UpdateUser);
+        }
+
+        public void fieldVersion() {
+            this.addSpecifyField(SolrExampleDbm.Version);
         }
     }
 }

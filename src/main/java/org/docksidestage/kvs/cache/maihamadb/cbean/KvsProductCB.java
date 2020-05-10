@@ -18,7 +18,7 @@ package org.docksidestage.kvs.cache.maihamadb.cbean;
 import org.docksidestage.kvs.cache.maihamadb.cbean.bs.KvsBsProductCB;
 
 /**
- * The condition-bean of (Products)Product.
+ * The condition-bean of (Product)Product.
  * @author FreeGen
  */
 public class KvsProductCB extends KvsBsProductCB {

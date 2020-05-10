@@ -80,6 +80,11 @@ public abstract class AbstractKvsStoreDBMeta implements KvsStoreDBMeta {
             T t = (T) DfTypeUtil.toLong(value);
             return t;
         }
+        if (targetClass.equals(Float.class)) {
+            @SuppressWarnings("unchecked")
+            T t = (T) DfTypeUtil.toFloat(value);
+            return t;
+        }
         if (targetClass.equals(BigDecimal.class)) {
             @SuppressWarnings("unchecked")
             T t = (T) DfTypeUtil.toBigDecimal(value);

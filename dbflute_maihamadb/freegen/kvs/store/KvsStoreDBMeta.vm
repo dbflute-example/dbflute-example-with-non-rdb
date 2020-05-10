@@ -29,6 +29,7 @@
 #set($added = $importList.add('org.dbflute.kvs.store.entity.KvsStoreEntity'))
 #set($added = $importList.add('org.dbflute.kvs.store.entity.dbmeta.AbstractKvsStoreDBMeta'))
 #set($added = $importList.add('org.dbflute.util.DfAssertUtil'))
+#set($added = $importList.add("${data.exEntity.bs.package}.${data.exEntity.bs.className}"))
 #set($added = $importList.add("${data.exEntity.package}.${data.exEntity.className}"))
 #if (!$data.kvs.suppressBehaviorGen)
 #set($added = $importList.add("${data.exConditionBean.package}.${data.exConditionBean.className}"))
@@ -89,7 +90,7 @@ public class ${data.className} extends AbstractKvsStoreDBMeta {
             return;
         }
 
-        ${data.exEntity.className} ${manager.initUncap($data.tableName)} = (${data.exEntity.className}) entity;
+        ${data.exEntity.bs.className} ${manager.initUncap($data.tableName)} = (${data.exEntity.bs.className}) entity;
 #foreach ($column in $data.columnList)
 #set ($javaNative = ${column.type})
 #if ($javaNative.matches('^java\.util\.(List|Map).*') && $javaNative.replaceAll('(java\.util\.(List|Map)|\<|\>|String|,| )', '').isEmpty())

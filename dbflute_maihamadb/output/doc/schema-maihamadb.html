@@ -1425,6 +1425,7 @@ pre.spolicyviodisp {
 		<th>ColumnComment</th>
 		<th>PropertyName</th>
 		<th>JavaType</th>
+		<th>NullObj</th>
 	</tr>
 	</thead>
 	<tbody id="member_security-body">
@@ -1445,6 +1446,7 @@ pre.spolicyviodisp {
 		<td class="commentcell"><pre>そのまま one-to-one を構成するためのFKとなる。</pre></td>
 		<td class="subcell">memberId</td>
 		<td class="subcell">Integer</td>
+		<td class="flgcell"> &nbsp;</td>
 	</tr>
 	<tr>
 		<td class="rownumcell">2</td>
@@ -1464,6 +1466,7 @@ pre.spolicyviodisp {
 本当は良くないが、Exampleなのでひとまず暗号化していない。</pre></td>
 		<td class="subcell">loginPassword</td>
 		<td class="subcell">String</td>
+		<td class="flgcell"> &nbsp;</td>
 	</tr>
 	<tr>
 		<td class="rownumcell">3</td>
@@ -1482,6 +1485,7 @@ pre.spolicyviodisp {
 		<td class="commentcell"><pre>パスワードを忘れた際のリマインダ機能における質問の内容。</pre></td>
 		<td class="subcell">reminderQuestion</td>
 		<td class="subcell">String</td>
+		<td class="flgcell">o</td>
 	</tr>
 	<tr>
 		<td class="rownumcell">4</td>
@@ -1500,6 +1504,7 @@ pre.spolicyviodisp {
 		<td class="commentcell"><pre>パスワードを忘れた際のリマインダ機能における質問の答え。</pre></td>
 		<td class="subcell">reminderAnswer</td>
 		<td class="subcell">String</td>
+		<td class="flgcell">o</td>
 	</tr>
 	<tr>
 		<td class="rownumcell">5</td>
@@ -1519,6 +1524,7 @@ pre.spolicyviodisp {
 これが多いと忘れっぽい会員と言えるが、そんなことを知ってもしょうがない。</pre></td>
 		<td class="subcell">reminderUseCount</td>
 		<td class="subcell">Integer</td>
+		<td class="flgcell"> &nbsp;</td>
 	</tr>
 	<tr>
 		<td class="rownumcell">6</td>
@@ -1537,6 +1543,7 @@ pre.spolicyviodisp {
 		<td class="commentcell"><pre>&nbsp;</pre></td>
 		<td class="subcell">registerDatetime</td>
 		<td class="subcell">LocalDateTime</td>
+		<td class="flgcell"> &nbsp;</td>
 	</tr>
 	<tr>
 		<td class="rownumcell">7</td>
@@ -1555,6 +1562,7 @@ pre.spolicyviodisp {
 		<td class="commentcell"><pre>&nbsp;</pre></td>
 		<td class="subcell">registerUser</td>
 		<td class="subcell">String</td>
+		<td class="flgcell"> &nbsp;</td>
 	</tr>
 	<tr>
 		<td class="rownumcell">8</td>
@@ -1573,6 +1581,7 @@ pre.spolicyviodisp {
 		<td class="commentcell"><pre>&nbsp;</pre></td>
 		<td class="subcell">updateDatetime</td>
 		<td class="subcell">LocalDateTime</td>
+		<td class="flgcell">o</td>
 	</tr>
 	<tr>
 		<td class="rownumcell">9</td>
@@ -1591,6 +1600,7 @@ pre.spolicyviodisp {
 		<td class="commentcell"><pre>&nbsp;</pre></td>
 		<td class="subcell">updateUser</td>
 		<td class="subcell">String</td>
+		<td class="flgcell"> &nbsp;</td>
 	</tr>
 	<tr>
 		<td class="rownumcell">10</td>
@@ -1609,6 +1619,7 @@ pre.spolicyviodisp {
 		<td class="commentcell"><pre>&nbsp;</pre></td>
 		<td class="subcell">versionNo</td>
 		<td class="subcell">Long</td>
+		<td class="flgcell"> &nbsp;</td>
 	</tr>
 	</tbody>
 </table>
@@ -1833,6 +1844,7 @@ pre.spolicyviodisp {
 		<th>ColumnComment</th>
 		<th>PropertyName</th>
 		<th>JavaType</th>
+		<th>NullObj</th>
 	</tr>
 	</thead>
 	<tbody id="member_status-body">
@@ -1854,6 +1866,7 @@ pre.spolicyviodisp {
 固定的なデータなので連番とか番号にはせず、データを直接見たときも人が直感的にわかるように、例えば "FML" とかの３桁のコード形式にしている。(3って何会員だっけ？とかの問答をやりたくないので)</pre></td>
 		<td class="subcell">memberStatusCode</td>
 		<td class="subcell">String</td>
+		<td class="flgcell"> &nbsp;</td>
 	</tr>
 	<tr>
 		<td class="rownumcell">2</td>
@@ -1873,6 +1886,7 @@ pre.spolicyviodisp {
 国際化対応するときはもっと色々考える必要があるかと...ということで英語名カラムがないので、そのまま区分値メソッド名の一部としても利用される。</pre></td>
 		<td class="subcell">memberStatusName</td>
 		<td class="subcell">String</td>
+		<td class="flgcell"> &nbsp;</td>
 	</tr>
 	<tr>
 		<td class="rownumcell">3</td>
@@ -1892,6 +1906,7 @@ pre.spolicyviodisp {
 区分値の一つ一つの要素に気の利いた説明があるとディベロッパーがとても助かるので絶対に欲しい。</pre></td>
 		<td class="subcell">description</td>
 		<td class="subcell">String</td>
+		<td class="flgcell">o</td>
 	</tr>
 	<tr>
 		<td class="rownumcell">4</td>
@@ -1911,6 +1926,7 @@ pre.spolicyviodisp {
 並べるときは、このカラムに対して昇順のソート条件にする。</pre></td>
 		<td class="subcell">displayOrder</td>
 		<td class="subcell">Integer</td>
+		<td class="flgcell"> &nbsp;</td>
 	</tr>
 	</tbody>
 </table>

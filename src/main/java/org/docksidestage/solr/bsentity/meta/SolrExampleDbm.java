@@ -26,6 +26,8 @@ public enum SolrExampleDbm implements SolrDBMeta {
     // ===================================================================================
     //                                                                       SolrFieldName
     //                                                                       =============
+    /** product_id */
+    ProductId("productId", "product_id"),
     /** latest_purchase_date */
     LatestPurchaseDate("latestPurchaseDate", "latest_purchase_date"),
     /** product_category */
@@ -42,16 +44,18 @@ public enum SolrExampleDbm implements SolrDBMeta {
     ProductStatus("productStatus", "product_status"),
     /** product_status_code */
     ProductStatusCode("productStatusCode", "product_status_code"),
+    /** regular_price */
+    RegularPrice("regularPrice", "regular_price"),
     /** register_datetime */
     RegisterDatetime("registerDatetime", "register_datetime"),
     /** register_user */
     RegisterUser("registerUser", "register_user"),
-    /** regular_price */
-    RegularPrice("regularPrice", "regular_price"),
     /** update_datetime */
     UpdateDatetime("updateDatetime", "update_datetime"),
     /** update_user */
     UpdateUser("updateUser", "update_user"),
+    /** _version_ */
+    Version("version", "_version_"),
 ;
 
     private final String _propertyName;
