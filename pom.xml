@@ -20,7 +20,7 @@
 		<lasta.remoteapi.version>0.4.2</lasta.remoteapi.version>
 
 		<!-- Library for Extension -->
-		<elasticsearch.version>6.1.1</elasticsearch.version>
+		<elasticsearch.version>6.8.17</elasticsearch.version>
 		<solrj.version>8.6.1</solrj.version>
 		<kvs.redis.version>3.3.0</kvs.redis.version>
 
