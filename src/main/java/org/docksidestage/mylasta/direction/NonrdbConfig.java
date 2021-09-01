@@ -15,7 +15,6 @@
  */
 package org.docksidestage.mylasta.direction;
 
-import org.docksidestage.mylasta.direction.NonrdbEnv;
 import org.lastaflute.core.direction.exception.ConfigPropertyNotFoundException;
 
 /**
@@ -203,7 +202,9 @@ public interface NonrdbConfig extends NonrdbEnv {
     /**
      * Get the value for the key 'kvs.examplekvs.maxWaitMillis'. <br>
      * The value is, e.g. -1 <br>
-     * comment: Max latency to get connection to kvs (milliseconds)
+     * comment: <br>
+     * Following configs will not be used if kvs.mock is true.<br>
+     * Max latency to get connection to kvs (milliseconds)
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      */
     String getKvsExamplekvsMaxWaitMillis();
@@ -211,7 +212,9 @@ public interface NonrdbConfig extends NonrdbEnv {
     /**
      * Get the value for the key 'kvs.examplekvs.maxWaitMillis' as {@link Integer}. <br>
      * The value is, e.g. -1 <br>
-     * comment: Max latency to get connection to kvs (milliseconds)
+     * comment: <br>
+     * Following configs will not be used if kvs.mock is true.<br>
+     * Max latency to get connection to kvs (milliseconds)
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      * @throws NumberFormatException When the property is not integer.
      */
@@ -336,7 +339,6 @@ public interface NonrdbConfig extends NonrdbEnv {
     /**
      * Get the value for the key 'kvs.cache.maihamadb.ttl'. <br>
      * The value is, e.g. 3600000 <br>
-     * comment: ---------------------
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      */
     String getKvsCacheMaihamadbTtl();
@@ -344,7 +346,6 @@ public interface NonrdbConfig extends NonrdbEnv {
     /**
      * Get the value for the key 'kvs.cache.maihamadb.ttl' as {@link Integer}. <br>
      * The value is, e.g. 3600000 <br>
-     * comment: ---------------------
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      * @throws NumberFormatException When the property is not integer.
      */

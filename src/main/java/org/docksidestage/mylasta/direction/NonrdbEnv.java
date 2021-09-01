@@ -171,7 +171,10 @@ public interface NonrdbEnv {
     /**
      * Get the value for the key 'time.adjust.time.millis'. <br>
      * The value is, e.g. 0 <br>
-     * comment: The milliseconds for (relative or absolute) adjust time (set only when test) @LongType *dynamic in development
+     * comment: <br>
+     * one day: 86400000, three days: 259200000, five days: 432000000, one week: 604800000, one year: 31556926000<br>
+     * special script :: absolute mode: $(2014/07/10), relative mode: addDay(3).addMonth(4)<br>
+     * The milliseconds for (relative or absolute) adjust time (set only when test) @LongType *dynamic in development
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      */
     String getTimeAdjustTimeMillis();
@@ -179,7 +182,10 @@ public interface NonrdbEnv {
     /**
      * Get the value for the key 'time.adjust.time.millis' as {@link Long}. <br>
      * The value is, e.g. 0 <br>
-     * comment: The milliseconds for (relative or absolute) adjust time (set only when test) @LongType *dynamic in development
+     * comment: <br>
+     * one day: 86400000, three days: 259200000, five days: 432000000, one week: 604800000, one year: 31556926000<br>
+     * special script :: absolute mode: $(2014/07/10), relative mode: addDay(3).addMonth(4)<br>
+     * The milliseconds for (relative or absolute) adjust time (set only when test) @LongType *dynamic in development
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      * @throws NumberFormatException When the property is not long.
      */
@@ -309,7 +315,6 @@ public interface NonrdbEnv {
     /**
      * Get the value for the key 'solr.example.url'. <br>
      * The value is, e.g. http://localhost:8983/solr/example <br>
-     * comment: -------
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      */
     String getSolrExampleUrl();
@@ -317,7 +322,10 @@ public interface NonrdbEnv {
     /**
      * Get the value for the key 'kvs.mock'. <br>
      * The value is, e.g. false <br>
-     * comment: Whether to use mock for KVS
+     * comment: <br>
+     * KVS<br>
+     * -=-=-<br>
+     * Whether to use mock for KVS
      * @return The value of found property. (NotNull: if not found, exception but basically no way)
      */
     String getKvsMock();
@@ -325,7 +333,10 @@ public interface NonrdbEnv {
     /**
      * Is the property for the key 'kvs.mock' true? <br>
      * The value is, e.g. false <br>
-     * comment: Whether to use mock for KVS
+     * comment: <br>
+     * KVS<br>
+     * -=-=-<br>
+     * Whether to use mock for KVS
      * @return The determination, true or false. (if not found, exception but basically no way)
      */
     boolean isKvsMock();
