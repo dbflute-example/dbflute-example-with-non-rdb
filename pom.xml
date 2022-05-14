@@ -39,7 +39,7 @@
 
 		<!-- Testing -->
 		<junit.version>4.8.2</junit.version> <!-- is latest version without hamcrest -->
-		<utflute.version>0.9.3</utflute.version>
+		<utflute.version>0.9.5</utflute.version>
 		<es.cluster.runner.version>6.1.1.0</es.cluster.runner.version>
 	</properties>
 
