@@ -15,7 +15,7 @@
 	<properties>
 		<!-- Main Framework -->
 		<dbflute.version>1.2.5</dbflute.version>
-		<lastaflute.version>1.2.1</lastaflute.version>
+		<lastaflute.version>1.2.4</lastaflute.version>
 		<lasta.thymeleaf.version>0.4.2</lasta.thymeleaf.version>
 		<lasta.remoteapi.version>0.4.5</lasta.remoteapi.version>
 
