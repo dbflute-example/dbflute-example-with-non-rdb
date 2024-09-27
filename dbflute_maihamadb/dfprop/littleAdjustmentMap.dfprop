@@ -38,6 +38,7 @@ map:{
     # o isAvailableAddingCatalogToTableSqlName: (NotRequired - Default false)
     #   [true]
     #     Add catalog to table SQL name. (The table name on query is CATALOG.SCHEMA.TABLE)
+    #     This property works only when isAvailableAddingSchemaToTableSqlName is true.
     #
     #; isAvailableAddingCatalogToTableSqlName = false
     # - - - - - - - - - -/
@@ -45,7 +46,8 @@ map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isAvailableDatabaseDependency: (NotRequired - Default false)
     #   [true]
-    #     Generate the method that depends on the database. e.g. cb.lockWithRR() at DB2.
+    #     Generate the method that depends on the database.
+    #     For example: cb.lockWithRR() at DB2.
     #
     #; isAvailableDatabaseDependency = false
     # - - - - - - - - - -/
@@ -53,7 +55,8 @@ map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isAvailableDatabaseNativeJDBC: (NotRequired - Default false)
     #   [true]
-    #     Use classes of database native JDBC on generated classes to get best performances of DB access.
+    #     Use classes of database native JDBC on generated classes
+    #     to get best performances of DB access.
     #     Your project needs to refer to database native JDBC.
     #
     #; isAvailableDatabaseNativeJDBC = false
@@ -113,7 +116,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o extendedDBFluteInitializerClass: (NotRequired - Default null)
+    # o extendedDBFluteInitializerClass: (NotRequired - Default '')
     #  If you want to extend the embedded DBFlute initializer,
     #  specify the class name of your original initializer
     #  that extends the embedded one.
@@ -135,14 +138,16 @@ map:{
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o quoteTableNameList: (NotRequired - Default list:{})
-    #  The list of table DB names that need to be quoted. Specified tables is quoted on auto-generated SQL.
+    #  The list of table DB names that need to be quoted.
+    #  Specified tables is quoted on auto-generated SQL.
     #
     #; quoteTableNameList = list:{}
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o quoteColumnNameList: (NotRequired - Default list:{})
-    #  The list of column DB names that need to be quoted. Specified columns is quoted on auto-generated SQL.
+    #  The list of column DB names that need to be quoted.
+    #  Specified columns is quoted on auto-generated SQL.
     #
     #; quoteColumnNameList = list:{}
     # - - - - - - - - - -/
@@ -198,7 +203,7 @@ map:{
     #  The fetch size of JDBC parameter for cursor select.
     #  For example, specify Integer.MIN_VALUE to enable fetch of MySQL.
     #
-    ; cursorSelectFetchSize = Integer.MIN_VALUE
+    #; cursorSelectFetchSize = Integer.MIN_VALUE
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

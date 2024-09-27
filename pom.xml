@@ -15,9 +15,9 @@
 	<properties>
 		<!-- Main Framework -->
 		<dbflute.version>1.2.5</dbflute.version>
-		<lastaflute.version>1.2.1</lastaflute.version>
+		<lastaflute.version>1.2.4</lastaflute.version>
 		<lasta.thymeleaf.version>0.4.2</lasta.thymeleaf.version>
-		<lasta.remoteapi.version>0.4.5</lasta.remoteapi.version>
+		<lasta.remoteapi.version>0.4.7</lasta.remoteapi.version>
 
 		<!-- Library for Extension -->
 		<elasticsearch.version>6.1.1</elasticsearch.version>
@@ -25,9 +25,9 @@
 		<kvs.redis.version>3.3.0</kvs.redis.version>
 
 		<!-- Partner Library -->
-		<h2.jdbc.version>1.4.199</h2.jdbc.version>
-		<slf4j.version>1.7.12</slf4j.version>
-		<logback.version>1.2.3</logback.version>
+		<h2.jdbc.version>1.4.199</h2.jdbc.version> <!-- fitting to DBFlute Engien's H2 -->
+		<slf4j.version>1.7.36</slf4j.version>
+		<logback.version>1.2.11</logback.version>
 		<log4j2slf4j.version>2.7</log4j2slf4j.version>
 		<servlet.version>3.1.0</servlet.version>
 		<jsp.version>2.3.1</jsp.version>
@@ -35,11 +35,11 @@
 
 		<!-- GoodNeighbor Library -->
 		<commons.lang.version>3.8.1</commons.lang.version>
-		<commons.fileupload.version>1.4</commons.fileupload.version>
+		<commons.fileupload.version>1.5</commons.fileupload.version>
 
 		<!-- Testing -->
 		<junit.version>4.8.2</junit.version> <!-- is latest version without hamcrest -->
-		<utflute.version>0.9.3</utflute.version>
+		<utflute.version>0.9.5</utflute.version>
 		<es.cluster.runner.version>6.1.1.0</es.cluster.runner.version>
 	</properties>
 
@@ -278,6 +278,13 @@
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
 			<version>${kvs.redis.version}</version>
+		</dependency>
+		<!-- Cassandra -->
+		<!-- #for_now unused but to confirm classes used by c7a (2024/09/18) -->
+		<dependency>
+			<groupId>com.datastax.cassandra</groupId>
+			<artifactId>cassandra-driver-mapping</artifactId>
+			<version>3.11.5</version>
 		</dependency>
 
 		<!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
