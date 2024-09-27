@@ -230,6 +230,9 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
     }
 
     protected void doInsertOrUpdate(ENTITY entity, Consumer<InsertOrUpdateOption> op) {
+        // Casasandra's insert can work as insertOrUpdate so use it here
+        // https://docs.datastax.com/en/cql/dse-6.9/reference/cql-commands/insert.html
+        // { @quote Inserts an entire row or upserts data into an existing row }
         Insert insert = QueryBuilder.insertInto(entity.asTableDbName());
 
         handleCommonColumnOfInsertIfNeeds(entity);
@@ -254,6 +257,9 @@ public abstract class AbstractC7aBehaviorWritable<ENTITY extends C7aEntity, CB e
         ResultSet resultSet = execute(mapper -> mapper.getManager().getSession().execute(insert));
         Row one = resultSet.one();
         if (one != null && !one.getBool(0)) {
+            // #for_now basically no way, but keep for compatible of unexpected case by jflute
+            // https://docs.datastax.com/en/cql/dse-6.9/reference/cql-commands/insert.html
+            // { @quote: Returns no results unless IF NOT EXISTS is used. }
             throw new EntityAlreadyExistsException(one.toString(), new SQLException(one.toString()));
         }
     }
