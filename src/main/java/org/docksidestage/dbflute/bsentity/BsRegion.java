@@ -29,42 +29,6 @@ import org.docksidestage.dbflute.exentity.*;
  * The entity of (地域)REGION as TABLE. <br>
  * 主に会員の住所に対応する漠然とした地域。<br>
  * かなりざっくりした感じではある。唯一の業務的one-to-oneの親テーブルのケース。
- * <pre>
- * [primary-key]
- *     REGION_ID
- *
- * [column]
- *     REGION_ID, REGION_NAME
- *
- * [sequence]
- *     
- *
- * [identity]
- *     
- *
- * [version-no]
- *     
- *
- * [foreign table]
- *     
- *
- * [referrer table]
- *     MEMBER_ADDRESS
- *
- * [foreign property]
- *     
- *
- * [referrer property]
- *     memberAddressList
- *
- * [get/set template]
- * /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
- * Integer regionId = entity.getRegionId();
- * String regionName = entity.getRegionName();
- * entity.setRegionId(regionId);
- * entity.setRegionName(regionName);
- * = = = = = = = = = =/
- * </pre>
  * @author DBFlute(AutoGenerator)
  */
 public abstract class BsRegion extends AbstractEntity implements DomainEntity {
@@ -117,7 +81,7 @@ public abstract class BsRegion extends AbstractEntity implements DomainEntity {
      * @return The instance of classification definition (as ENUM type). (NullAllowed: when the column value is null)
      */
     public CDef.Region getRegionIdAsRegion() {
-        return CDef.Region.codeOf(getRegionId());
+        return CDef.Region.of(getRegionId()).orElse(null);
     }
 
     /**

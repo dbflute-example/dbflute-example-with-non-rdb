@@ -28,44 +28,6 @@ import org.docksidestage.dbflute.exentity.*;
 /**
  * The entity of (退会理由)WITHDRAWAL_REASON as TABLE. <br>
  * 会員に選ばせる定型的な退会理由のマスタ。そういえば、これ表示順カラムがないですねぇ...
- * <pre>
- * [primary-key]
- *     WITHDRAWAL_REASON_CODE
- *
- * [column]
- *     WITHDRAWAL_REASON_CODE, WITHDRAWAL_REASON_TEXT, DISPLAY_ORDER
- *
- * [sequence]
- *     
- *
- * [identity]
- *     
- *
- * [version-no]
- *     
- *
- * [foreign table]
- *     
- *
- * [referrer table]
- *     MEMBER_WITHDRAWAL
- *
- * [foreign property]
- *     
- *
- * [referrer property]
- *     memberWithdrawalList
- *
- * [get/set template]
- * /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
- * String withdrawalReasonCode = entity.getWithdrawalReasonCode();
- * String withdrawalReasonText = entity.getWithdrawalReasonText();
- * Integer displayOrder = entity.getDisplayOrder();
- * entity.setWithdrawalReasonCode(withdrawalReasonCode);
- * entity.setWithdrawalReasonText(withdrawalReasonText);
- * entity.setDisplayOrder(displayOrder);
- * = = = = = = = = = =/
- * </pre>
  * @author DBFlute(AutoGenerator)
  */
 public abstract class BsWithdrawalReason extends AbstractEntity implements DomainEntity {
@@ -132,7 +94,7 @@ public abstract class BsWithdrawalReason extends AbstractEntity implements Domai
      * @return The instance of classification definition (as ENUM type). (NullAllowed: when the column value is null)
      */
     public CDef.WithdrawalReason getWithdrawalReasonCodeAsWithdrawalReason() {
-        return CDef.WithdrawalReason.codeOf(getWithdrawalReasonCode());
+        return CDef.WithdrawalReason.of(getWithdrawalReasonCode()).orElse(null);
     }
 
     /**

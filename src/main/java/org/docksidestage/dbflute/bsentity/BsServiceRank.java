@@ -28,50 +28,6 @@ import org.docksidestage.dbflute.exentity.*;
 /**
  * The entity of (サービスランク)SERVICE_RANK as TABLE. <br>
  * 会員のサービスレベルを表現するランク。(ゴールドとかプラチナとか)
- * <pre>
- * [primary-key]
- *     SERVICE_RANK_CODE
- *
- * [column]
- *     SERVICE_RANK_CODE, SERVICE_RANK_NAME, SERVICE_POINT_INCIDENCE, NEW_ACCEPTABLE_FLG, DESCRIPTION, DISPLAY_ORDER
- *
- * [sequence]
- *     
- *
- * [identity]
- *     
- *
- * [version-no]
- *     
- *
- * [foreign table]
- *     
- *
- * [referrer table]
- *     MEMBER_SERVICE
- *
- * [foreign property]
- *     
- *
- * [referrer property]
- *     memberServiceList
- *
- * [get/set template]
- * /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
- * String serviceRankCode = entity.getServiceRankCode();
- * String serviceRankName = entity.getServiceRankName();
- * java.math.BigDecimal servicePointIncidence = entity.getServicePointIncidence();
- * Integer newAcceptableFlg = entity.getNewAcceptableFlg();
- * String description = entity.getDescription();
- * Integer displayOrder = entity.getDisplayOrder();
- * entity.setServiceRankCode(serviceRankCode);
- * entity.setServiceRankName(serviceRankName);
- * entity.setServicePointIncidence(servicePointIncidence);
- * entity.setNewAcceptableFlg(newAcceptableFlg);
- * entity.setDescription(description);
- * entity.setDisplayOrder(displayOrder);
- * = = = = = = = = = =/
- * </pre>
  * @author DBFlute(AutoGenerator)
  */
 public abstract class BsServiceRank extends AbstractEntity implements DomainEntity {
@@ -147,7 +103,7 @@ public abstract class BsServiceRank extends AbstractEntity implements DomainEnti
      * @return The instance of classification definition (as ENUM type). (NullAllowed: when the column value is null)
      */
     public CDef.ServiceRank getServiceRankCodeAsServiceRank() {
-        return CDef.ServiceRank.codeOf(getServiceRankCode());
+        return CDef.ServiceRank.of(getServiceRankCode()).orElse(null);
     }
 
     /**
@@ -168,7 +124,7 @@ public abstract class BsServiceRank extends AbstractEntity implements DomainEnti
      * @return The instance of classification definition (as ENUM type). (NullAllowed: when the column value is null)
      */
     public CDef.Flg getNewAcceptableFlgAsFlg() {
-        return CDef.Flg.codeOf(getNewAcceptableFlg());
+        return CDef.Flg.of(getNewAcceptableFlg()).orElse(null);
     }
 
     /**
@@ -188,7 +144,7 @@ public abstract class BsServiceRank extends AbstractEntity implements DomainEnti
      * @param determination The determination, true or false. (NullAllowed: if null, null value is set to the column)
      */
     public void setNewAcceptableFlgAsBoolean(Boolean determination) {
-        setNewAcceptableFlgAsFlg(CDef.Flg.codeOf(determination));
+        setNewAcceptableFlgAsFlg(CDef.Flg.of(determination).orElse(null));
     }
 
     // ===================================================================================
