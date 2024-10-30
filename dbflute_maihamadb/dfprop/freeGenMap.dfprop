@@ -55,6 +55,7 @@ map:{
             ; schema = examplestore
             ; schemaPrefix = Eg
             ; kvsPoolDiFile = kvs/di/kvs-pool-examplekvs.xml
+            ; ruleJsPath = ../src/main/resources/kvs/schema/examplestore/kvs_store_schema_examplestore_rule.js
         }
     }
     # ==========================================================================

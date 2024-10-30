@@ -274,7 +274,12 @@ function processStore(rule, request) {
     kvsStoreFacadeImpl.package = request.package + '.' + tableMap.schema + '.facade';
     kvsStoreFacadeImpl.className = manager.initCap(tableMap.schema) + 'KvsStoreFacade';
     kvsStoreFacadeImpl.extendsClass = tableMap.type === 'hash' ? 'org.dbflute.kvs.store.facade.AbstractKvsStoreHashFacade' : 'org.dbflute.kvs.store.facade.AbstractKvsStoreFacade';
-    generate('./kvs/store/KvsStoreFacadeImpl.vm', request.generateDirPath + tableMap.schema + '/facade/' + kvsStoreFacadeImpl.className + '.java', kvsStoreFacadeImpl, true);
+
+    // KvsStoreFacadeImpl can be extended class by option by jflute (2024/10/31)
+    // https://github.com/dbflute-example/dbflute-example-with-non-rdb/issues/17
+    var isFacadeImplExtendedClass = scriptEngine.invokeMethod(rule, 'isKvsStoreFacadeImplAsExtendedClass', request);
+    var facadeImplOverwritten = !isFacadeImplExtendedClass;
+    generate('./kvs/store/KvsStoreFacadeImpl.vm', request.generateDirPath + tableMap.schema + '/facade/' + kvsStoreFacadeImpl.className + '.java', kvsStoreFacadeImpl, facadeImplOverwritten);
 
     var kvs = new java.util.LinkedHashMap();
     kvs.schema = scriptEngine.invokeMethod(rule, 'schema', request);

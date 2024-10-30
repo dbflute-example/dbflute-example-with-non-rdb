@@ -73,6 +73,16 @@ var baseRule = {
     },
 
     /**
+     * Is the KvsStore facade implmentation treated as extended class? (generation gap) \
+     * If true, you can override abstract facade methods at your facade implementation.
+     * @param {Request} request - The object of FreeGen request defined at freeGenMap.dfprop. (NotNull)
+     * @return {boolean} true if exnteded class. (NotNull)
+     */
+    isKvsStoreFacadeImplAsExtendedClass: function(request) {
+        return false;
+    },
+
+    /**
      * Return delete target.
      * @param {Request} request - rquest. (NullAllowed)
      * @return {File} file. (NotNull)
