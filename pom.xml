@@ -15,9 +15,9 @@
 	<properties>
 		<!-- Main Framework -->
 		<dbflute.version>1.2.8</dbflute.version>
-		<lastaflute.version>1.2.4</lastaflute.version>
-		<lasta.thymeleaf.version>0.4.2</lasta.thymeleaf.version>
-		<lasta.remoteapi.version>0.4.7</lasta.remoteapi.version>
+		<lastaflute.version>1.2.7</lastaflute.version>
+		<lasta.thymeleaf.version>0.4.3</lasta.thymeleaf.version>
+		<lasta.remoteapi.version>0.5.1</lasta.remoteapi.version>
 
 		<!-- Library for Extension -->
 		<solrj.version>8.6.1</solrj.version>
@@ -26,11 +26,10 @@
 		<!-- Partner Library -->
 		<h2.jdbc.version>1.4.199</h2.jdbc.version> <!-- fitting to DBFlute Engien's H2 -->
 		<slf4j.version>1.7.36</slf4j.version>
-		<logback.version>1.2.11</logback.version>
-		<log4j2slf4j.version>2.7</log4j2slf4j.version>
+		<logback.version>1.2.13</logback.version>
 		<servlet.version>3.1.0</servlet.version>
 		<jsp.version>2.3.1</jsp.version>
-		<jetty.boot.version>0.5.1</jetty.boot.version>
+		<jetty.boot.version>0.5.4</jetty.boot.version>
 
 		<!-- GoodNeighbor Library -->
 		<commons.lang.version>3.8.1</commons.lang.version>
@@ -38,7 +37,7 @@
 
 		<!-- Testing -->
 		<junit.version>4.8.2</junit.version> <!-- is latest version without hamcrest -->
-		<utflute.version>0.9.5</utflute.version>
+		<utflute.version>0.9.8</utflute.version>
 	</properties>
 
 	<licenses>
@@ -300,11 +299,6 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>${logback.version}</version>
-		</dependency>
-		<dependency> <!-- for e.g. opensearch's logging -->
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-to-slf4j</artifactId>
-			<version>${log4j2slf4j.version}</version>
 		</dependency>
 		<!-- servlet -->
 		<dependency>
