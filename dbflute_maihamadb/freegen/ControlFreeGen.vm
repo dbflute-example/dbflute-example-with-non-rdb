@@ -1,5 +1,15 @@
 $manager.info("requestList: ${requestList.size()}")
-#parse("./c7a/ControlFreeGenC7aJava.vm")
+
+## _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+## #for_now emergently comment out C7aFlute generation process by jflute (2024/10/31)
+## java.lang.NoSuchMethodException: Can't unambiguously select between fixed arity signatures
+## [(java.lang.String, java.lang.String), (java.io.File, java.lang.String)]
+## of the method java.io.File.<init> for argument types [null, jdk.nashorn.internal.runtime.ConsString]
+##   at jdk.internal.dynalink.beans.OverloadedMethod.throwAmbiguousMethod(OverloadedMethod.java:225)
+##   at jdk.nashorn.internal.scripts.Script$Recompilation$4$21745AAAA$ControlFreeGenC7aJava.clean(./freegen/c7a/ControlFreeGenC7aJava.js:410)
+## _/_/_/_/_/_/_/_/_/_/
+## #parse("./c7a/ControlFreeGenC7aJava.vm")
+
 #parse("./kvs/ControlFreeGenKvsJava.vm")
 #parse("./solr/ControlFreeGenSolrJava.vm")
 #parse("./dbfluteOptional/ControlFreeGenDbfluteOptionalJava.vm")
