@@ -20,7 +20,6 @@
 		<lasta.remoteapi.version>0.4.7</lasta.remoteapi.version>
 
 		<!-- Library for Extension -->
-		<elasticsearch.version>6.1.1</elasticsearch.version>
 		<solrj.version>8.6.1</solrj.version>
 		<kvs.redis.version>3.3.0</kvs.redis.version>
 
@@ -40,7 +39,6 @@
 		<!-- Testing -->
 		<junit.version>4.8.2</junit.version> <!-- is latest version without hamcrest -->
 		<utflute.version>0.9.5</utflute.version>
-		<es.cluster.runner.version>6.1.1.0</es.cluster.runner.version>
 	</properties>
 
 	<licenses>
@@ -256,17 +254,6 @@
 		<!-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = -->
 		<!--                                                         Library for Extension -->
 		<!--                                                         = = = = = = = = = = = -->
-		<!-- elasticsearch -->
-		<dependency>
-			<groupId>org.elasticsearch</groupId>
-			<artifactId>elasticsearch</artifactId>
-			<version>${elasticsearch.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.elasticsearch.client</groupId>
-			<artifactId>transport</artifactId>
-			<version>${elasticsearch.version}</version>
-		</dependency>
 		<!-- Solr -->
 		<dependency>
 			<groupId>org.apache.solr</groupId>
@@ -314,7 +301,7 @@
 			<artifactId>logback-classic</artifactId>
 			<version>${logback.version}</version>
 		</dependency>
-		<dependency> <!-- for e.g. elasticsearch's logging -->
+		<dependency> <!-- for e.g. opensearch's logging -->
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-to-slf4j</artifactId>
 			<version>${log4j2slf4j.version}</version>
@@ -361,12 +348,6 @@
 			<groupId>org.dbflute.utflute</groupId>
 			<artifactId>utflute-lastaflute</artifactId>
 			<version>${utflute.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.codelibs</groupId>
-			<artifactId>elasticsearch-cluster-runner</artifactId>
-			<version>${es.cluster.runner.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

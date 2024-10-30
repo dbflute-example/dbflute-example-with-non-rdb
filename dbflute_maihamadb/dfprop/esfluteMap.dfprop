@@ -18,22 +18,27 @@
 # *The line that starts with '#' means comment-out.
 #
 map:{
-    # base package of generated classes
-    ; basePackage = org.docksidestage.esflute
+    #
+    # ESFlute example is here:
+    # https://github.com/lastaflute/lastaflute-example-waterfront
+    #
 
-    # base path to JSON resource, URL or relative path
-    ; basePath = ../src/main/resources/es/schema
+    ## base package of generated classes
+    #; basePackage = org.docksidestage.esflute
 
-    # settings for indexes
-    ; indexMap = map:{
-        ; maihama = map:{
-            ; package = maihama
-            ; esclientDiFile = es/di/es_client.xml
-            ; esfluteDiFile = es/di/es_maihama.xml
-        }
-    }
+    ## base path to JSON resource, URL or relative path
+    #; basePath = ../src/main/resources/es/schema
 
-    # version for elasticsearch's jar file (no version means latest)
-    ; elasticsearchVersion = 2.3.0
+    ## settings for indexes
+    #; indexMap = map:{
+    #    ; maihama = map:{
+    #        ; package = maihama
+    #        ; esclientDiFile = es/di/es_client.xml
+    #        ; esfluteDiFile = es/di/es_maihama.xml
+    #    }
+    #}
+
+    ## version for elasticsearch's jar file (no version means latest)
+    #; elasticsearchVersion = 2.3.0
 }
 # ----------------/
