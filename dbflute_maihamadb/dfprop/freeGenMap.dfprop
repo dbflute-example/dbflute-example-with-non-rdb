@@ -44,7 +44,7 @@ map:{
         ; resourceMap = map:{
             ; baseDir = ../src/main
             ; resourceType = JSON_SCHEMA
-            ; resourceFile = $$baseDir$$/resources/kvs/schema/kvs_store_schema_examplestore.json
+            ; resourceFile = $$baseDir$$/resources/kvs/schema/examplestore/kvs_store_schema_examplestore.json
         }
         ; outputMap = map:{
             ; outputDirectory = $$baseDir$$/java
